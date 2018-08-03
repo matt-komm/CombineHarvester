@@ -3,6 +3,10 @@ import sys
 import numpy
 import math
 import ROOT
+import random
+
+import scipy
+import scipy.interpolate
 
 # ROOT.gStyle.SetHistFillStyle(0)
 # ROOT.gStyle.SetLegoInnerR(Float_t rad = 0.5)
@@ -71,8 +75,8 @@ ROOT.gStyle.SetTitleSize(35, "XYZ")
 # ROOT.gStyle.SetTitleYSize(Float_t size = 0.02)
 ROOT.gStyle.SetTitleXOffset(1.2)
 #ROOT.gStyle.SetTitleYOffset(1.2)
-ROOT.gStyle.SetTitleOffset(1.45, "YZ") # Another way to set the Offset
-
+ROOT.gStyle.SetTitleOffset(1.45, "Y") # Another way to set the Offset
+ROOT.gStyle.SetTitleOffset(1.38, "Z")
 # For the axis labels:
 
 ROOT.gStyle.SetLabelColor(1, "XYZ")
@@ -176,6 +180,108 @@ massesDict = {
     2400:[0,200,400,600,800,1000,1200,1400]
 }
 
+def getTheoryXsecFct(filePath):
+    f = open(filePath)
+    llpvalues = []
+    xsecvalues = []
+    xsecvaluesUp = []
+    xsecvaluesDown = []
+    for l in f:
+        if len(l)==0:
+            continue
+        splitted = l.split(",")
+        if len(splitted)!=3:
+            print "cannot parse xsec line: ",l
+            continue
+        llpvalues.append(float(splitted[0]))
+        xsec = float(splitted[1])
+        xsecRelUnc = float(splitted[2])
+        xsecvalues.append(math.log(xsec))
+        xsecvaluesUp.append(math.log(xsec*(1+xsecRelUnc)))
+        xsecvaluesDown.append(math.log(xsec*(1-xsecRelUnc)))
+        
+    llpvalues = numpy.array(llpvalues,dtype=numpy.float32)
+    xsecvalues = numpy.array(xsecvalues,dtype=numpy.float32)
+    xsecvaluesUp = numpy.array(xsecvaluesUp,dtype=numpy.float32)
+    xsecvaluesDown = numpy.array(xsecvaluesDown,dtype=numpy.float32)
+    
+    tckXsec = scipy.interpolate.splrep(llpvalues,xsecvalues,s=1e-3)
+    tckXsecUp = scipy.interpolate.splrep(llpvalues,xsecvaluesUp,s=1e-3)
+    tckXsecDown = scipy.interpolate.splrep(llpvalues,xsecvaluesDown,s=1e-3)
+
+    def getValue(llpMass):
+        xsec = math.exp(scipy.interpolate.splev(llpMass,tckXsec))
+        xsecUp = math.exp(scipy.interpolate.splev(llpMass,tckXsecUp))
+        xsecDown = math.exp(scipy.interpolate.splev(llpMass,tckXsecDown))
+        return xsec,xsecUp,xsecDown
+    return getValue
+    
+    
+def interpolatedHist(limitFct,binningX,binningY):
+    newHist = ROOT.TH2F(
+        "interpolated"+str(random.random()),
+        "",
+        len(binningX)-1,
+        binningX,
+        len(binningY)-1,
+        binningY
+    )
+    for ibin in range(newHist.GetNbinsX()):
+        xval = newHist.GetXaxis().GetBinCenter(ibin+1)
+        for jbin in range(newHist.GetNbinsY()):
+            yval = newHist.GetYaxis().GetBinCenter(jbin+1)
+            if yval>=xval:
+                continue
+            newHist.SetBinContent(ibin+1,jbin+1,limitFct(xval,yval))
+    return newHist 
+
+def interpolatedLimitFct(result,kind="median"):
+    xvalues = []
+    yvalues = []
+    zvalues = []
+    for llpMass in sorted(result.keys()):
+        for lspMass in sorted(result[llpMass].keys()):
+            loglimit = math.log(result[llpMass][lspMass][kind])
+            xvalues.append(llpMass)
+            yvalues.append(llpMass-lspMass)
+            zvalues.append(loglimit)
+    xvalues = numpy.array(xvalues,dtype=numpy.float32)
+    yvalues = numpy.array(yvalues,dtype=numpy.float32)
+    zvalues = numpy.array(zvalues,dtype=numpy.float32)
+   
+    tck = scipy.interpolate.bisplrep(
+        xvalues,
+        yvalues,
+        zvalues,
+        kx=3,
+        ky=3,
+        s=1e-3
+    )
+    n = 0
+    meanDiff = 0.
+    meanDiff2 = 0.
+    maxDiff = 0.
+    for llpMass in sorted(result.keys()):
+        for lspMass in sorted(result[llpMass].keys()):
+            n+=1
+            limit = (result[llpMass][lspMass][kind])
+            limitSmooth = numpy.exp(scipy.interpolate.bisplev(
+                1.*llpMass,1.*(llpMass-lspMass),tck
+            ))
+            diff = 1-limitSmooth/limit
+            meanDiff += math.fabs(diff)
+            meanDiff2 += math.fabs(diff)**2
+            maxDiff = max(maxDiff, math.fabs(diff))
+    print "rel. interpolation difference mean: %5.3f+-%.3f (max: %5.3f)"%(meanDiff/n,math.sqrt(meanDiff2/n-(meanDiff/n)**2),maxDiff)
+    
+    def getValue(llpMass,lspMass):
+        return numpy.exp(scipy.interpolate.bisplev(
+            1.*llpMass,1.*(llpMass-lspMass),tck
+        ))
+    return getValue
+    
+    
+
 def parseCombineResult(filePath):
     rootFile = ROOT.TFile(filePath)
     limitTree = rootFile.Get("limit")
@@ -227,33 +333,64 @@ for ctau in results.keys():
     cv.SetRightMargin(0.195)
     cv.SetBottomMargin(0.14)
     cv.SetTopMargin(0.08)
+    cv.SetLogz(1)
     xmin = 600
     ymin = 0
     xmax = 2400
     ymax = 1600
-    print numpy.linspace(xmin-25,xmax+25,(xmax-xmin)/50+2)
+
     axis = ROOT.TH2F("axis",";m#lower[0.2]{#scale[0.8]{#tilde{g}}} (GeV); m#lower[0.2]{#scale[0.8]{#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.2]{#lower[0.6]{#scale[0.65]{1}}}}} (GeV)",
         (xmax-xmin)/50+1,numpy.linspace(xmin-25,xmax+25,(xmax-xmin)/50+2),
         (ymax-ymin)/50+1,numpy.linspace(ymin-25,ymax+25,(ymax-ymin)/50+2)
     )
+    axis.Fill(-1,-1)
     for xbin in range(axis.GetNbinsX()):
         value = xmin+xbin*(xmax-xmin)/50
         if xbin%4==0:
             axis.GetXaxis().SetBinLabel(xbin+1,"%.0f"%axis.GetXaxis().GetBinCenter(xbin+1))
-    for llpMass in sorted(results[ctau].keys()):
-        for lspMass in sorted(results[ctau][llpMass].keys()):
-            axis.Fill(llpMass,lspMass,results[ctau][llpMass][lspMass]["median"])
-    
-    axis.Draw("colz")
-    axis.GetZaxis().SetTitle("95% CL upper limit on #sigma (pb)")
+    axis.Draw("colz")    
+    axis.GetZaxis().SetTitle("95% CL upper limit on #sigma#lower[0.2]{#scale[0.8]{pp#rightarrow#tilde{g}#tilde{g}}} (pb)")
     axis.GetZaxis().Set(50,0.0005,0.5)
-    axis.GetZaxis().SetRangeUser(0.0005,0.5)
-    cv.SetLogz(1)
+    axis.GetZaxis().SetRangeUser(0.0008,0.15)
+    
     axis.GetXaxis().SetNoExponent(True)
     #axis.GetXaxis().LabelsOption("v")
     axis.GetYaxis().SetNoExponent(True)
     axis.GetXaxis().SetNdivisions(510)
     axis.GetYaxis().SetNdivisions(510)
+    
+    
+    
+    limitHist = ROOT.TH2F("limitHist",";m#lower[0.2]{#scale[0.8]{#tilde{g}}} (GeV); m#lower[0.2]{#scale[0.8]{#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.2]{#lower[0.6]{#scale[0.65]{1}}}}} (GeV)",
+        (xmax-xmin)/50+1,numpy.linspace(xmin-25,xmax+25,(xmax-xmin)/50+2),
+        (ymax-ymin)/50+1,numpy.linspace(ymin-25,ymax+25,(ymax-ymin)/50+2)
+    )
+    boxes = []
+    for llpMass in sorted(results[ctau].keys()):
+        for lspMass in sorted(results[ctau][llpMass].keys()):
+            limitHist.Fill(llpMass,lspMass,results[ctau][llpMass][lspMass]["median"])
+            box= ROOT.TBox(llpMass-27,lspMass-27,llpMass+27,lspMass+27)
+            box.SetLineColor(ROOT.kWhite)
+            box.SetLineWidth(2)
+            box.SetFillStyle(0)
+            boxes.append(box)
+    
+    limitFct = interpolatedLimitFct(
+        results[ctau],
+        kind="median"
+    )
+    
+    limitHistSmooth = interpolatedHist(
+        limitFct,
+        numpy.linspace(xmin-25,xmax+25,(xmax-xmin)/10),
+        numpy.linspace(ymin-25,ymax+25,(ymax-ymin)/10)
+    )
+    limitHistSmooth.Draw("colSame")
+    limitHist.Draw("colSame")
+    
+    for box in boxes:
+        box.Draw("L")
+    
     
     poly = ROOT.TPolyLine(3,
         numpy.array([600-25,1600+25,600-25],dtype=numpy.float32), 
@@ -262,6 +399,83 @@ for ctau in results.keys():
     poly.SetFillColor(ROOT.kGray)
     poly.SetFillStyle(3445)
     poly.Draw("F")
+    
+    
+    xsecFct = getTheoryXsecFct("theory_xsec.dat")
+    
+    
+    llpMassExpMedian = []
+    lspMassExpMedian = []
+    
+    llpMassExpUp = []
+    lspMassExpUp = []
+    
+    llpMassExpDown = []
+    lspMassExpDown = []
+    
+    for angle in numpy.linspace(0.0,math.pi/4,100):
+        foundDown = False
+        foundMedian = False
+        foundUp = False
+        for r in numpy.linspace(1000,2500,1000):
+            llpMass = r*math.cos(angle)
+            lspMass = r*math.sin(angle)
+            xsecTheo,xsecTheoUp,xsecTheoDown = xsecFct(llpMass)
+            xsecLimit = limitFct(llpMass,lspMass)
+            if not foundDown and xsecLimit>xsecTheoDown:
+                llpMassExpDown.append(llpMass)
+                lspMassExpDown.append(lspMass)
+                foundDown = True
+            if not foundMedian and xsecLimit>xsecTheo:
+                llpMassExpMedian.append(llpMass)
+                lspMassExpMedian.append(lspMass)
+                foundMedian = True
+            if not foundUp and xsecLimit>xsecTheoUp:
+                llpMassExpUp.append(llpMass)
+                lspMassExpUp.append(lspMass)
+                foundUp = True
+            if foundDown and foundMedian and foundUp:
+                break
+            
+    print llpMassExpMedian[0],lspMassExpMedian[0]
+    
+    llpMassExpMedian = numpy.array(llpMassExpMedian)
+    lspMassExpMedian = numpy.array(lspMassExpMedian)
+    
+    llpMassExpUp = numpy.array(llpMassExpUp)
+    lspMassExpUp = numpy.array(lspMassExpUp)
+    
+    llpMassExpDown = numpy.array(llpMassExpDown)
+    lspMassExpDown = numpy.array(lspMassExpDown)
+    
+    polyExpMedian = ROOT.TPolyLine(
+        len(llpMassExpMedian),
+        llpMassExpMedian,
+        lspMassExpMedian
+    )
+    polyExpMedian.SetLineColor(ROOT.kBlack)
+    polyExpMedian.SetLineWidth(2)
+    polyExpMedian.Draw("L")
+    
+    polyExpDown = ROOT.TPolyLine(
+        len(llpMassExpDown),
+        llpMassExpDown,
+        lspMassExpDown
+    )
+    polyExpDown.SetLineColor(ROOT.kBlack)
+    polyExpDown.SetLineWidth(2)
+    polyExpDown.SetLineStyle(2)
+    polyExpDown.Draw("L")
+    
+    polyExpUp = ROOT.TPolyLine(
+        len(llpMassExpUp),
+        llpMassExpUp,
+        lspMassExpUp
+    )
+    polyExpUp.SetLineColor(ROOT.kBlack)
+    polyExpUp.SetLineWidth(2)
+    polyExpUp.SetLineStyle(2)
+    polyExpUp.Draw("L")
     
     ROOT.gPad.RedrawAxis()
     
