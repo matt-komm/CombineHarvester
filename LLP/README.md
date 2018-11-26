@@ -3,11 +3,12 @@
 ## Step 1: Produce histograms
 
 * script ```driver.py``` defines what histograms to produce per category, systematic variation, lifetime, and llp/lsp mass pair
-* script ```produceHist``` generates the batch submission file
+* script ```produceHistJobs.py``` generates the SGE batch submission file
 
 ## Step2: Produce datacards and run combine
 
 * script ```produceDatacards.py``` produces a datacard lifetime and llp/lsp mass pair
+* a SGE batch submission file is created as well
 
 ## Step3: Collect results
 
