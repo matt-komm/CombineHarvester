@@ -203,9 +203,9 @@ for ctau in ctauValues:
     if not massesDict.has_key(ctau):
         massesDict[ctau] = {}
     for signalSample in [ctauSampleName,ctauSampleName+"_extra"]:
-        for llpMass in genweights[signalSample]:
-            for lspMass in genweights[signalSample][llpMass]:
-                if genweights[signalSample][llpMass][lspMass]<10:
+        for llpMass in genweights[signalSample].keys():
+            for lspMass in genweights[signalSample][llpMass].keys():
+                if genweights[signalSample][llpMass][lspMass]["sum"]<10:
                     continue
                 if int(llpMass)==int(lspMass):
                     continue
@@ -264,7 +264,7 @@ def interpolatedHist(limitFct,binningX,binningY):
         xval = newHist.GetXaxis().GetBinCenter(ibin+1)
         for jbin in range(newHist.GetNbinsY()):
             yval = newHist.GetYaxis().GetBinCenter(jbin+1)
-            if yval>=xval:
+            if (yval)>=xval:
                 continue
             newHist.SetBinContent(ibin+1,jbin+1,limitFct(xval,yval))
     return newHist 
@@ -277,7 +277,7 @@ def interpolatedLimitFct(result,kind="median"):
         for lspMass in sorted(result[llpMass].keys()):
             loglimit = math.log(result[llpMass][lspMass][kind])
             xvalues.append(int(llpMass))
-            yvalues.append(math.sqrt(int(llpMass)-int(lspMass)))
+            yvalues.append(math.sqrt(100+int(llpMass)-int(lspMass)))
             zvalues.append(loglimit)
     xvalues = numpy.array(xvalues,dtype=numpy.float32)
     yvalues = numpy.array(yvalues,dtype=numpy.float32)
@@ -295,7 +295,7 @@ def interpolatedLimitFct(result,kind="median"):
     def getValue(llpMass,lspMass):
         tckCopy = numpy.copy(tck)
         return numpy.exp(scipy.interpolate.bisplev(
-            1.*int(llpMass),1.*math.sqrt(int(llpMass)-int(lspMass)),tckCopy
+            1.*int(llpMass),1.*math.sqrt(100+int(llpMass)-int(lspMass)),tckCopy
         ))
         
     n = 0
@@ -414,8 +414,8 @@ for ctau in results.keys():
     cv.SetLogz(1)
     xmin = 600
     ymin = 0
-    xmax = 2800
-    ymax = 2800
+    xmax = 2600
+    ymax = 2600
 
     axis = ROOT.TH2F("axis"+ctau,";m#lower[0.2]{#scale[0.8]{#tilde{g}}} (GeV); m#lower[0.2]{#scale[0.8]{#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.2]{#lower[0.6]{#scale[0.65]{1}}}}} (GeV)",
         (xmax-xmin)/50+1,numpy.linspace(xmin-25,xmax+25,(xmax-xmin)/50+2),
@@ -428,7 +428,7 @@ for ctau in results.keys():
             axis.GetXaxis().SetBinLabel(xbin+1,"%.0f"%axis.GetXaxis().GetBinCenter(xbin+1))
     axis.Draw("colz")    
     axis.GetZaxis().SetTitle("95% CL expected limit #sigma#lower[0.2]{#scale[0.8]{pp#rightarrow#tilde{g}#tilde{g}}} (pb)")
-    axis.GetZaxis().SetRangeUser(0.0002,0.05)
+    axis.GetZaxis().SetRangeUser(0.0001,0.35)
     
     axis.GetXaxis().SetNoExponent(True)
     #axis.GetXaxis().LabelsOption("v")
@@ -452,11 +452,12 @@ for ctau in results.keys():
             box.SetLineWidth(2)
             box.SetFillStyle(0)
             '''
+            '''
             marker= ROOT.TMarker(int(llpMass),int(lspMass),20)
             marker.SetMarkerColor(ROOT.kWhite)
             marker.SetMarkerSize(1.4)
             boxes.append(marker)
-    
+            '''
     limitFct = interpolatedLimitFct(
         results[ctau],
         kind="median"
@@ -477,17 +478,18 @@ for ctau in results.keys():
         numpy.linspace(ymin-25,ymax+25,(ymax-ymin)/10)
     )
     
-    
-    limitHistSmooth.Draw("colSame")
-    #limitHist.Draw("colSame")
+    limitHistSmooth.GetZaxis().SetRangeUser(0.0001,0.35)
+    #limitHistSmooth.Draw("colSame")
+    limitHist.GetZaxis().SetRangeUser(0.0001,0.35)
+    limitHist.Draw("colSame")
     
     for box in boxes:
         box.Draw("L")
     
     
     poly = ROOT.TPolyLine(3,
-        numpy.array([600-25,2800+25,600-25],dtype=numpy.float32), 
-        numpy.array([600-25,2800+25,2800+25],dtype=numpy.float32),
+        numpy.array([600-25,2600+25,600-25],dtype=numpy.float32), 
+        numpy.array([600-25,2600+25,2600+25],dtype=numpy.float32),
     )
     poly.SetFillColor(ROOT.kGray)
     poly.SetFillStyle(3445)
@@ -510,7 +512,7 @@ for ctau in results.keys():
         foundDown = False
         foundMedian = False
         foundUp = False
-        for r in numpy.linspace(1500,3000,1000):
+        for r in numpy.linspace(500,3000,1250):
             llpMass = r*math.cos(angle)
             lspMass = r*math.sin(angle)
             if llpMass>(xmax) or lspMass>(ymax):
@@ -626,27 +628,74 @@ for ctau in results.keys():
     cv.Print("limits_ctau%s.pdf"%ctau)
     cv.Print("limits_ctau%s.png"%ctau)
     
-xvalues = numpy.linspace(-6,1,num=8)
+xvalues = numpy.logspace(-6,1,num=8)
+#xvalues = numpy.power(10,xvalues)
 yvaluesC = numpy.zeros(8)
 yvaluesU = numpy.zeros(8)
 
 for ctau in limitsU.keys():
-    yvaluesC[ctauValueMap[ctau]]=limitsC[ctau]
-    yvaluesU[ctauValueMap[ctau]]=limitsU[ctau]
+    yvaluesC[ctauValueMap[ctau]]=limitsC[ctau]*0.001
+    yvaluesU[ctauValueMap[ctau]]=limitsU[ctau]*0.001
     
-cv = ROOT.TCanvas("summary","",800,600)
-axis = ROOT.TH2F("axis","",50,-6.2,2.2,50,500,3000)
+    print ctau,limitsC[ctau],limitsU[ctau]
+    
+cv = ROOT.TCanvas("summary","",800,650)
+cv.SetGridx(True)
+cv.SetGridy(True)
+cv.SetLogx(1)
+cv.SetMargin(0.155,0.04,0.15,0.09)
+ROOT.gStyle.SetGridColor(ROOT.kBlack)
+ROOT.gStyle.SetGridStyle(2)
+ROOT.gStyle.SetGridWidth(1)
+axis = ROOT.TH2F("axis",";c#tau (m); 95% CL lower limit on m#lower[0.2]{#scale[0.8]{#tilde{g}}} (TeV)",50,10**-6.2,10**1.2,50,0.5,2.6)
 axis.Draw("AXIS")
 graphC = ROOT.TGraph(8,xvalues,yvaluesC)
-graphC.SetLineColor(ROOT.kMagenta+1)
+graphC.SetLineColor(ROOT.kOrange+7)
 graphC.SetLineWidth(3)
 graphC.SetLineStyle(2)
-graphC.Draw("L")
+graphC.SetMarkerStyle(20)
+graphC.SetMarkerSize(1.5)
+graphC.SetMarkerColor(ROOT.kOrange+7)
+graphC.Draw("PL")
 graphU = ROOT.TGraph(8,xvalues,yvaluesU)
-graphU.SetLineColor(ROOT.kViolet+1)
-graphU.SetLineWidth(3)
-graphU.SetLineStyle(2)
-graphU.Draw("L")
+graphU.SetLineColor(ROOT.kRed+1)
+graphU.SetLineWidth(2)
+graphU.SetLineStyle(1)
+graphU.SetMarkerStyle(20)
+graphU.SetMarkerSize(1.5)
+graphU.SetMarkerColor(ROOT.kRed+1)
+graphU.Draw("PL")
+
+pTextCMS = ROOT.TPaveText(cv.GetLeftMargin(),1-cv.GetTopMargin()+0.055,cv.GetLeftMargin(),1-cv.GetTopMargin()+0.055,"NDC")
+pTextCMS.AddText("CMS")
+pTextCMS.SetTextFont(63)
+pTextCMS.SetTextSize(32)
+pTextCMS.SetTextAlign(13)
+pTextCMS.Draw("Same")
+
+pTextPreliminary = ROOT.TPaveText(cv.GetLeftMargin()+0.09,1-cv.GetTopMargin()+0.055,cv.GetLeftMargin()+0.09,1-cv.GetTopMargin()+0.05,"NDC")
+pTextPreliminary.AddText("Preliminary")
+pTextPreliminary.SetTextFont(53)
+pTextPreliminary.SetTextSize(32)
+pTextPreliminary.SetTextAlign(13)
+pTextPreliminary.Draw("Same")
+
+pInfo = ROOT.TPaveText(1-cv.GetRightMargin(),1-cv.GetTopMargin()+0.06,1-cv.GetRightMargin(),1-cv.GetTopMargin()+0.06,"NDC")
+pInfo.AddText("p#kern[-0.6]{ }p#kern[-0.5]{ }#rightarrow#kern[-0.5]{ }#tilde{g}#kern[-0.6]{ }#tilde{g}, #tilde{g}#kern[-0.5]{ }#rightarrow#kern[-0.5]{ }q#kern[-0.6]{ }#bar{q}#kern[-0.6]{ }#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.2]{#lower[0.6]{#scale[0.65]{1}}}")
+pInfo.SetTextFont(43)
+pInfo.SetTextSize(32)
+pInfo.SetTextAlign(33)
+pInfo.Draw("Same")
+
+legend = ROOT.TLegend(1-cv.GetRightMargin()-0.03-0.45,cv.GetBottomMargin()+0.03+0.17,1-cv.GetRightMargin()-0.08,cv.GetBottomMargin()+0.05)
+legend.SetFillColor(ROOT.kWhite)
+legend.SetBorderSize(1)
+legend.SetTextFont(43)
+legend.SetTextSize(30)
+legend.AddEntry(graphU,"#kern[-0.5]{ }m#lower[0.2]{#scale[0.8]{#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.2]{#lower[0.6]{#scale[0.65]{1}}}}}#kern[-0.4]{ }=#kern[-0.5]{ }100#kern[-0.6]{ }GeV","PL")
+legend.AddEntry(graphC,"m#lower[0.2]{#scale[0.8]{#tilde{g}}}#kern[-0.5]{ }-#kern[-0.5]{ }m#lower[0.2]{#scale[0.8]{#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.2]{#lower[0.6]{#scale[0.65]{1}}}}}#kern[-0.4]{ }=#kern[-0.5]{ }100#kern[-0.6]{ }GeV","PL")
+legend.Draw("Same")
+
 cv.Print("summary.pdf")
 cv.Print("summary.png")
 

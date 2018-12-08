@@ -1,28 +1,27 @@
 import os
 import sys
 
-basePath = '/vols/build/cms/mkomm/LLP/CMSSW_8_1_0/src/hists_ex'
-
+basePath = '/vols/build/cms/mkomm/LLP/CMSSW_8_1_0/src/hists'
+'''
 htBins = [200,700,1300,10000]
 mhtBins = [300,600,10000]
 jetBins = [3,4,5,50]
+'''
 ctauValues = ["0p001","0p01","0p1","1","10","100","1000","10000"]
-systematics = ["nominal","jesUp","jesDown","jerUp","jerDown","unclEnUp","unclEnDown","puUp","puDown"]
+systematics = [ 
+    "nominal","jesUp","jesDown","jerUp","jerDown","unclEnUp","unclEnDown","puUp","puDown",
+    "wjetsScaleUp","wjetsScaleDown","ttbarScaleUp","ttbarScaleDown","stScaleUp","stScaleDown",
+    "znunuScaleUp","znunuScaleDown"
+]
 
 jobArrayCfg = []
 for ctau in ctauValues:
-    for jetBin in range(len(jetBins)-1):
-        for htBin in range(len(htBins)-1):
-            for mhtBin in range(len(mhtBins)-1):
-                for syst in systematics:
-                    jobArrayCfg.append([
-                        "-o %s"%basePath,
-                        "--jetBin %i"%jetBin,
-                        "--htBin %i"%htBin,
-                        "--mhtBin %i"%mhtBin,
-                        "--syst %s"%syst,
-                        "--ctau %s"%ctau
-                    ])
+    for syst in systematics:
+        jobArrayCfg.append([
+            "-o %s"%basePath,
+            "--syst %s"%syst,
+            "--ctau %s"%ctau
+        ])
             
 submitFile = open("runHist.sh","w")
 submitFile.write('''#!/bin/bash
