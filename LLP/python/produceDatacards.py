@@ -34,6 +34,7 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,systematics=[]):
     bbFactory.SetAddThreshold(0.1)
     #bbFactory.SetMergeThreshold(0.5)
     bbFactory.SetFixNorm(True)
+    #bbFactory.SetPoissonErrors(True)
     bbFactory.SetPattern("bb_$BIN_$PROCESS_bin_$#")
     #bbFactory.MergeBinErrors(cb.cp().backgrounds())
     bbFactory.AddBinByBin(cb.cp().backgrounds(), cb)
@@ -102,7 +103,7 @@ submitFile = open("runCombine.sh","w")
 submitFile.write('''#!/bin/bash
 #$ -cwd
 #$ -q hep.q
-#$ -l h_rt=00:20:00 
+#$ -l h_rt=01:30:00 
 #$ -t 1-'''+str(len(jobArrayCfg))+'''
 #$ -e '''+os.path.join(basePath,'log')+'''/log.$TASK_ID.err
 #$ -o '''+os.path.join(basePath,'log')+'''/log.$TASK_ID.out
@@ -127,7 +128,17 @@ echo ${JOBS[$SGE_TASK_ID]}
 cd ${JOBS[$SGE_TASK_ID]}
 #combine -M FitDiagnostics --plots --saveWithUncertainties -t -1 -d out.txt
 #combine -M MultiDimFit --saveFitResult -t -1 -d out.txt
-combine -M AsymptoticLimits --rAbsAcc 0.0000001 --saveToys -t -1 -d out.txt
+
+#for estimating LEE
+#(note: for some weirdness toys>1000 are failing)
+for i in 12 23 34 45 56 67 78 89 90 91 
+    do
+    combine -M Significance -t 1000 -s '12'$i'56'$i --maxTries 5 --expectSignal=0 -d out.txt
+    done
+
+#expected limits
+combine -M AsymptoticLimits --rAbsAcc 0.000001 --saveToys --cminDefaultMinimizerStrategy 0 --X-rtd MINIMIZER_MaxCalls=99999999999 -t -1 -d out.txt
+
 date
 ''')
 submitFile.close()

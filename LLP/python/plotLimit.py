@@ -452,12 +452,12 @@ for ctau in results.keys():
             box.SetLineWidth(2)
             box.SetFillStyle(0)
             '''
-            '''
+            
             marker= ROOT.TMarker(int(llpMass),int(lspMass),20)
             marker.SetMarkerColor(ROOT.kWhite)
             marker.SetMarkerSize(1.4)
             boxes.append(marker)
-            '''
+            
     limitFct = interpolatedLimitFct(
         results[ctau],
         kind="median"
@@ -479,7 +479,7 @@ for ctau in results.keys():
     )
     
     limitHistSmooth.GetZaxis().SetRangeUser(0.0001,0.35)
-    #limitHistSmooth.Draw("colSame")
+    limitHistSmooth.Draw("colSame")
     limitHist.GetZaxis().SetRangeUser(0.0001,0.35)
     limitHist.Draw("colSame")
     
@@ -512,7 +512,7 @@ for ctau in results.keys():
         foundDown = False
         foundMedian = False
         foundUp = False
-        for r in numpy.linspace(500,3000,1250):
+        for r in numpy.linspace(3000,600,1250):
             llpMass = r*math.cos(angle)
             lspMass = r*math.sin(angle)
             if llpMass>(xmax) or lspMass>(ymax):
@@ -521,15 +521,15 @@ for ctau in results.keys():
             xsecLimit = limitFct(llpMass,lspMass)
             xsecLimitUp = limitFctUp(llpMass,lspMass)
             xsecLimitDown = limitFctDown(llpMass,lspMass)
-            if not foundDown and xsecLimitDown>xsecTheo:
+            if not foundDown and xsecLimitDown<xsecTheo:
                 llpMassExpDown.append(llpMass)
                 lspMassExpDown.append(lspMass)
                 foundDown = True
-            if not foundMedian and xsecLimit>xsecTheo:
+            if not foundMedian and xsecLimit<xsecTheo:
                 llpMassExpMedian.append(llpMass)
                 lspMassExpMedian.append(lspMass)
                 foundMedian = True
-            if not foundUp and xsecLimitUp>xsecTheo:
+            if not foundUp and xsecLimitUp<xsecTheo:
                 llpMassExpUp.append(llpMass)
                 lspMassExpUp.append(lspMass)
                 foundUp = True
@@ -538,7 +538,7 @@ for ctau in results.keys():
                 
     foundC=False
     foundU=False
-    for r in numpy.linspace(500,3000,2000):
+    for r in numpy.linspace(3000,600,2000):
         llpMassC = r
         lspMassC = r-100.
         llpMassU = r
@@ -546,13 +546,13 @@ for ctau in results.keys():
         
         xsecTheoC,_,_ = xsecFct(llpMassC)
         xsecLimitC = limitFct(llpMassC,lspMassC)
-        if not foundC and xsecLimitC>xsecTheoC:
+        if not foundC and xsecLimitC<xsecTheoC:
             limitsC[ctau]=llpMassC
             foundC = True
         
         xsecTheoU,_,_ = xsecFct(llpMassU)
         xsecLimitU = limitFct(llpMassU,lspMassU)
-        if not foundU and xsecLimitU>xsecTheoU:
+        if not foundU and xsecLimitU<xsecTheoU:
             limitsU[ctau]=llpMassU
             foundU = True
             
