@@ -778,12 +778,20 @@ print histBinning
 histograms = []
 
 def removeNegEntries(hist):
+    alpha = 1. - 0.6827
+    upErr = ROOT.Math.gamma_quantile_c(alpha/2,1,1)
+    avgWeight = hist.Integral()/hist.GetEntries()
     for ibin in range(hist.GetNbinsX()+2):
         c = hist.GetBinContent(ibin)
-        if c<10**-6:
-            hist.SetBinContent(ibin,10**-6)
-            if hist.GetBinError(ibin)<10**-5:
-                hist.SetBinError(ibin,10**-5)
+        if c<10**-3:
+            hist.SetBinContent(ibin,10**-2)
+            #note: in case of 0 entries the uncertainty is also small
+            #(this is not the case with negative events)
+            if hist.GetBinError(ibin)<10**-1:
+                #set uncertainties for empy bins
+                #https://twiki.cern.ch/twiki/bin/viewauth/CMS/PoissonErrorBars
+                hist.SetBinError(ibin,upErr*avgWeight)
+        
                 
 systPostfix = "_"+args.syst
 if args.syst=="nominal":
