@@ -218,57 +218,96 @@ for ctau in ctauLabels.keys():
 
     print ctau
     fileDictPerSeed = {}
-
+    llpMasses = {}
+    lspMasses = {}
     for folder in os.listdir(basePath):
         if re.match('ctau'+ctau+'_llp[0-9]+_lsp[0-9]+',folder):
+            llpMass = int(folder[folder.find('llp')+3:folder.find('_',folder.find('llp'))])
+            lspMass = int(folder[folder.find('lsp')+3:])
+            
             for f in os.listdir(os.path.join(basePath,folder)):
                 if re.match('higgsCombineTest.Significance.mH120.[0-9]+.root',f):
                     if not fileDictPerSeed.has_key(f):
                         fileDictPerSeed[f] = []
+                        llpMasses[f] = []
+                        lspMasses[f] = []
                     fileDictPerSeed[f].append(os.path.join(basePath,folder,f))
+                    llpMasses[f].append(llpMass)
+                    lspMasses[f].append(lspMass)
     
-    histSig = ROOT.TH1F("sig"+ctau,"",100,0,5)
+    histSig = ROOT.TH1F("sig"+ctau,"",100,-0.0001,5)
+    xmin = 0.600
+    xmax = 2.500
+    ymin = 0.0
+    ymax = 2.500
+    histMasses = ROOT.TH2F("masses"+ctau,";LLP (TeV); LSP (Tev)",
+        int(round((xmax-xmin)/0.050))+1,xmin-0.025,xmax+0.025,
+        int(round((ymax-ymin)/0.050))+1,ymin-0.025,ymax+0.025
+    )
     for k in fileDictPerSeed.keys():
+        print k,len(fileDictPerSeed[k])
         sigPerPoint = []
         for f in fileDictPerSeed[k]:
             rootFile = uproot.open(f,localsource=uproot.FileSource.defaults)
+            if len(rootFile.keys())==0:
+                print "WARNING - file '"+f+"' likely corrupted -> skip"
+                continue
             sig = rootFile['limit']['limit'].array()
+            #print f,numpy.sort(sig)[-5:]
+            
             sigPerPoint.append(sig)
+ 
         sigPerPoint = numpy.stack(sigPerPoint,axis=0)
-        #print significancesPerPoint.shape
-        maxSig = numpy.max(sigPerPoint,axis=0)
-        for i in range(maxSig.shape[0]):
-            histSig.Fill(maxSig[i])
-        #print k,len(fileDictPerSeed[k])
-        #break
+        
+        
+        maxIndex = numpy.argmax(sigPerPoint,axis=0)
+        #maxIndex = numpy.ones(sigPerPoint.shape[1],dtype=numpy.int32)*0
+        
+        for i in range(maxIndex.shape[0]):
+            histSig.Fill(sigPerPoint[maxIndex[i],i])
+            histMasses.Fill(0.001*llpMasses[k][maxIndex[i]],0.001*lspMasses[k][maxIndex[i]],sigPerPoint[maxIndex[i],i])
+
+    #print histSig.GetEntries(), histSig.Integral(2,histSig.GetNbinsX()+2)/histSig.GetEntries()
     histSig.Scale(1./histSig.GetEntries())
-    s = 1. 
+    histMasses.Scale(1./histSig.GetEntries()) #average max significance
     
-    localSig = numpy.zeros(histSig.GetNbinsX()+2)
-    globalSig = numpy.zeros(histSig.GetNbinsX()+2)
+    s = 0.99999
     
-    for ibin in range(histSig.GetNbinsX()+2):
+    localSig = numpy.zeros(histSig.GetNbinsX()+1)
+    globalSig = numpy.zeros(histSig.GetNbinsX()+1)
+    
+    for ibin in range(histSig.GetNbinsX()+1):
         c = histSig.GetBinContent(ibin)
         localSig[ibin] = histSig.GetBinCenter(ibin)
-        globalSig[ibin] = localSig[ibin]*(1-s) if s<1 else 0
+        #globalSig[ibin] = 2*ROOT.TMath.ErfInverse(1.-s)/math.sqrt(2) if s<1 else 0
+        globalSig[ibin] =  ROOT.RooStats.PValueToSignificance(s)
         #print ibin,localSig[ibin],globalSig[ibin],s
         histSig.SetBinContent(ibin,s)
-        histSig.SetBinError(ibin,math.sqrt(s*histSig.GetEntries())/histSig.GetEntries() if s>0 else 0)
+        #histSig.SetBinError(ibin,math.sqrt(s*histSig.GetEntries())/histSig.GetEntries() if s>0 else 0)
         s-=c
+    print s,histSig.GetBinContent(histSig.GetNbinsX()+1)
         
+    cvSigMasses = ROOT.TCanvas("cvSigMasses"+ctau,"",800,700)
+    cvSigMasses.SetMargin(0.155,0.24,0.15,0.09)
+    histMasses.Draw("colz")
+    cvSigMasses.Print("leeSigMasses_"+ctau+".pdf")
+    cvSigMasses.Print("leeSigMasses_"+ctau+".png")
 
     cvSig = ROOT.TCanvas("cvSig"+ctau,"",800,700)
     cvSig.SetLogy(1)
     cvSig.SetGridx(True)
     cvSig.SetGridy(True)
     cvSig.SetMargin(0.155,0.04,0.15,0.09)
-    axisSig = ROOT.TH2F("axisSig"+ctau,";Max. significance #forall ("+mglu+",#kern[-0.6]{ }"+mchi+");Normalized cumulative #toys",50,0,5,50,0.001,1.1)
+    axisSig = ROOT.TH2F("axisSig"+ctau,";Max. significance #forall ("+mglu+",#kern[-0.6]{ }"+mchi+");Normalized cumulative #toys",
+        50,histSig.GetXaxis().GetXmin(),histSig.GetXaxis().GetXmax(),
+        50,0.0001,1.1
+    )
     axisSig.Draw("AXIS")
     histSig.SetLineColor(ROOT.kOrange+7)
     histSig.SetLineWidth(2)
     histSig.SetMarkerSize(0)
     histSig.SetMarkerStyle(0)
-    histSig.Draw("HISTLESame")
+    #histSig.Draw("HISTLESame")
     histSig.Draw("HISTLSame")
     ROOT.gPad.RedrawAxis()
     

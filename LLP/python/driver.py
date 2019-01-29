@@ -144,7 +144,7 @@ def llpdnnxVar(syst,ctau,m=0):
 def baseSelection(syst="nominal",region="D"):
     # B | D   
     # A | C   => C/A=D/B => D = B*C/A
-    selection = "(MonoCentralPFJet80_PFMETNoMu_PFMHTNoMu_IDTight>0)*(PFHT900>0)"
+    selection = "((MonoCentralPFJet80_PFMETNoMu_PFMHTNoMu_IDTight>0) || (PFHT900>0))"
     selection += "*(nvetoMuons==0)*(nvetoElectrons==0)"
     selection += "*("+nVetoFwdJetVar(syst)+"==0)"
     selection += "*("+nJetVar(syst)+">2)"
@@ -170,28 +170,36 @@ def mcWeight(sampleName,syst="nominal",lumi="35.822"):
     mcWeight = "(genweight)*"+lumi+"*1000.0"
     if args.syst=="puUp":
         mcWeight+="*(puweightUp)"
-    if args.syst=="puDown":
+    elif args.syst=="puDown":
         mcWeight+="*(puweightDown)"
+    else:
+        mcWeight+="*(puweight)"
     if sampleName=="WJets":
         if args.syst=="wjetsScaleUp":
             mcWeight+="*(scaleweight_0/scaleweight_4)"
-        if args.syst=="wjetsScaleDown":
+        elif args.syst=="wjetsScaleDown":
             mcWeight+="*(scaleweight_8/scaleweight_4)"
-    if sampleName=="ttbar":
+    elif sampleName=="ttbar":
         if args.syst=="ttbarScaleUp":
             mcWeight+="*(scaleweight_0/scaleweight_4)"
-        if args.syst=="ttbarScaleDown":
+        elif args.syst=="ttbarScaleDown":
             mcWeight+="*(scaleweight_8/scaleweight_4)"
-    if sampleName=="st":
+    elif sampleName=="st":
         if args.syst=="stScaleUp":
             mcWeight+="*(scaleweight_0/scaleweight_4)"
-        if args.syst=="stScaleDown":
+        elif args.syst=="stScaleDown":
             mcWeight+="*(scaleweight_8/scaleweight_4)"
-    if sampleName=="Znunu":
+    elif sampleName=="ZNuNu":
         if args.syst=="znunuScaleUp":
             mcWeight+="*(scaleweight_0/scaleweight_4)"
-        if args.syst=="znunuScaleDown":
+        elif args.syst=="znunuScaleDown":
             mcWeight+="*(scaleweight_8/scaleweight_4)"
+    elif sampleName=="QCDHT":
+        pass
+    elif sampleName=="SMS-T1qqqq":
+        pass
+    else:
+        raise Exception("Unknown sample name '"+sampleName+"'")
     return mcWeight
     
 
@@ -424,7 +432,7 @@ mcSetDict = {
             "WZ_TuneCUETP8M1_13TeV-pythia8",
             "ZZ_TuneCUETP8M1_13TeV-pythia8"
         ],
-        "weight":globalMCWeight("diboson"),
+        "weight":'1',
         "fill":newColor(0.35,0.95,0.55),
         "title":"Diboson",
         "addtitle":""
@@ -435,7 +443,7 @@ mcSetDict = {
             "WToLNu_1J_13TeV-amcatnloFXFX-pythia8",
             "WToLNu_2J_13TeV-amcatnloFXFX-pythia8"
         ],
-        "weight":globalMCWeight("WJets"),
+        "weight":'1',
         "fill":newColor(0.33,0.75,0.35),
         "title":"W+jets",
         "addtitle":""
@@ -451,7 +459,7 @@ mcSetDict = {
             "WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8",
             "WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8"
         ],
-        "weight":globalMCWeight("WJets"),
+        "weight":'1',
         "fill":newColor(0.33,0.75,0.35),
         "title":"W+jets",
         "addtitle":""
@@ -461,7 +469,7 @@ mcSetDict = {
             "DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
             "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8"
         ],
-        "weight":globalMCWeight("ZJets"),
+        "weight":'1',
         "fill":newColor(0.3,0.75,0.95),
         "title":"Z/#gamma*+jets",
         "addtitle":""
@@ -479,7 +487,7 @@ mcSetDict = {
             ["DYJetsToLL_M-50_HT-1200to2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8","(znloweight_nominal)"],
             ["DYJetsToLL_M-50_HT-2500toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8","(znloweight_nominal)"],
         ],
-        "weight":globalMCWeight("ZJets"),
+        "weight":'1',
         "fill":newColor(0.3,0.75,0.95),
         "title":"Z/#gamma*+jets",
         "addtitle":"(rew. NLO)"
@@ -488,7 +496,7 @@ mcSetDict = {
         "processes": [
             "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8",
         ],
-        "weight":globalMCWeight("ttbar"),
+        "weight":'1',
         "fill":newColor(1.,0.8,0.0),
         "title":"t#bar{t}",
         "addtitle":""
@@ -502,7 +510,7 @@ mcSetDict = {
             "ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1",
             "ST_tW_top_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1"
         ],
-        "weight":globalMCWeight("st"),
+        "weight":'1',
         "fill":newColor(0.5,0.47,0.95),
         "title":"Single t/#bar{t}",
         "addtitle":""
@@ -526,7 +534,7 @@ mcSetDict = {
             "QCD_Pt_2400to3200_TuneCUETP8M1_13TeV_pythia8",
             "QCD_Pt_3200toInf_TuneCUETP8M1_13TeV_pythia8",
         ],
-        "weight":globalMCWeight("QCD"),
+        "weight":'1',
         "fill":newColor(0.85,0.85,0.85),
         "title":"Multijet",
         "addtitle":""
@@ -544,7 +552,7 @@ mcSetDict = {
             "QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8",
             "QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8",
         ],
-        "weight": globalMCWeight("QCD"),
+        "weight": '1',
         "fill":newColor(0.85,0.85,0.85),
         "title":"Multijet",
         "addtitle":""
@@ -560,7 +568,7 @@ mcSetDict = {
             "ZJetsToNuNu_HT-1200To2500_13TeV-madgraph",
             "ZJetsToNuNu_HT-2500ToInf_13TeV-madgraph",
         ],
-        "weight":globalMCWeight("Znunu"),
+        "weight": '1',
         "fill":newColor(0.3,0.75,0.95),
         "title":"Z#rightarrow#nu#nu",
         "addtitle":""
@@ -575,7 +583,7 @@ mcSetDict = {
             "DYJetsToNuNu_PtZ-400To650_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
             "DYJetsToNuNu_PtZ-650ToInf_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8",
         ],
-        "weight":globalMCWeight("Znunu"),
+        "weight": '1',
         "fill":newColor(0.3,0.75,0.95),
         "title":"Z#rightarrow#nu#nu",
         "addtitle":""
@@ -716,7 +724,7 @@ for llpMass in sorted(massesDict.keys()):
             "llp":llpMass,
             "lsp":lspMass,
             "processes":[ctauSampleName,ctauSampleName+"_extra"],
-            "weight":"(%7.5e)*(llp==%i)*(lsp==%i)*%s"%(genweight,int(llpMass),int(lspMass),globalMCWeight("SMS-T1qqqq"))
+            "weight":"(%7.5e)*(llp==%i)*(lsp==%i)"%(genweight,int(llpMass),int(lspMass))
         })
     print
 
@@ -777,21 +785,24 @@ print histBinning
     
 histograms = []
 
-def removeNegEntries(hist):
+def removeNegEntries(hist,avgWeight=-1):
     alpha = 1. - 0.6827
     upErr = ROOT.Math.gamma_quantile_c(alpha/2,1,1)
-    avgWeight = hist.Integral()/hist.GetEntries()
-    for ibin in range(hist.GetNbinsX()+2):
-        c = hist.GetBinContent(ibin)
-        if c<10**-3:
-            hist.SetBinContent(ibin,10**-2)
+    avgWeight = hist.Integral()/hist.GetEntries() if hist.GetEntries()>0 else -1
+    print "weight",avgWeight
+    for ibin in range(hist.GetNbinsX()):
+        c = hist.GetBinContent(ibin+1)
+        if c<10**-4:
+            hist.SetBinContent(ibin+1,10**-3)
             #note: in case of 0 entries the uncertainty is also small
             #(this is not the case with negative events)
-            if hist.GetBinError(ibin)<10**-1:
+            if hist.GetBinError(ibin+1)<10**-4 and avgWeight>0:
                 #set uncertainties for empy bins
                 #https://twiki.cern.ch/twiki/bin/viewauth/CMS/PoissonErrorBars
-                hist.SetBinError(ibin,upErr*avgWeight)
-        
+                hist.SetBinError(ibin+1,upErr*avgWeight)
+            else:
+                hist.SetBinError(ibin+1,10**-4)
+        print "bin%2i, %.1f+-%.1f (+-%.1f%%)"%(ibin,c,hist.GetBinError(ibin+1),100.*hist.GetBinError(ibin+1)/c if c>0 else -1)
                 
 systPostfix = "_"+args.syst
 if args.syst=="nominal":
@@ -799,43 +810,22 @@ if args.syst=="nominal":
     
 histBinningWeight = histBinning["weight"]
 print "bin: ",histBinning["name"]
-for backgroundMCSet in ["WJets","st","ttbar","ZNuNu"]:
-    print "  background: ",backgroundMCSet
-    setWeight = globalMCWeight(backgroundMCSet)
-    histBackground = ROOT.TH1F(histBinning["name"]+"_"+backgroundMCSet+systPostfix,"",len(histBinning["binning"])-1,histBinning["binning"]) #<channel>_<process>_<syst>
-    histBackground.SetDirectory(0)
-    histograms.append(histBackground)
-    histBackground.Sumw2()
-    for process in mcSetDict[backgroundMCSet]["processes"]:
-        processWeight = "1"
-        if type(process)==type(list()):
-            processWeight+="*"+process[1]
-            process = process[0]
-        processWeight+="*"+processDict[process]["weight"]
-        #print histBinningWeight+"*"+setWeight+"*"+processWeight
-        for ifile,f in enumerate(processDict[process]["files"]):
-            rootFile = ROOT.TFile.Open(f)
-            tree = rootFile.Get("Friends")
-            if tree:
-                processHist = ROOT.TH1F(histBinning["name"]+"_"+backgroundMCSet+"_"+process+str(random.random())+str(ifile),"",len(histBinning["binning"])-1,histBinning["binning"])
-                tree.Project(processHist.GetName(),histBinning["var"],histBinningWeight+"*"+setWeight+"*"+processWeight)
-                
-                processHist.SetDirectory(0)
-                histBackground.Add(processHist)
-            rootFile.Close()
-            #break
-    removeNegEntries(histBackground)
-    print "    -> ",histBackground.GetEntries(),"/",histBackground.Integral()," entries/integral"
-    
-for backgroundMCSet in ["QCDHT"]:
-    qcdHistPerRegion = {}
+
+
+for backgroundMCSet in ["WJets","st","ttbar","ZNuNu","QCDHT"]:
     for region in ["A","B","C","D"]:
         print "  background: ",backgroundMCSet,region
         setWeight = globalMCWeight(backgroundMCSet,region=region)
-        histBackground = ROOT.TH1F(histBinning["name"]+"_"+backgroundMCSet+systPostfix+region,"",len(histBinning["binning"])-1,histBinning["binning"]) #<channel>_<process>_<syst>
+        histBackground = ROOT.TH1F(histBinning["name"]+region+"_"+backgroundMCSet+systPostfix,"",len(histBinning["binning"])-1,histBinning["binning"]) #<channel>_<process>_<syst>
         histBackground.SetDirectory(0)
-        qcdHistPerRegion[region] = histBackground
+        histograms.append(histBackground)
         histBackground.Sumw2()
+        
+        sumPos = 0
+        sumNeg = 0
+        integralPos = 0
+        integralNeg = 0
+        
         for process in mcSetDict[backgroundMCSet]["processes"]:
             processWeight = "1"
             if type(process)==type(list()):
@@ -847,56 +837,54 @@ for backgroundMCSet in ["QCDHT"]:
                 rootFile = ROOT.TFile.Open(f)
                 tree = rootFile.Get("Friends")
                 if tree:
-                    processHist = ROOT.TH1F(histBinning["name"]+"_"+backgroundMCSet+"_"+process+str(random.random())+str(ifile),"",len(histBinning["binning"])-1,histBinning["binning"])
-                    tree.Project(processHist.GetName(),histBinning["var"],histBinningWeight+"*"+setWeight+"*"+processWeight)
+                    processHistPos = ROOT.TH1F(histBinning["name"]+"_pos_"+backgroundMCSet+"_"+process+str(random.random())+str(ifile),"",len(histBinning["binning"])-1,histBinning["binning"])
+                    tree.Project(processHistPos.GetName(),histBinning["var"],histBinningWeight+"*"+setWeight+"*"+processWeight+"*(genweight>0)")
                     
-                    processHist.SetDirectory(0)
-                    histBackground.Add(processHist)
+                    processHistNeg = ROOT.TH1F(histBinning["name"]+"_neg_"+backgroundMCSet+"_"+process+str(random.random())+str(ifile),"",len(histBinning["binning"])-1,histBinning["binning"])
+                    tree.Project(processHistNeg.GetName(),histBinning["var"],histBinningWeight+"*"+setWeight+"*"+processWeight+"*(genweight<0)")
+                    
+                    processHistPos.SetDirectory(0)
+                    processHistNeg.SetDirectory(0)
+                    histBackground.Add(processHistPos)
+                    histBackground.Add(processHistNeg)
+                    
+                    sumPos+=processHistPos.GetEntries()
+                    sumNeg+=processHistNeg.GetEntries()
+                    integralPos+=processHistPos.Integral()
+                    integralNeg+=processHistNeg.Integral()
+                    
                 rootFile.Close()
                 #break
-        removeNegEntries(histBackground)
-        print "    -> ",region,histBackground.GetEntries(),"/",histBackground.Integral()," entries/integral"
         
-    histBackground = ROOT.TH1F(histBinning["name"]+"_"+backgroundMCSet+systPostfix,"",len(histBinning["binning"])-1,histBinning["binning"]) #<channel>_<process>_<syst>
-    histBackground.SetDirectory(0)
-    histBackground.Sumw2()
-    #D = B*C/A
-    histBackground.Add(qcdHistPerRegion["C"])
-    histBackground.Multiply(qcdHistPerRegion["B"])
-    histBackground.Divide(qcdHistPerRegion["A"])
-    for ibin in range(histBackground.GetNbinsX()):
-        print "agreement ",ibin,"%.1f+-%.1f,  %.1f+-%.1f"%(
-            histBackground.GetBinContent(ibin+1),
-            histBackground.GetBinError(ibin+1),
-            qcdHistPerRegion["D"].GetBinContent(ibin+1),
-            qcdHistPerRegion["D"].GetBinError(ibin+1)
+        removeNegEntries(
+            histBackground,
+            avgWeight=(integralPos-integralNeg)/(sumPos+sumNeg) if (sumPos+sumNeg)>0 else -1
         )
-        
-    histograms.append(histBackground)
-        
-    
+        print "    -> ",histBackground.GetEntries(),"/",histBackground.Integral()," entries/integral"
         
   
 for signalCfg in signalConfigs:
-    print "  signal: ",signalCfg["name"]
-    signalHist = ROOT.TH1F(histBinning["name"]+"_"+signalCfg["name"]+systPostfix,"",len(histBinning["binning"])-1,histBinning["binning"]) #<channel>_<process>_<syst>
-    signalHist.SetDirectory(0)
-    histograms.append(signalHist)
-    signalWeight = signalCfg["weight"]
-    #print histBinningWeight+"*"+signalWeight
-    for process in signalCfg["processes"]:
-        for ifile,f in enumerate(processDict[process]["files"]):
-            rootFile = ROOT.TFile.Open(f)
-            tree = rootFile.Get("Friends")
-            if tree:
-                processHist = ROOT.TH1F(histBinning["name"]+"_"+signalCfg["name"]+"_"+process+str(random.random())+str(ifile),"",len(histBinning["binning"])-1,histBinning["binning"])
-                tree.Project(processHist.GetName(),histBinning["var"],histBinningWeight+"*"+signalWeight)
-                processHist.SetDirectory(0)
-                signalHist.Add(processHist)
-            rootFile.Close()
-            #break
-    removeNegEntries(signalHist)
-    print "    -> ",signalHist.GetEntries(),"/",signalHist.Integral()," entries/integral"
+    for region in ["D"]:
+        print "  signal: ",signalCfg["name"],region
+        signalHist = ROOT.TH1F(histBinning["name"]+region+"_"+signalCfg["name"]+systPostfix,"",len(histBinning["binning"])-1,histBinning["binning"]) #<channel>_<process>_<syst>
+        setWeight = globalMCWeight("SMS-T1qqqq",region)
+        signalHist.SetDirectory(0)
+        histograms.append(signalHist)
+        signalWeight = signalCfg["weight"]
+        #print histBinningWeight+"*"+signalWeight+"*"+setWeight
+        for process in signalCfg["processes"]:
+            for ifile,f in enumerate(processDict[process]["files"]):
+                rootFile = ROOT.TFile.Open(f)
+                tree = rootFile.Get("Friends")
+                if tree:
+                    processHist = ROOT.TH1F(histBinning["name"]+"_"+signalCfg["name"]+"_"+process+str(random.random())+str(ifile),"",len(histBinning["binning"])-1,histBinning["binning"])
+                    tree.Project(processHist.GetName(),histBinning["var"],histBinningWeight+"*"+signalWeight+"*"+setWeight)
+                    processHist.SetDirectory(0)
+                    signalHist.Add(processHist)
+                rootFile.Close()
+                #break
+        removeNegEntries(signalHist,avgWeight=histBackground.Integral()/histBackground.GetEntries())
+        print "    -> ",signalHist.GetEntries(),"/",signalHist.Integral()," entries/integral"
 
 outputFile = ROOT.TFile(os.path.join(args.output,"hist_%s_%s_%s.root"%(args.ctau,histBinning["name"],args.syst)),"RECREATE")
 for hist in histograms:

@@ -27,7 +27,7 @@ submitFile = open("runHist.sh","w")
 submitFile.write('''#!/bin/bash
 #$ -cwd
 #$ -q hep.q
-#$ -l h_rt=0:45:00 
+#$ -l h_rt=2:00:00 
 #$ -t 1-'''+str(len(jobArrayCfg))+'''
 #$ -e '''+os.path.join(basePath,'log')+'''/log.$TASK_ID.err
 #$ -o '''+os.path.join(basePath,'log')+'''/log.$TASK_ID.out

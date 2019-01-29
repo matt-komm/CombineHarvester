@@ -260,13 +260,16 @@ def interpolatedHist(limitFct,binningX,binningY):
         len(binningY)-1,
         binningY
     )
+    newHist.SetDirectory(0)
+    
     for ibin in range(newHist.GetNbinsX()):
-        xval = newHist.GetXaxis().GetBinCenter(ibin+1)
+        llpMass = newHist.GetXaxis().GetBinCenter(ibin+1)*1000
         for jbin in range(newHist.GetNbinsY()):
-            yval = newHist.GetYaxis().GetBinCenter(jbin+1)
-            if (yval)>=xval:
+            lspMass = newHist.GetYaxis().GetBinCenter(jbin+1)*1000
+            if (llpMass-lspMass)<100:
                 continue
-            newHist.SetBinContent(ibin+1,jbin+1,limitFct(xval,yval))
+            newHist.SetBinContent(ibin+1,jbin+1,limitFct(llpMass,lspMass))
+    
     return newHist 
 
 def interpolatedLimitFct(result,kind="median"):
@@ -316,8 +319,104 @@ def interpolatedLimitFct(result,kind="median"):
         
     return getValue
     
-def parseCombineJson(filePath):
+def interpolatedLimitFct2(result,kind="median"):
+    xvalues = []
+    yvalues = []
+    zvalues = []
+    for llpMass in sorted(result.keys()):
+        for lspMass in sorted(result[llpMass].keys()):
+            loglimit = math.log(result[llpMass][lspMass][kind])
+            xvalues.append(int(llpMass))
+            yvalues.append((100+int(llpMass)-int(lspMass)))
+            zvalues.append(loglimit)
+    xvalues = numpy.array(xvalues,dtype=numpy.float32)
+    yvalues = numpy.array(yvalues,dtype=numpy.float32)
+    zvalues = numpy.array(zvalues,dtype=numpy.float32)
+   
+       
+    def getValue(llpMass,lspMass):
+        xval = 1.*int(llpMass)
+        yval = (100+int(llpMass)-int(lspMass))
+        
+        distances = numpy.zeros(len(xvalues))
+        values = numpy.zeros(len(xvalues))
+        
+        for i in range(len(xvalues)):
+            distance = math.sqrt((xvalues[i]-xval)**2+(yvalues[i]-yval)**2)
+            distances[i] = distance
+            values[i] = zvalues[i]
+        
+        sortedIndices = numpy.argsort(distances)
+        distances = distances[sortedIndices]
+        values = values[sortedIndices]
+        #print distances
+        #print values
+        wsum = 0.
+        vsum = 0.
+        for i in range(len(distances)):
+            weight = math.exp(-distances[i]**2/(numpy.mean(distances[0:2])**2))
+            vsum += weight*values[i]
+            wsum+=weight
+            
+        return math.exp(vsum/wsum)
+        '''
+        nearestX = (numpy.abs(xvalues[1:-1]-xval)).argmin()+1
+        nearestY = (numpy.abs(yvalues[1:-1]-yval)).argmin()+1
+        
+        
+            
+        if xvalues[nearestX]>xval:
+            leftX = xvalues[nearestX-1]
+            rightX = xvalues[nearestX]
+            zleftX = zvalues[nearestX-1]
+            zrightX = zvalues[nearestX]
+        else:
+            leftX = xvalues[nearestX]
+            rightX = xvalues[nearestX+1]
+            zleftX = zvalues[nearestX]
+            zrightX = zvalues[nearestX+1]
+            
+        if yvalues[nearestY]>yval:
+            leftY = yvalues[nearestY-1]
+            rightY = yvalues[nearestY]
+            zleftY = zvalues[nearestY-1]
+            zrightY = zvalues[nearestY]
+        else:
+            leftY = yvalues[nearestY]
+            rightY = yvalues[nearestY+1]
+            zleftY = zvalues[nearestY]
+            zrightY = zvalues[nearestY+1]
+        
+        xfrac = (xval-leftX)/(rightX-leftX)
+        yfrac = (yval-leftY)/(rightY-leftY)
+        
+        print yval,leftY,rightY
+        
+        return 0.5*(xfrac*zleftX+(1-xfrac)*zrightX+zleftY*yfrac+(1-yfrac)*zrightY)
+        '''
+        
+    n = 0
+    meanDiff = 0.
+    meanDiff2 = 0.
+    maxDiff = 0.
+    for llpMass in sorted(result.keys()):
+        for lspMass in sorted(result[llpMass].keys()):
+            n+=1
+            limit = (result[llpMass][lspMass][kind])
+            limitSmooth = getValue(1.*int(llpMass),1.*int(lspMass))
+            diff = 1-limitSmooth/limit
+            meanDiff += math.fabs(diff)
+            meanDiff2 += math.fabs(diff)**2
+            maxDiff = max(maxDiff, math.fabs(diff))
+    print "rel. interpolation difference mean: %5.3f+-%.3f (max: %5.3f)"%(meanDiff/n,math.sqrt(meanDiff2/n-(meanDiff/n)**2),maxDiff)
+ 
+        
+    return getValue
     
+    
+def parseCombineJson(filePath):
+    if not os.path.exists(filePath):
+        return None    
     data = json.load(open(filePath))
     #note: combine seems to be not very precise here
     mapping = {
@@ -363,8 +462,8 @@ basePath = "limits"
 
 results = {}
 
-ctauValues = ["0p001","0p01","0p1","1","10","100","1000","10000"]
-#ctauValues = ["1","10","100","1000","10000"]
+#ctauValues = ["0p001","0p01","0p1","1","10","100","1000","10000"]
+ctauValues = ["1","10","100"]
 ctauLabels = {
     "0p001":"1#kern[-0.5]{ }#mum",
     "0p01":"10#kern[-0.5]{ }#mum",
@@ -394,38 +493,43 @@ for ctau in ctauValues:
             signalProcess = "ctau%s_llp%s_lsp%s"%(ctau,llpMass,lspMass)
             combineJsonFile = os.path.join(basePath,"limits_%s.json"%signalProcess)
             result = parseCombineJson(combineJsonFile)
+            if not result:
+                print "ERROR: file '"+combineJsonFile+"' not found -> skip"
+                continue
             if len(result.keys())!=5:
                 print "WARNING: Not all quantiles found in file ",combineJsonFile
             if not result.has_key("median"):
                 print "ERROR: Median found in file ",combineJsonFile," -> skip"
-            else:
-                results[ctau][llpMass][lspMass] = result
+                continue
+            results[ctau][llpMass][lspMass] = result
                 
    
 limitsU = {}
 limitsC = {}
    
 for ctau in results.keys():
-    cv = ROOT.TCanvas("cv","",850,700)
+    cv = ROOT.TCanvas("cv"+ctau,"",850,700)
     cv.SetLeftMargin(0.145)
     cv.SetRightMargin(0.195)
     cv.SetBottomMargin(0.14)
     cv.SetTopMargin(0.08)
     cv.SetLogz(1)
-    xmin = 600
+    xmin = 0.600
     ymin = 0
-    xmax = 2600
-    ymax = 2600
+    xmax = 2.400
+    ymax = 2.400
 
-    axis = ROOT.TH2F("axis"+ctau,";m#lower[0.2]{#scale[0.8]{#tilde{g}}} (GeV); m#lower[0.2]{#scale[0.8]{#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.2]{#lower[0.6]{#scale[0.65]{1}}}}} (GeV)",
-        (xmax-xmin)/50+1,numpy.linspace(xmin-25,xmax+25,(xmax-xmin)/50+2),
-        (ymax-ymin)/50+1,numpy.linspace(ymin-25,ymax+25,(ymax-ymin)/50+2)
+    axis = ROOT.TH2F("axis"+ctau,";m#lower[0.2]{#scale[0.8]{#tilde{g}}} (TeV); m#lower[0.2]{#scale[0.8]{#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.2]{#lower[0.6]{#scale[0.65]{1}}}}} (TeV)",
+        int(round((xmax-xmin)/0.050))+1,numpy.linspace(xmin-0.025,xmax+0.025,int(round((xmax-xmin)/0.050))+2),
+        int(round((ymax-ymin)/0.050))+1,numpy.linspace(ymin-0.025,ymax+0.025,int(round((ymax-ymin)/0.050))+2)
     )
     axis.Fill(-1,-1)
+    '''
     for xbin in range(axis.GetNbinsX()):
         value = xmin+xbin*(xmax-xmin)/50
         if xbin%4==0:
             axis.GetXaxis().SetBinLabel(xbin+1,"%.0f"%axis.GetXaxis().GetBinCenter(xbin+1))
+    '''
     axis.Draw("colz")    
     axis.GetZaxis().SetTitle("95% CL expected limit #sigma#lower[0.2]{#scale[0.8]{pp#rightarrow#tilde{g}#tilde{g}}} (pb)")
     axis.GetZaxis().SetRangeUser(0.0001,0.35)
@@ -438,48 +542,59 @@ for ctau in results.keys():
     
     
     
-    limitHist = ROOT.TH2F("limitHist"+ctau,";m#lower[0.2]{#scale[0.8]{#tilde{g}}} (GeV); m#lower[0.2]{#scale[0.8]{#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.2]{#lower[0.6]{#scale[0.65]{1}}}}} (GeV)",
-        (xmax-xmin)/50+1,numpy.linspace(xmin-25,xmax+25,(xmax-xmin)/50+2),
-        (ymax-ymin)/50+1,numpy.linspace(ymin-25,ymax+25,(ymax-ymin)/50+2)
+    limitHist = ROOT.TH2F("limitHist"+ctau,";m#lower[0.2]{#scale[0.8]{#tilde{g}}} (TeV); m#lower[0.2]{#scale[0.8]{#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.2]{#lower[0.6]{#scale[0.65]{1}}}}} (TeV)",
+        int(round((xmax-xmin)/0.050))+1,numpy.linspace(xmin-0.025,xmax+0.025,int(round((xmax-xmin)/0.050))+2),
+        int(round((ymax-ymin)/0.050))+1,numpy.linspace(ymin-0.025,ymax+0.025,int(round((ymax-ymin)/0.050))+2)
     )
     boxes = []
     for llpMass in sorted(results[ctau].keys()):
         for lspMass in sorted(results[ctau][llpMass].keys()):
-            limitHist.Fill(int(llpMass),int(lspMass),results[ctau][llpMass][lspMass]["median"])
+        
+            if 0.001*int(llpMass)>xmax:
+                continue
+            if 0.001*int(lspMass)>ymax:
+                continue
+            limitHist.Fill(0.001*int(llpMass),0.001*int(lspMass),results[ctau][llpMass][lspMass]["median"])
             '''
-            box= ROOT.TBox(llpMass-27,lspMass-27,llpMass+27,lspMass+27)
-            box.SetLineColor(ROOT.kWhite)
-            box.SetLineWidth(2)
-            box.SetFillStyle(0)
+            box= ROOT.TBox(0.001*int(llpMass)-0.025,0.001*int(lspMass)-0.025,0.001*int(llpMass)+0.025,0.001*int(lspMass)+0.025)
+            box.SetFillColor(ROOT.kGray)
+            box.SetLineWidth(0)
+            box.SetFillStyle(1001)
+            boxes.append(box)
             '''
-            
-            marker= ROOT.TMarker(int(llpMass),int(lspMass),20)
+            '''
+            marker= ROOT.TMarker(0.001*int(llpMass),0.001*int(lspMass),20)
             marker.SetMarkerColor(ROOT.kWhite)
             marker.SetMarkerSize(1.4)
             boxes.append(marker)
-            
-    limitFct = interpolatedLimitFct(
+            '''
+    
+    limitFct = interpolatedLimitFct2(
         results[ctau],
         kind="median"
     )
     
-    limitFctUp = interpolatedLimitFct(
+    limitFctUp = interpolatedLimitFct2(
         results[ctau],
         kind="+1"
     )
-    limitFctDown = interpolatedLimitFct(
+    limitFctDown = interpolatedLimitFct2(
         results[ctau],
         kind="-1"
     )
     
+    #print limitFct(600,0)
+    
+    
     limitHistSmooth = interpolatedHist(
         limitFct,
-        numpy.linspace(xmin-25,xmax+25,(xmax-xmin)/10),
-        numpy.linspace(ymin-25,ymax+25,(ymax-ymin)/10)
+        numpy.linspace(xmin-0.025,xmax+0.025,(xmax-xmin)/0.050),
+        numpy.linspace(ymin-0.025,ymax+0.025,(ymax-ymin)/0.050)
     )
     
     limitHistSmooth.GetZaxis().SetRangeUser(0.0001,0.35)
     limitHistSmooth.Draw("colSame")
+    
     limitHist.GetZaxis().SetRangeUser(0.0001,0.35)
     limitHist.Draw("colSame")
     
@@ -488,12 +603,14 @@ for ctau in results.keys():
     
     
     poly = ROOT.TPolyLine(3,
-        numpy.array([600-25,2600+25,600-25],dtype=numpy.float32), 
-        numpy.array([600-25,2600+25,2600+25],dtype=numpy.float32),
+        numpy.array([0.600-0.025,2.400+0.025,0.600-0.025],dtype=numpy.float32), 
+        numpy.array([0.600-0.025,2.400+0.025,2.400+0.025],dtype=numpy.float32),
     )
     poly.SetFillColor(ROOT.kGray)
     poly.SetFillStyle(3445)
     poly.Draw("F")
+    
+    
     
     
     xsecFct = getTheoryXsecFct("theory_xsec.dat")
@@ -512,15 +629,19 @@ for ctau in results.keys():
         foundDown = False
         foundMedian = False
         foundUp = False
-        for r in numpy.linspace(3000,600,1250):
+        for r in numpy.linspace(2.600,0.600,100):
             llpMass = r*math.cos(angle)
             lspMass = r*math.sin(angle)
+            #print llpMass,lspMass
             if llpMass>(xmax) or lspMass>(ymax):
                 continue
-            xsecTheo,xsecTheoUp,xsecTheoDown = xsecFct(llpMass)
-            xsecLimit = limitFct(llpMass,lspMass)
-            xsecLimitUp = limitFctUp(llpMass,lspMass)
-            xsecLimitDown = limitFctDown(llpMass,lspMass)
+            if (llpMass-lspMass)<0.1:
+                continue
+            xsecTheo,xsecTheoUp,xsecTheoDown = xsecFct(llpMass*1000.)
+            xsecLimit = limitFct(llpMass*1000.,lspMass*1000.)
+            #print llpMass,lspMass,xsecLimit,xsecTheo
+            xsecLimitUp = limitFctUp(llpMass*1000.,lspMass*1000.)
+            xsecLimitDown = limitFctDown(llpMass*1000.,lspMass*1000.)
             if not foundDown and xsecLimitDown<xsecTheo:
                 llpMassExpDown.append(llpMass)
                 lspMassExpDown.append(lspMass)
@@ -535,23 +656,25 @@ for ctau in results.keys():
                 foundUp = True
             if foundDown and foundMedian and foundUp:
                 break
+    #print llpMassExpMedian
+    #print lspMassExpMedian
                 
     foundC=False
     foundU=False
-    for r in numpy.linspace(3000,600,2000):
+    for r in numpy.linspace(3.000,0.600,200):
         llpMassC = r
-        lspMassC = r-100.
+        lspMassC = r-0.100
         llpMassU = r
-        lspMassU = 100.
+        lspMassU = 0.100
         
-        xsecTheoC,_,_ = xsecFct(llpMassC)
-        xsecLimitC = limitFct(llpMassC,lspMassC)
+        xsecTheoC,_,_ = xsecFct(llpMassC*1000.)
+        xsecLimitC = limitFct(llpMassC*1000.,lspMassC*1000.)
         if not foundC and xsecLimitC<xsecTheoC:
             limitsC[ctau]=llpMassC
             foundC = True
         
-        xsecTheoU,_,_ = xsecFct(llpMassU)
-        xsecLimitU = limitFct(llpMassU,lspMassU)
+        xsecTheoU,_,_ = xsecFct(llpMassU*1000.)
+        xsecLimitU = limitFct(llpMassU*1000.,lspMassU*1000.)
         if not foundU and xsecLimitU<xsecTheoU:
             limitsU[ctau]=llpMassU
             foundU = True
@@ -634,8 +757,8 @@ yvaluesC = numpy.zeros(8)
 yvaluesU = numpy.zeros(8)
 
 for ctau in limitsU.keys():
-    yvaluesC[ctauValueMap[ctau]]=limitsC[ctau]*0.001
-    yvaluesU[ctauValueMap[ctau]]=limitsU[ctau]*0.001
+    yvaluesC[ctauValueMap[ctau]]=limitsC[ctau]
+    yvaluesU[ctauValueMap[ctau]]=limitsU[ctau]
     
     print ctau,limitsC[ctau],limitsU[ctau]
     
