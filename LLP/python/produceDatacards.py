@@ -4,6 +4,19 @@ import json
 import ROOT
 import CombineHarvester.CombineTools.ch as ch
 
+ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.WARNING)
+
+def getHist(fileName,histName):
+    rootFile = ROOT.TFile(fileName)
+    hist = rootFile.Get(histName)
+    hist = hist.Clone()
+    hist.SetDirectory(0)
+    rootFile.Close()
+    return hist
+    
+alpha = 1. - 0.6827
+upErr = ROOT.Math.gamma_quantile_c(alpha/2,1,1)
+
     
 def makeDatacard(cats,ctau,signalProc,histPath,outputPath,systematics=[]):
     print "Producing datacards for signal '"+signalProc+"' under '"+outputPath+"'"
@@ -13,7 +26,7 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,systematics=[]):
         os.makedirs(outputPath)
         
     cb = ch.CombineHarvester()
-    #cb.SetVerbosity(3)
+    #cb.SetVerbosity(0)
     cb.AddProcesses(era=["13TeV2016"],procs=["WJets","st","ttbar","ZNuNu"],bin=cats.values(),signal=False)
     
     #add signal only to region 'D'
@@ -34,40 +47,60 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,systematics=[]):
            os.path.join(histPath,"hists_%s.root"%ctau),
           "$BIN_$PROCESS",
           "$BIN_$PROCESS_$SYSTEMATIC")
-          
-    '''
-    proc = ch.Process()
-    proc.set_process('QCD')
-    proc.set_bin('llpA')
-    proc.set_era('13TeV2016')
-    proc.set_rate(1)
-    hist = ROOT.TH1F("qcdHist","",13,-0.5,12.5)
-    hist.Fill(3)
-    hist.SetDirectory(0)
-    proc.set_shape(hist,True)
-    cb.InsertProcess(proc)
-    cb.cp().bin(['llpA']).process(['QCD']).AddSyst(cb,'qcd_$BIN',"rateParam",ch.SystMap("era")(["13TeV2016"],0.))
-    '''
-    met = ROOT.RooRealVar("met","E_{T}^{miss}",-0.5,12.5)
-    bin1 = ROOT.RooRealVar("bkg_SR_bin1","Background yield in signal region, bin 1",10,0,10**6)
-    bin2 = ROOT.RooRealVar("bkg_SR_bin2","Background yield in signal region, bin 2",10,0,10**6)
-    bin3 = ROOT.RooRealVar("bkg_SR_bin3","Background yield in signal region, bin 3",10,0,10**6)
-    bin4 = ROOT.RooRealVar("bkg_SR_bin4","Background yield in signal region, bin 4",10,0,10**6)
-    bkg_SR_bins = ROOT.RooArgList()
-    bkg_SR_bins.add(bin1)
-    bkg_SR_bins.add(bin2)
-    bkg_SR_bins.add(bin3)
-    bkg_SR_bins.add(bin4)
-    hist = ROOT.TH1F("qcdHist","",13,-0.5,12.5)
-    hist.SetDirectory(0)
-    p_bkg = ROOT.RooParametricHist ("bkg_SR", "Background PDF in signal region",met,bkg_SR_bins,hist)
-    proc = ch.Process()
-    proc.set_process('QCD')
-    proc.set_bin('llpA')
-    proc.set_era('13TeV2016')
-    proc.set_pdf(p_bkg)
-    cb.InsertProcess(proc)
-    '''
+    
+        
+    
+    for region in ["A","B","C"]:
+        qcdHistNominal = getHist(
+            os.path.join(histPath,"hists_%s.root"%ctau),
+            "llp%s_QCDHT"%region
+        )
+        for ibin in range(13):
+            proc = ch.Process()
+            processName = 'QCD_llp%s_bin%i'%(region,ibin+1)
+            systName = 'qcd_llp%s_bin%i'%(region,ibin+1)
+            proc.set_process(processName)
+            proc.set_bin('llp%s'%region)
+            proc.set_era('13TeV2016')
+            hist = ROOT.TH1F("qcdHist_llp%s_bin%i"%(region,ibin+1),"",13,-0.5,12.5)
+            hist.Fill(ibin)
+            hist.SetDirectory(0)
+            proc.set_shape(hist,True)
+            cb.InsertProcess(proc)
+            
+            cb.cp().process([processName]).AddSyst(cb,systName,"rateParam",
+                ch.SystMap("era")(["13TeV2016"],max(10**-3,qcdHistNominal.GetBinContent(ibin+1)))
+            )
+            param =  cb.GetParameter(systName)
+            avgWeight = qcdHistNominal.Integral()/qcdHistNominal.GetEntries() if hist.GetEntries()>0 else 1.
+            param.set_val(max(upErr*avgWeight,qcdHistNominal.GetBinContent(ibin+1)))
+            param.set_range(0.,qcdHistNominal.GetBinContent(ibin+1)*10+qcdHistNominal.Integral()*0.1+100)
+    
+    for ibin in range(13):
+        proc = ch.Process()
+        processName = 'QCD_llp%s_bin%i'%('D',ibin+1)
+        systNameA = 'qcd_llp%s_bin%i'%('A',ibin+1)
+        systNameB = 'qcd_llp%s_bin%i'%('B',ibin+1)
+        systNameC = 'qcd_llp%s_bin%i'%('C',ibin+1)
+        systNameD = 'qcd_llp%s_bin%i'%('D',ibin+1)
+        proc.set_process(processName)
+        proc.set_bin('llp%s'%region)
+        proc.set_era('13TeV2016')
+        hist = ROOT.TH1F("qcdHist_llp%s_bin%i"%(region,ibin+1),"",13,-0.5,12.5)
+        hist.Fill(ibin)
+        hist.SetDirectory(0)
+        proc.set_shape(hist,True)
+        cb.InsertProcess(proc)
+        # B | D   
+        # A | C   => C/A=D/B => D = B*C/A
+        cb.cp().process([processName]).AddSyst(cb,systNameD,"rateParam",
+            ch.SystMap("era")(["13TeV2016"],(
+                "TMath::Max(@0,0)*TMath::Max(TMath::Max(@1,0)/@2,0.1)",
+                systNameB+","+systNameC+","+systNameA
+            ))
+        )
+        
+        
     bbFactory = ch.BinByBinFactory()
     bbFactory.SetAddThreshold(0.1)
     #bbFactory.SetMergeThreshold(0.5)
@@ -76,8 +109,7 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,systematics=[]):
     bbFactory.SetPattern("bb_$BIN_$PROCESS_bin_$#")
     #bbFactory.MergeBinErrors(cb.cp().backgrounds())
     bbFactory.AddBinByBin(cb.cp().process(['WJets','st','ttbar','ZNuNu']), cb)
-    '''
-
+    
     #cb.PrintAll()
 
     cb.cp().WriteDatacard(
@@ -86,8 +118,8 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,systematics=[]):
     )
     
 
-#ctauValues = ["0p001","0p01","0p1","1","10","100","1000","10000"]
-ctauValues = ["1"]
+ctauValues = ["0p001","0p01","0p1","1","10","100","1000","10000"]
+#ctauValues = ["1"]
 
 systematics = ["jes","jer","unclEn","pu","wjetsScale","ttbarScale","stScale","znunuScale"]
 
@@ -139,16 +171,14 @@ for ctau in ctauValues:
             )
             
             jobArrayCfg.append([datacardPath])
-            
-            break
-        break
-    break
+
+
             
 submitFile = open("runCombine.sh","w")
 submitFile.write('''#!/bin/bash
 #$ -cwd
 #$ -q hep.q
-#$ -l h_rt=02:30:00 
+#$ -l h_rt=08:00:00 
 #$ -t 1-'''+str(len(jobArrayCfg))+'''
 #$ -e '''+os.path.join(basePath,'log')+'''/log.$TASK_ID.err
 #$ -o '''+os.path.join(basePath,'log')+'''/log.$TASK_ID.out
@@ -181,18 +211,19 @@ cd ${JOBS[$SGE_TASK_ID]}
 for i in 12 23 34 45 56 67 78 89 90 91 
     do
     #note: do not use option '--saveToys' as this will store something else in 'limit' branch
-    combine -M Significance -t 1000 -s '12'$i'56'$i --maxTries 5 --expectSignal=0 -d out.txt
+    combine -M Significance --verbose -1 -t 1000 -s '12'$i'56'$i --maxTries 10 --expectSignal=0 -d out.txt
     done
 
 #expected impacts
+#note: excluding regex only works in hacked combineTool.py
 text2workspace.py -m 120 out.txt -o workspace.root
-combineTool.py -M Impacts -d workspace.root -m 120 --robustFit 1 --doInitialFit -t -1 --expectSignal=1 
-combineTool.py -M Impacts -d workspace.root -m 120 --robustFit 1 --doFits -t -1 --expectSignal=1
-combineTool.py -M Impacts -d workspace.root -m 120 -o impacts.json
+combineTool.py -M Impacts -d workspace.root -m 120 --X-rtd MINIMIZER_analytic --robustFit 1 --doInitialFit -t -1 --expectSignal=1 
+combineTool.py -M Impacts -d workspace.root -m 120 --X-rtd MINIMIZER_analytic --robustFit 1 --doFits --exclude "bb_.*,qcd_llp[ABC].*" -t -1 --expectSignal=1
+combineTool.py -M Impacts -d workspace.root -m 120 --X-rtd MINIMIZER_analytic --exclude "bb_.*,qcd_llp[ABC].*" -o impacts.json
 plotImpacts.py -i impacts.json -o impacts
 
 #expected limits
-combine -M AsymptoticLimits --rAbsAcc 0.000001 --X-rtd MINIMIZER_MaxCalls=99999999999 -t -1 -d out.txt
+combine -M AsymptoticLimits --rAbsAcc 0.000001 --X-rtd MINIMIZER_analytic --X-rtd MINIMIZER_MaxCalls=99999999999 -t -1 -d out.txt
 
 date
 ''')

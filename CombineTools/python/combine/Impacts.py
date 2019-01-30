@@ -3,6 +3,7 @@
 import sys
 import json
 import ROOT
+import re
 import CombineHarvester.CombineTools.combine.utils as utils
 
 from CombineHarvester.CombineTools.combine.CombineToolBase import CombineToolBase
@@ -157,7 +158,14 @@ class Impacts(CombineToolBase):
         # Exclude some parameters
         if self.args.exclude is not None:
             exclude = self.args.exclude.split(',')
-            paramList = [x for x in paramList if x not in exclude]
+            exclude = [re.compile(x) for x in exclude]
+            for param in paramList[:]:
+                for expr in exclude:
+                    if expr.match(param):
+                        paramList.remove(param)
+                        break
+                        
+            #paramList = [x for x in paramList if x not in exclude]
 
         print 'Have parameters: ' + str(len(paramList))
 
