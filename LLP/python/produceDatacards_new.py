@@ -16,9 +16,8 @@ def getHist(fileName,histName):
     
 alpha = 1. - 0.6827
 upErr = ROOT.Math.gamma_quantile_c(alpha/2,1,1)
-
     
-def makeDatacard(cats,ctau,signalProc,histPath,outputPath,systematics=[]):
+def makeDatacard(cats,ctau,signalProc,histPath,outputPath,llpMCEff=1.,systematics=[]):
     print "Producing datacards for signal '"+signalProc+"' under '"+outputPath+"'"
     if os.path.exists(outputPath):
         pass
@@ -27,10 +26,37 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,systematics=[]):
         
     cb = ch.CombineHarvester()
     #cb.SetVerbosity(0)
+    
+    
+    cb.ParseDatacard(os.path.join(os.path.dirname(os.path.abspath(__file__)),"dummy.txt"),
+		"",
+		"",
+		"",
+		0,
+		""
+	) 	
+    
+    #cb.PrintAll()
+    
     cb.AddProcesses(era=["13TeV2016"],procs=["WJets","st","ttbar","ZNuNu"],bin=cats.values(),signal=False)
+
     
     #add signal only to region 'D'
-    cb.AddProcesses(era=["13TeV2016"],procs=[signalProc],bin=[cats['D']],signal=True)
+    for nLLP in range(7):
+        for nLLPTagged in range(nLLP+1):
+            processSubName = signalProc+("_%illp%it"%(nLLP,nLLPTagged))
+            cb.AddProcesses(era=["13TeV2016"],procs=[processSubName],bin=[cats['D']],signal=True)
+            cb.cp().process([processSubName]).AddSyst(cb,processSubName+"_rate","rateParam",
+                ch.SystMap("era")(["13TeV2016"],(
+                    #"1.0",
+                    "TMath::Power(TMath::Range(0.01,0.99,@0*%.3f),%i)*TMath::Power(1-TMath::Range(0.01,0.99,@0*%.3f),%i)/(TMath::Power(%.3f,%i)*TMath::Power(1-%.3f,%i))"%(
+                        llpMCEff,nLLPTagged,llpMCEff,nLLP-nLLPTagged,
+                        llpMCEff,nLLPTagged,llpMCEff,nLLP-nLLPTagged 
+                    ),
+                    "llpEff"
+                ))
+            )
+    
 
     cb.cp().AddSyst(cb,"lumi","lnN",ch.SystMap("era")(["13TeV2016"],1.026))
     #cb.cp().process(['QCDHT']).AddSyst(cb,"qcd_$ERA","lnN",ch.SystMap("era")(["13TeV2016"],1.2))
@@ -48,8 +74,7 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,systematics=[]):
           "$BIN_$PROCESS",
           "$BIN_$PROCESS_$SYSTEMATIC")
     
-        
-    nbins = -1
+    #cb.cp().process(qcdProcessNamesInSR).AddSyst(cb,'qcd_yield',"lnN",ch.SystMap("era")(["13TeV2016"],1.5))
     
     for region in ["A","B","C"]:
         qcdHistNominal = getHist(
@@ -105,7 +130,9 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,systematics=[]):
         )
         
     cb.cp().process(qcdProcessNamesInSR).AddSyst(cb,'qcd_yield',"lnN",ch.SystMap("era")(["13TeV2016"],1.5))
-        
+    
+    
+    
     bbFactory = ch.BinByBinFactory()
     bbFactory.SetAddThreshold(0.1)
     #bbFactory.SetMergeThreshold(0.5)
@@ -115,16 +142,15 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,systematics=[]):
     #bbFactory.MergeBinErrors(cb.cp().backgrounds())
     bbFactory.AddBinByBin(cb.cp().process(['WJets','st','ttbar','ZNuNu']), cb)
     
-    #cb.PrintAll()
-
+    
     cb.cp().WriteDatacard(
         os.path.join(outputPath,"out.txt"),
         os.path.join(outputPath,"out.root")
     )
     
 
-ctauValues = ["0p001","0p01","0p1","1","10","100","1000","10000"]
-#ctauValues = ["1"]
+#ctauValues = ["0p001","0p01","0p1","1","10","100","1000","10000"]
+ctauValues = ["1"]
 
 systematics = ["jes","jer","unclEn","pu","wjetsScale","ttbarScale","stScale","znunuScale"]
 
@@ -135,6 +161,9 @@ print categories
 
 with open('eventyields.json',) as f:
     genweights = json.load(f)
+    
+with open('llpEfficiency.json',) as f:
+    llpEfficiency = json.load(f)
 
 massesDict = {}
 for ctau in ctauValues:
@@ -152,9 +181,10 @@ for ctau in ctauValues:
                     massesDict[ctau][llpMass] = []
                 if not lspMass in massesDict[ctau][llpMass]:
                     massesDict[ctau][llpMass].append(lspMass)
+                
 
-basePath = "cards"
-histPath = "hists"
+basePath = "cards_new"
+histPath = "hists_new"
 if os.path.exists(os.path.join(basePath,'log')):
     pass
 else:
@@ -166,16 +196,24 @@ for ctau in ctauValues:
         for lspMass in massesDict[ctau][llpMass]:
             signalProcess = "ctau%s_llp%s_lsp%s"%(str(ctau),str(llpMass),str(lspMass))
             datacardPath = os.path.join(basePath,signalProcess)
+            ctauHack = ctau
+            if ctau =="1":
+                ctauHack = "0"
+            selectedJets = llpEfficiency[ctauHack][llpMass][lspMass]
+            eff = 1.*selectedJets["tagged"]/selectedJets["total"] if selectedJets["total"]>0. else 1.
             makeDatacard(
                 categories,
                 ctau,
                 signalProcess,
                 histPath,
                 datacardPath,
-                systematics=systematics
+                systematics=systematics,
+                llpMCEff=eff
             )
             
             jobArrayCfg.append([datacardPath])
+            break
+        break
 
 
             
@@ -183,7 +221,7 @@ submitFile = open("runCombine.sh","w")
 submitFile.write('''#!/bin/bash
 #$ -cwd
 #$ -q hep.q
-#$ -l h_rt=08:00:00 
+#$ -l h_rt=01:00:00 
 #$ -t 1-'''+str(len(jobArrayCfg))+'''
 #$ -e '''+os.path.join(basePath,'log')+'''/log.$TASK_ID.err
 #$ -o '''+os.path.join(basePath,'log')+'''/log.$TASK_ID.out
@@ -209,25 +247,18 @@ cd ${JOBS[$SGE_TASK_ID]}
 #combine -M FitDiagnostics --plots --saveWithUncertainties -t -1 -d out.txt
 #combine -M MultiDimFit --saveFitResult -t -1 -d out.txt
 
-#for estimating LEE
-#(note: for some weirdness toys>1000 are failing)
-#for i in 12 23 34 45 56 67 78 89 90 91 
-for i in 12 23 34
-    do
-    #note: do not use option '--saveToys' as this will store something else in 'limit' branch
-    combine -M Significance --verbose -1 -t 1000 -s '12'$i'56'$i --maxTries 10 --expectSignal=0 -d out.txt
-    done
+
 
 #expected impacts
 #note: excluding regex only works in hacked combineTool.py
-text2workspace.py -m 120 out.txt -o workspace.root
-combineTool.py -M Impacts -d workspace.root -m 120 --X-rtd MINIMIZER_analytic --robustFit 1 --doInitialFit -t -1 --expectSignal=1 
-combineTool.py -M Impacts -d workspace.root -m 120 --X-rtd MINIMIZER_analytic --robustFit 1 --doFits --exclude "bb_.*,qcd_llp[ABC].*" -t -1 --expectSignal=1
-combineTool.py -M Impacts -d workspace.root -m 120 --X-rtd MINIMIZER_analytic --exclude "bb_.*,qcd_llp[ABC].*" -o impacts.json
-plotImpacts.py -i impacts.json -o impacts
+#text2workspace.py -m 120 out.txt -o workspace.root
+#combineTool.py -M Impacts -d workspace.root -m 120 --X-rtd MINIMIZER_analytic --robustFit 1 --doInitialFit -t -1 --expectSignal=1 
+#combineTool.py -M Impacts -d workspace.root -m 120 --X-rtd MINIMIZER_analytic --robustFit 1 --doFits --exclude "bb_.*,qcd_llp[ABC].*" -t -1 --expectSignal=1
+#combineTool.py -M Impacts -d workspace.root -m 120 --X-rtd MINIMIZER_analytic --exclude "bb_.*,qcd_llp[ABC].*" -o impacts.json
+#plotImpacts.py -i impacts.json -o impacts
 
 #expected limits
-combine -M AsymptoticLimits --rAbsAcc 0.000001 --run expected --X-rtd MINIMIZER_analytic --X-rtd MINIMIZER_MaxCalls=99999999999 -t -1 -d out.txt
+combine -M AsymptoticLimits --setParameterRanges llpEff=0.75,1.25 --rAbsAcc 0.000001 --run expected --X-rtd MINIMIZER_analytic --X-rtd MINIMIZER_MaxCalls=99999999999 -t -1 -d out.txt
 
 date
 ''')

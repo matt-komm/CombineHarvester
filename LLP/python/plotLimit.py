@@ -196,6 +196,27 @@ with open('eventyields.json',) as f:
     genweights = json.load(f)
 
 ctauValues = ["0p001","0p01","0p1","1","10","100","1000","10000"]
+#ctauValues = ["1","10","100"]
+ctauLabels = {
+    "0p001":"1#kern[-0.5]{ }#mum",
+    "0p01":"10#kern[-0.5]{ }#mum",
+    "0p1":"100#kern[-0.5]{ }#mum",
+    "1":"1#kern[-0.5]{ }mm",
+    "10":"10#kern[-0.5]{ }mm",
+    "100":"100#kern[-0.5]{ }mm",
+    "1000":"1#kern[-0.5]{ }m",
+    "10000":"10#kern[-0.5]{ }m",
+}
+ctauValueMap = {
+    "0p001":0,
+    "0p01":1,
+    "0p1":2,
+    "1":3,
+    "10":4,
+    "100":5,
+    "1000":6,
+    "10000":7,
+}
 
 massesDict = {}
 for ctau in ctauValues:
@@ -418,7 +439,6 @@ def parseCombineJson(filePath):
     if not os.path.exists(filePath):
         return None    
     data = json.load(open(filePath))
-    #note: combine seems to be not very precise here
     mapping = {
         "median": "exp0", 
         "+1":"exp+1", 
@@ -428,6 +448,8 @@ def parseCombineJson(filePath):
     }
     result = {}
     for k,v in mapping.iteritems():
+        if not data.has_key("120.0"):
+            return None
         if data["120.0"].has_key(v):
             result[k]=data["120.0"][v]
         
@@ -462,28 +484,7 @@ basePath = "limits"
 
 results = {}
 
-#ctauValues = ["0p001","0p01","0p1","1","10","100","1000","10000"]
-ctauValues = ["1","10","100"]
-ctauLabels = {
-    "0p001":"1#kern[-0.5]{ }#mum",
-    "0p01":"10#kern[-0.5]{ }#mum",
-    "0p1":"100#kern[-0.5]{ }#mum",
-    "1":"1#kern[-0.5]{ }mm",
-    "10":"10#kern[-0.5]{ }mm",
-    "100":"100#kern[-0.5]{ }mm",
-    "1000":"1#kern[-0.5]{ }m",
-    "10000":"10#kern[-0.5]{ }m",
-}
-ctauValueMap = {
-    "0p001":0,
-    "0p01":1,
-    "0p1":2,
-    "1":3,
-    "10":4,
-    "100":5,
-    "1000":6,
-    "10000":7,
-}
+
 
 for ctau in ctauValues:
     results[ctau] = {}

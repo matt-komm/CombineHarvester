@@ -461,7 +461,21 @@ class CombineHarvester {
   void SetAutoMCStats(CombineHarvester &target, double thresh, bool sig=false, int mode=1);
   void RenameAutoMCStatsBin(std::string const& oldname, std::string const& newname);
   std::set<std::string> GetAutoMCStatsBins() const;
+  
+  
+  void AddExtraParameter(const char* name, double val, double min, double max)
+  {
+    extraParams_[name].reset(new RooRealVar(name,name,val,min,max));
+    RooArgSet argSet(*extraParams_[name]);
+    ImportParameters(&argSet);
+  }
+  
+  
  private:
+  std::unordered_map<std::string,std::shared_ptr<RooRealVar>> extraParams_;
+ 
+  void ImportParameters(RooArgSet *vars);
+ 
   friend void swap(CombineHarvester& first, CombineHarvester& second);
 
   // ---------------------------------------------------------------
@@ -528,7 +542,7 @@ class CombineHarvester {
   std::shared_ptr<RooWorkspace> SetupWorkspace(RooWorkspace const& ws,
                                     bool can_rename = false);
 
-  void ImportParameters(RooArgSet *vars);
+  
 
   RooAbsData const* FindMatchingData(Process const* proc);
 

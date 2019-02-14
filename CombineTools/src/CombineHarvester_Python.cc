@@ -14,6 +14,9 @@
 #include "TH2F.h"
 #include "TGraph.h"
 #include "RooFitResult.h"
+#include "RooRealVar.h"
+#include "RooArgSet.h"
+
 namespace py = boost::python;
 using ch::CombineHarvester;
 using ch::Object;
@@ -113,6 +116,11 @@ void CloneProcsAndSystsPy(ch::CombineHarvester& src, ch::CombineHarvester& dest,
   ch::CloneProcsAndSysts(src, dest, lambda);
 }
 
+void addVar(ch::Parameter& param,const char* name, double val, double min, double max)
+{
+    param.vars().push_back(new RooRealVar(name,name,val,min,max));
+}
+
 // To resolve overloaded methods we first define some pointers
 int (CombineHarvester::*Overload1_ParseDatacard)(
     std::string const&, std::string const&, std::string const&,
@@ -201,6 +209,9 @@ BOOST_PYTHON_MODULE(libCombineHarvesterCombineTools)
 
   py::to_python_converter<RooWorkspace,
                           convert_cpp_root_to_py_root<RooWorkspace>>();
+  
+  py::to_python_converter<RooArgSet,
+                          convert_cpp_root_to_py_root<RooArgSet>>();
 
   // Define converters from python --> C++
   convert_py_seq_to_cpp_vector<std::string>();
@@ -212,9 +223,11 @@ BOOST_PYTHON_MODULE(libCombineHarvesterCombineTools)
   convert_py_root_to_cpp_root<TH1F>();
   convert_py_root_to_cpp_root<TH2F>();
   convert_py_root_to_cpp_root<TH1>();
+  convert_py_root_to_cpp_root<RooRealVar>();
   convert_py_root_to_cpp_root<TGraph>();
   convert_py_root_to_cpp_root<RooFitResult>();
   convert_py_root_to_cpp_root<RooWorkspace>();
+  convert_py_root_to_cpp_root<RooArgSet>();
 
   py::class_<CombineHarvester>("CombineHarvester")
       // Constructors, destructors and copying
@@ -305,6 +318,7 @@ BOOST_PYTHON_MODULE(libCombineHarvesterCombineTools)
       .def("RemoveGroup", &CombineHarvester::RemoveGroup)
       .def("AddDatacardLineAtEnd", &CombineHarvester::AddDatacardLineAtEnd)
       .def("ClearDatacardLinesAtEnd", &CombineHarvester::ClearDatacardLinesAtEnd)
+      .def("AddExtraParameter",&CombineHarvester::AddExtraParameter)
       // Evaluation
       .def("GetRate", &CombineHarvester::GetRate)
       .def("GetObservedRate", &CombineHarvester::GetObservedRate)
@@ -322,6 +336,7 @@ BOOST_PYTHON_MODULE(libCombineHarvesterCombineTools)
       .def("AddSystFromProc", &CombineHarvester::AddSystFromProc)
       .def("ExtractShapes", &CombineHarvester::ExtractShapes)
       .def("AddBinByBin", Overload_AddBinByBin)
+      .def("CreateParameterIfEmpty",&CombineHarvester::CreateParameterIfEmpty)
       .def("MergeBinErrors",  &CombineHarvester::MergeBinErrors)
       .def("InsertObservation", &CombineHarvester::InsertObservation)
       .def("InsertProcess", &CombineHarvester::InsertProcess)
@@ -413,6 +428,7 @@ BOOST_PYTHON_MODULE(libCombineHarvesterCombineTools)
       .def("range_d", &Parameter::range_d)
       .def("set_frozen", &Parameter::set_frozen)
       .def("frozen", &Parameter::frozen)
+      //.def("addVar", &addVar, &Parameter::vars, py::return_internal_reference<>())
     ;
 
     py::class_<CardWriter>("CardWriter", py::init<std::string, std::string>())
@@ -468,4 +484,5 @@ BOOST_PYTHON_MODULE(libCombineHarvesterCombineTools)
     py::def("ValsFromRange", ch::ValsFromRange, defaults_ValsFromRange());
     py::def("SetStandardBinNames", ch::SetStandardBinNames, defaults_SetStandardBinNames());
     py::def("ParseCombineWorkspace", ch::ParseCombineWorkspacePy);
+    py::def("addVar",addVar);
 }
