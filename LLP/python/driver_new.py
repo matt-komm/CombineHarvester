@@ -187,24 +187,24 @@ def mcWeight(sampleName,syst="nominal",lumi="35.822"):
         mcWeight+="*(puweight)"
     if sampleName=="WJets":
         if args.syst=="wjetsScaleUp":
-            mcWeight+="*(scaleweight_0/scaleweight_4)"
+            mcWeight+="*TMath::Range(-2,2,scaleweight_0/scaleweight_4)"
         elif args.syst=="wjetsScaleDown":
-            mcWeight+="*(scaleweight_8/scaleweight_4)"
+            mcWeight+="*TMath::Range(-2,2,scaleweight_8/scaleweight_4)"
     elif sampleName=="ttbar":
         if args.syst=="ttbarScaleUp":
-            mcWeight+="*(scaleweight_0/scaleweight_4)"
+            mcWeight+="*TMath::Range(-2,2,scaleweight_0/scaleweight_4)"
         elif args.syst=="ttbarScaleDown":
-            mcWeight+="*(scaleweight_8/scaleweight_4)"
+            mcWeight+="*TMath::Range(-2,2,scaleweight_8/scaleweight_4)"
     elif sampleName=="st":
         if args.syst=="stScaleUp":
-            mcWeight+="*(scaleweight_0/scaleweight_4)"
+            mcWeight+="*TMath::Range(-2,2,scaleweight_0/scaleweight_4)"
         elif args.syst=="stScaleDown":
-            mcWeight+="*(scaleweight_8/scaleweight_4)"
+            mcWeight+="TMath::Range(-2,2,scaleweight_8/scaleweight_4)"
     elif sampleName=="ZNuNu":
         if args.syst=="znunuScaleUp":
-            mcWeight+="*(scaleweight_0/scaleweight_4)"
+            mcWeight+="*TMath::Range(-2,2,scaleweight_0/scaleweight_4)"
         elif args.syst=="znunuScaleDown":
-            mcWeight+="*(scaleweight_8/scaleweight_4)"
+            mcWeight+="*TMath::Range(-2,2,scaleweight_8/scaleweight_4)"
     elif sampleName=="QCDHT":
         pass
     elif sampleName=="SMS-T1qqqq":
@@ -608,14 +608,14 @@ if args.ctau=="1":
     ctauHack = "0"
 
 thresholds = {      
-    "0p001": 0.387823150883,
-    "0p01": 0.384857432375,
-    "0p1": 0.391062097082,
-    "0": 0.49578781558,
-    "10": 0.524539457092,
-    "100": 0.507625327835,
-    "1000": 0.58713464571,
-    "10000": 0.699834154377
+    "0p001": 0.37245617939,
+    "0p01": 0.368606702814,
+    "0p1": 0.343856976757,
+    "0": 0.436759756336,
+    "10": 0.557319806347,
+    "100": 0.64487092329,
+    "1000": 0.565088437328,
+    "10000": 0.590826915035
 }
 
 signalConfigs = []
@@ -737,8 +737,13 @@ histBinningWeight = histBinning["weight"]
 print "bin: ",histBinning["name"]
 
 
-for backgroundMCSet in ["WJets","st","ttbar","ZNuNu","QCDHT"]:
-    for region in ["A","B","C","D"]:
+
+
+for region in ["A","B","C","D"]:
+    histBackgroundSum = ROOT.TH1F(histBinning["name"]+region+"_sum"+systPostfix,"",len(histBinning["binning"])-1,histBinning["binning"]) #<channel>_<process>_<syst>
+    histBackgroundSum.SetDirectory(0)
+    histograms.append(histBackgroundSum)
+    for backgroundMCSet in ["WJets","st","ttbar","ZNuNu","QCDHT"]:
         print "  background: ",backgroundMCSet,region
         setWeight = globalMCWeight(backgroundMCSet,region=region)
         histBackground = ROOT.TH1F(histBinning["name"]+region+"_"+backgroundMCSet+systPostfix,"",len(histBinning["binning"])-1,histBinning["binning"]) #<channel>_<process>_<syst>
@@ -785,6 +790,7 @@ for backgroundMCSet in ["WJets","st","ttbar","ZNuNu","QCDHT"]:
             histBackground,
             avgWeight=(integralPos-integralNeg)/(sumPos+sumNeg) if (sumPos+sumNeg)>0 else -1
         )
+        histBackgroundSum.Add(histBackground)
         print "    -> ",histBackground.GetEntries(),"/",histBackground.Integral()," entries/integral"
         
   

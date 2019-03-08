@@ -198,7 +198,7 @@ def getDarkerColor(color):
     darkerColor=newColor(color.GetRed()*0.6,color.GetGreen()*0.6,color.GetBlue()*0.6)
     return darkerColor
 
-basePath = 'cards'
+basePath = 'cards_new'
 
 mglu = "m#lower[0.2]{#scale[0.8]{#tilde{g}}}"
 mchi = "m#lower[0.2]{#scale[0.8]{#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.2]{#lower[0.6]{#scale[0.65]{1}}}}}"
@@ -235,7 +235,7 @@ for ctau in ctauLabels.keys():
                     llpMasses[f].append(llpMass)
                     lspMasses[f].append(lspMass)
     
-    histSig = ROOT.TH1F("sig"+ctau,"",100,-0.0001,5)
+    histSig = ROOT.TH1F("sig"+ctau,"",100,-0.0001,3)
     xmin = 0.600
     xmax = 2.500
     ymin = 0.0
@@ -248,7 +248,7 @@ for ctau in ctauLabels.keys():
         print k,len(fileDictPerSeed[k])
         sigPerPoint = []
         for f in fileDictPerSeed[k]:
-            rootFile = uproot.open(f,localsource=uproot.FileSource.defaults)
+            rootFile = uproot.open(f)
             if len(rootFile.keys())==0:
                 print "WARNING - file '"+f+"' likely corrupted -> skip"
                 continue
@@ -342,7 +342,7 @@ for ctau in ctauLabels.keys():
     cvTF.SetGridx(True)
     cvTF.SetGridy(True)
     cvTF.SetMargin(0.155,0.04,0.15,0.09)
-    axisTF = ROOT.TH2F("axisTF"+ctau,";Local significance;Global significance",50,0,5,50,0,5)
+    axisTF = ROOT.TH2F("axisTF"+ctau,";Local significance;Global significance",50,0,3,50,0,3)
     axisTF.Draw("AXIS")
     gTF = ROOT.TGraph(localSig.shape[0],localSig,globalSig)
     gTF.SetLineColor(ROOT.kOrange+7)

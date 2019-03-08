@@ -195,8 +195,8 @@ def getDarkerColor(color):
 with open('eventyields.json',) as f:
     genweights = json.load(f)
 
-ctauValues = ["0p001","0p01","0p1","1","10","100","1000","10000"]
-#ctauValues = ["1","10","100"]
+#ctauValues = ["0p001","0p01","0p1","1","10","100","1000","10000"]
+ctauValues = ["0p1"]#,"10","100"]
 ctauLabels = {
     "0p001":"1#kern[-0.5]{ }#mum",
     "0p01":"10#kern[-0.5]{ }#mum",
@@ -374,12 +374,27 @@ def interpolatedLimitFct2(result,kind="median"):
         #print values
         wsum = 0.
         vsum = 0.
+        
+        wsumExclNearest = 0.
+        vsumExclNearest = 0.
+        
         for i in range(len(distances)):
-            weight = math.exp(-distances[i]**2/(numpy.mean(distances[0:2])**2))
+            weight = math.exp(-distances[i]**1.7/((20+numpy.mean(distances[0:2]))**1.7))
             vsum += weight*values[i]
             wsum+=weight
             
-        return math.exp(vsum/wsum)
+            if i>=1:
+                weightExclNearest = math.exp(-distances[i]**1.7/((20+numpy.mean(distances[1:2]))**1.7))
+                wsumExclNearest += weightExclNearest*values[i]
+                vsumExclNearest+=weightExclNearest
+                
+                
+        result = math.exp(vsum/wsum)
+        resultExclNearest = math.exp(vsumExclNearest/wsumExclNearest)
+        
+        
+        return result#(distances[1]*resultExclNearest+distances[0]*result)/(distances[1]+distances[0])
+        
         '''
         nearestX = (numpy.abs(xvalues[1:-1]-xval)).argmin()+1
         nearestY = (numpy.abs(yvalues[1:-1]-yval)).argmin()+1
@@ -563,12 +578,12 @@ for ctau in results.keys():
             box.SetFillStyle(1001)
             boxes.append(box)
             '''
-            '''
+            
             marker= ROOT.TMarker(0.001*int(llpMass),0.001*int(lspMass),20)
             marker.SetMarkerColor(ROOT.kWhite)
             marker.SetMarkerSize(1.4)
             boxes.append(marker)
-            '''
+            
     
     limitFct = interpolatedLimitFct2(
         results[ctau],
@@ -597,7 +612,7 @@ for ctau in results.keys():
     limitHistSmooth.Draw("colSame")
     
     limitHist.GetZaxis().SetRangeUser(0.0001,0.35)
-    limitHist.Draw("colSame")
+    #limitHist.Draw("colSame")
     
     for box in boxes:
         box.Draw("L")
