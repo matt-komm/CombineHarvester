@@ -220,12 +220,11 @@ for ctau in ctauLabels.keys():
     fileDictPerSeed = {}
     llpMasses = {}
     lspMasses = {}
-    for folder in os.listdir(basePath):
+    for folder in sorted(os.listdir(basePath)):
         if re.match('ctau'+ctau+'_llp[0-9]+_lsp[0-9]+',folder):
             llpMass = int(folder[folder.find('llp')+3:folder.find('_',folder.find('llp'))])
             lspMass = int(folder[folder.find('lsp')+3:])
-            
-            for f in os.listdir(os.path.join(basePath,folder)):
+            for f in sorted(os.listdir(os.path.join(basePath,folder))):
                 if re.match('higgsCombineTest.Significance.mH120.[0-9]+.root',f):
                     if not fileDictPerSeed.has_key(f):
                         fileDictPerSeed[f] = []
@@ -235,15 +234,10 @@ for ctau in ctauLabels.keys():
                     llpMasses[f].append(llpMass)
                     lspMasses[f].append(lspMass)
     
-    histSig = ROOT.TH1F("sig"+ctau,"",100,-0.0001,3)
-    xmin = 0.600
-    xmax = 2.500
-    ymin = 0.0
-    ymax = 2.500
-    histMasses = ROOT.TH2F("masses"+ctau,";LLP (TeV); LSP (Tev)",
-        int(round((xmax-xmin)/0.050))+1,xmin-0.025,xmax+0.025,
-        int(round((ymax-ymin)/0.050))+1,ymin-0.025,ymax+0.025
-    )
+    
+    
+    significances = []
+    
     for k in fileDictPerSeed.keys():
         print k,len(fileDictPerSeed[k])
         sigPerPoint = []
@@ -258,7 +252,14 @@ for ctau in ctauLabels.keys():
             sigPerPoint.append(sig)
  
         sigPerPoint = numpy.stack(sigPerPoint,axis=0)
+        if len(significances)==0 or sigPerPoint.shape[0]==significances[-1].shape[0]:
+            significances.append(sigPerPoint)
+        else:
+            print "Skip incompatible toys from seed '"+k+"' with '",sigPerPoint.shape,"' != '",significances[-1].shape,"'"
         
+            
+        '''
+        print sigPerPoint.shape
         
         maxIndex = numpy.argmax(sigPerPoint,axis=0)
         #maxIndex = numpy.ones(sigPerPoint.shape[1],dtype=numpy.int32)*0
@@ -266,33 +267,100 @@ for ctau in ctauLabels.keys():
         for i in range(maxIndex.shape[0]):
             histSig.Fill(sigPerPoint[maxIndex[i],i])
             histMasses.Fill(0.001*llpMasses[k][maxIndex[i]],0.001*lspMasses[k][maxIndex[i]],sigPerPoint[maxIndex[i],i])
-
-    #print histSig.GetEntries(), histSig.Integral(2,histSig.GetNbinsX()+2)/histSig.GetEntries()
-    histSig.Scale(1./histSig.GetEntries())
-    histMasses.Scale(1./histSig.GetEntries()) #average max significance
-    
-    s = 0.99999
-    
-    localSig = numpy.zeros(histSig.GetNbinsX()+1)
-    globalSig = numpy.zeros(histSig.GetNbinsX()+1)
-    
-    for ibin in range(histSig.GetNbinsX()+1):
-        c = histSig.GetBinContent(ibin)
-        localSig[ibin] = histSig.GetBinCenter(ibin)
-        #globalSig[ibin] = 2*ROOT.TMath.ErfInverse(1.-s)/math.sqrt(2) if s<1 else 0
-        globalSig[ibin] =  ROOT.RooStats.PValueToSignificance(s)
-        #print ibin,localSig[ibin],globalSig[ibin],s
-        histSig.SetBinContent(ibin,s)
-        #histSig.SetBinError(ibin,math.sqrt(s*histSig.GetEntries())/histSig.GetEntries() if s>0 else 0)
-        s-=c
-    print s,histSig.GetBinContent(histSig.GetNbinsX()+1)
+        '''
         
+    significances = numpy.concatenate(significances,axis=1)
+    print significances.shape
+    
+    #normalize local significance (can be wrong otherwise due to asymtotic approximation in combine)
+    for imass in range(significances.shape[0]):
+        hist = ROOT.TH1F(
+            "hist"+str(random.random())+str(imass),"",
+            1000,-0.0001,5
+        )
+        #make distribution of significances per mass point
+        for itoy in range(significances.shape[1]):
+            hist.Fill(significances[imass,itoy])
+        
+            
+        #make cumulative distribution
+        hist.Scale(1./hist.GetEntries())
+        for ibin in reversed(range(hist.GetNbinsX())):
+            hist.SetBinContent(ibin+1,
+                hist.GetBinContent(ibin+1)+hist.GetBinContent(ibin+2)
+            )
+        #add underflowbin
+        hist.SetBinContent(1,hist.GetBinContent(0)+hist.GetBinContent(1))
+        hist.SetBinContent(0,0)
+        
+        '''
+        cv = ROOT.TCanvas("cv","",800,600)
+        cv.SetLogy(1)
+        hist.Draw("HIST")
+        fct = ROOT.TF1("fct","RooStats::SignificanceToPValue(x)",0.01,5)
+        fct.Draw("Same")
+        cv.Print("hist.pdf")
+        '''
+        for itoy in range(significances.shape[1]):
+            if significances[imass,itoy]>1e-6:
+                ibin = hist.GetXaxis().FindBin(significances[imass,itoy])
+                pvalue = hist.GetBinContent(ibin)
+                localSignificance =ROOT.RooStats.PValueToSignificance(pvalue)
+                #print significances[imass,itoy],hist.GetBinCenter(ibin),pvalue,localSignificance
+                significances[imass,itoy] = localSignificance
+            else:
+                significances[imass,itoy]=0.
+        
+    maxSignificances = numpy.max(significances,axis=0)
+    print maxSignificances.shape
+        
+    histSig = ROOT.TH1F("sig"+ctau,"",1000,-0.0001,5)
+
+    for itoy in range(maxSignificances.shape[0]):
+        histSig.Fill(maxSignificances[itoy])
+        
+    #make cumulative distribution
+    histSig.Scale(1./histSig.GetEntries())
+    for ibin in reversed(range(histSig.GetNbinsX())):
+        histSig.SetBinContent(ibin+1,
+            histSig.GetBinContent(ibin+1)+histSig.GetBinContent(ibin+2)
+        )
+    #add underflowbin
+    histSig.SetBinContent(1,histSig.GetBinContent(0)+histSig.GetBinContent(1))
+    histSig.SetBinContent(0,0)
+
+    localSigList = []
+    globalSigList = []
+    
+    for ibin in reversed(range(histSig.GetNbinsX())):
+        localSig = histSig.GetBinCenter(ibin+1)
+        #globalSig[ibin] = 2*ROOT.TMath.ErfInverse(1.-s)/math.sqrt(2) if s<1 else 0
+        pvalue = histSig.GetBinContent(ibin+1)
+        globalSig = ROOT.RooStats.PValueToSignificance(pvalue)
+        #cap when pvalue==0 -> globalSig=inf
+        if globalSig>10:
+            globalSig = 10
+        #print ibin,localSig[ibin],globalSig[ibin],s
+        #histSig.SetBinContent(ibin,s)
+        #histSig.SetBinError(ibin,math.sqrt(s*histSig.GetEntries())/histSig.GetEntries() if s>0 else 0)
+        if len(globalSigList)>0 and math.fabs(1.-globalSigList[-1]/globalSig)<1e-6:
+            continue
+        if localSig>0 and globalSig>0:
+            localSigList.append(localSig)
+            globalSigList.append(globalSig)
+        
+        
+    localSigList = numpy.array(localSigList)
+    globalSigList = numpy.array(globalSigList)
+       
+    ''' 
     cvSigMasses = ROOT.TCanvas("cvSigMasses"+ctau,"",800,700)
     cvSigMasses.SetMargin(0.155,0.24,0.15,0.09)
     histMasses.Draw("colz")
     cvSigMasses.Print("leeSigMasses_"+ctau+".pdf")
     cvSigMasses.Print("leeSigMasses_"+ctau+".png")
-
+    '''
+    
     cvSig = ROOT.TCanvas("cvSig"+ctau,"",800,700)
     cvSig.SetLogy(1)
     cvSig.SetGridx(True)
@@ -344,7 +412,7 @@ for ctau in ctauLabels.keys():
     cvTF.SetMargin(0.155,0.04,0.15,0.09)
     axisTF = ROOT.TH2F("axisTF"+ctau,";Local significance;Global significance",50,0,3,50,0,3)
     axisTF.Draw("AXIS")
-    gTF = ROOT.TGraph(localSig.shape[0],localSig,globalSig)
+    gTF = ROOT.TGraph(len(localSigList),localSigList,globalSigList)
     gTF.SetLineColor(ROOT.kOrange+7)
     gTF.SetLineWidth(2)
     gTF.Draw("L")

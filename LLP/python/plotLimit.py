@@ -195,8 +195,8 @@ def getDarkerColor(color):
 with open('eventyields.json',) as f:
     genweights = json.load(f)
 
-#ctauValues = ["0p001","0p01","0p1","1","10","100","1000","10000"]
-ctauValues = ["0p1"]#,"10","100"]
+ctauValues = ["0p001","0p01","0p1","1","10","100","1000","10000"]
+#ctauValues = ["10"]
 ctauLabels = {
     "0p001":"1#kern[-0.5]{ }#mum",
     "0p01":"10#kern[-0.5]{ }#mum",
@@ -390,7 +390,7 @@ def interpolatedLimitFct2(result,kind="median"):
                 
                 
         result = math.exp(vsum/wsum)
-        resultExclNearest = math.exp(vsumExclNearest/wsumExclNearest)
+        #resultExclNearest = math.exp(vsumExclNearest/wsumExclNearest)
         
         
         return result#(distances[1]*resultExclNearest+distances[0]*result)/(distances[1]+distances[0])
@@ -534,6 +534,8 @@ for ctau in results.keys():
     ymin = 0
     xmax = 2.400
     ymax = 2.400
+    zmax = 0.35
+    zmin = 0.0005
 
     axis = ROOT.TH2F("axis"+ctau,";m#lower[0.2]{#scale[0.8]{#tilde{g}}} (TeV); m#lower[0.2]{#scale[0.8]{#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.2]{#lower[0.6]{#scale[0.65]{1}}}}} (TeV)",
         int(round((xmax-xmin)/0.050))+1,numpy.linspace(xmin-0.025,xmax+0.025,int(round((xmax-xmin)/0.050))+2),
@@ -548,7 +550,7 @@ for ctau in results.keys():
     '''
     axis.Draw("colz")    
     axis.GetZaxis().SetTitle("95% CL expected limit #sigma#lower[0.2]{#scale[0.8]{pp#rightarrow#tilde{g}#tilde{g}}} (pb)")
-    axis.GetZaxis().SetRangeUser(0.0001,0.35)
+    axis.GetZaxis().SetRangeUser(zmin,zmax)
     
     axis.GetXaxis().SetNoExponent(True)
     #axis.GetXaxis().LabelsOption("v")
@@ -604,14 +606,14 @@ for ctau in results.keys():
     
     limitHistSmooth = interpolatedHist(
         limitFct,
-        numpy.linspace(xmin-0.025,xmax+0.025,(xmax-xmin)/0.050),
-        numpy.linspace(ymin-0.025,ymax+0.025,(ymax-ymin)/0.050)
+        numpy.linspace(xmin-0.025,xmax+0.025,(xmax-xmin)/0.010),
+        numpy.linspace(ymin-0.025,ymax+0.025,(ymax-ymin)/0.010)
     )
     
-    limitHistSmooth.GetZaxis().SetRangeUser(0.0001,0.35)
+    limitHistSmooth.GetZaxis().SetRangeUser(zmin,zmax)
     limitHistSmooth.Draw("colSame")
     
-    limitHist.GetZaxis().SetRangeUser(0.0001,0.35)
+    limitHist.GetZaxis().SetRangeUser(zmin,zmax)
     #limitHist.Draw("colSame")
     
     for box in boxes:

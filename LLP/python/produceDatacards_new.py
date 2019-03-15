@@ -50,7 +50,7 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,llpMCEff=1.,systematic
 	) 	
     '''
     cb.AddExtArgValue('llpEff', 1.0)
-    cb.GetParameter('llpEff').set_range(0.5, 1.5)
+    cb.GetParameter('llpEff').set_range(0.75, 1.25)
     
     '''
     llpEffFakeProc = ch.Process()
@@ -91,7 +91,7 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,llpMCEff=1.,systematic
     cb.cp().process(['st','ttbar']).AddSyst(cb,"topbkg_yield","lnN",ch.SystMap("era")(["13TeV2016"],1.2))
     cb.cp().process(['ZNuNu']).AddSyst(cb,"znunnu_yield","lnN",ch.SystMap("era")(["13TeV2016"],1.2))
     
-    #cb.AddObservations(['*'], ['*'], ['13TeV2016'], ['*'], cats.values())
+    #
         
     for syst in systematics:
         cb.cp().AddSyst(cb,syst, "shape", ch.SystMap("era")(["13TeV2016"],1.0))
@@ -100,6 +100,15 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,llpMCEff=1.,systematic
            os.path.join(histPath,"hists_%s.root"%ctau),
           "$BIN_$PROCESS",
           "$BIN_$PROCESS_$SYSTEMATIC")
+          
+    bbFactory = ch.BinByBinFactory()
+    bbFactory.SetAddThreshold(0.1)
+    #bbFactory.SetMergeThreshold(0.5)
+    bbFactory.SetFixNorm(True)
+    #bbFactory.SetPoissonErrors(True)
+    bbFactory.SetPattern("bb_$BIN_$PROCESS_bin_$#")
+    #bbFactory.MergeBinErrors(cb.cp().backgrounds())
+    bbFactory.AddBinByBin(cb.cp().process(['WJets','st','ttbar','ZNuNu']), cb)
           
     #required for toys to know it's not unbinned
     
@@ -110,16 +119,24 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,llpMCEff=1.,systematic
             os.path.join(histPath,"hists_%s.root"%ctau),
             "llp%s_sum"%cat
         )
+        histObs.SetName("llp%s_data_obs"%cats[cat][0])
         histObs.SetDirectory(0)
+        #obs.set_name("llp%s_data_obs"%cats[cat][0])
         obs.set_shape(histObs,True)
         obs.set_bin(cats[cat][1])
         obs.set_era('13TeV2016')
         cb.InsertObservation(obs)
+        
+    #cb.AddObservations(['*'], ['*'], ['13TeV2016'], ['*'], cats.values())
     
     for region in ["A","B","C"]:
         qcdHistNominal = getHist(
             os.path.join(histPath,"hists_%s.root"%ctau),
             "llp%s_QCDHT"%region
+        )
+        sumHistNominal = getHist(
+            os.path.join(histPath,"hists_%s.root"%ctau),
+            "llp%s_sum"%region
         )
         for ibin in range(nbins):
             proc = ch.Process()
@@ -129,7 +146,8 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,llpMCEff=1.,systematic
             proc.set_bin('llp%s'%region)
             proc.set_era('13TeV2016')
             hist = ROOT.TH1F("qcdHist_llp%s_bin%i"%(region,ibin+1),"",nbins,binMin,binMax)
-            hist.Fill(ibin)
+            hist.SetBinContent(ibin+1,1)
+            hist.SetBinError(ibin+1,0.00000000001)
             hist.SetDirectory(0)
             proc.set_shape(hist,True)
             cb.InsertProcess(proc)
@@ -139,10 +157,13 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,llpMCEff=1.,systematic
             )
             param =  cb.GetParameter(systName)
             avgWeight = qcdHistNominal.Integral()/qcdHistNominal.GetEntries() if hist.GetEntries()>0 else 1.
-            param.set_val(max(upErr*avgWeight,qcdHistNominal.GetBinContent(ibin+1)))
-            param.set_range(0.,qcdHistNominal.GetBinContent(ibin+1)*10+qcdHistNominal.Integral()*0.1+100)
+            content = max(0.,qcdHistNominal.GetBinContent(ibin+1))
+            err = max(0.,math.sqrt(sumHistNominal.GetBinContent(ibin+1)))
+            param.set_val(content)
+            param.set_range(0.,content+2.*err)
     
     qcdProcessNamesInSR = []
+    
     for ibin in range(nbins):
         proc = ch.Process()
         processName = 'QCD_llp%s_bin%i'%('D',ibin+1)
@@ -155,7 +176,8 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,llpMCEff=1.,systematic
         proc.set_bin('llpD')
         proc.set_era('13TeV2016')
         hist = ROOT.TH1F("qcdHist_llp%s_bin%i"%('D',ibin+1),"",nbins,binMin,binMax)
-        hist.Fill(ibin)
+        hist.SetBinContent(ibin+1,1.)
+        hist.SetBinError(ibin+1,0.00000000001)
         hist.SetDirectory(0)
         proc.set_shape(hist,True)
         cb.InsertProcess(proc)
@@ -163,23 +185,16 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,llpMCEff=1.,systematic
         # A | C   => C/A=D/B => D = C*B/A
         cb.cp().process([processName]).AddSyst(cb,systNameD,"rateParam",
             ch.SystMap("era")(["13TeV2016"],(
-                "TMath::Max(@0,0)*TMath::Range(0,2,TMath::Max(@1,0)/TMath::Max(@2,0))",
-                systNameC+","+systNameB+","+systNameA
+                "TMath::Max(@0,0.000001)*TMath::Range(0,10.,TMath::Max(@1,0.000001)/TMath::Max(@2,0.000001))",
+                systNameB+","+systNameC+","+systNameA
             ))
         )
-        
+    
     cb.cp().process(qcdProcessNamesInSR).AddSyst(cb,'qcd_yield',"lnN",ch.SystMap("era")(["13TeV2016"],1.5))
     
     
     
-    bbFactory = ch.BinByBinFactory()
-    bbFactory.SetAddThreshold(0.1)
-    #bbFactory.SetMergeThreshold(0.5)
-    bbFactory.SetFixNorm(True)
-    #bbFactory.SetPoissonErrors(True)
-    bbFactory.SetPattern("bb_$BIN_$PROCESS_bin_$#")
-    #bbFactory.MergeBinErrors(cb.cp().backgrounds())
-    bbFactory.AddBinByBin(cb.cp().process(['WJets','st','ttbar','ZNuNu']), cb)
+    
     
     
     cb.cp().WriteDatacard(
@@ -278,6 +293,7 @@ for ctau in ctauValues:
     for llpMass in sorted(massesDict[ctau].keys()):
         xsec,xsecUp,xsecDown = theoXsec(1.*int(llpMass))
         for lspMass in massesDict[ctau][llpMass]:
+            
             signalProcess = "ctau%s_llp%s_lsp%s"%(str(ctau),str(llpMass),str(lspMass))
             datacardPath = os.path.join(basePath,signalProcess)
             ctauHack = ctau
@@ -285,7 +301,7 @@ for ctau in ctauValues:
                 ctauHack = "0"
             selectedJets = llpEfficiency[ctauHack][llpMass][lspMass]
             eff = 1.*selectedJets["tagged"]/selectedJets["total"] if selectedJets["total"]>0. else 1.
-            
+            '''
             makeDatacard(
                 categories,
                 ctau,
@@ -295,18 +311,18 @@ for ctau in ctauValues:
                 systematics=systematics,
                 llpMCEff=eff
             )
-            
+            '''
             jobLimitArrayCfg.append({
                 "path":datacardPath,
                 "cmd": [
-                    "combine -M AsymptoticLimits --setParameterRanges llpEff=0.5,1.5 --rAbsAcc 0.000001 --run expected --cminDefaultMinimizerStrategy 0 --X-rtd MINIMIZER_analytic --X-rtd MINIMIZER_MaxCalls=99999999999 -t -1 -d out.txt"
+                    "combine -M AsymptoticLimits --setParameterRanges llpEff=0.75,1.25 --rAbsAcc 0.000001 --run expected --cminDefaultMinimizerStrategy 0 --X-rtd MINIMIZER_analytic --X-rtd MINIMIZER_MaxCalls=9999999 --cminPreScan -t -1 -d out.txt"
                 ]
             })
             
             jobLimitHybridArrayCfg.append({
                 "path":datacardPath,
                 "cmd": [
-                    "combine -M HybridNew -t 1 --frequentist --testStat LHC --singlePoint 0.01 --rule CLs --rAbsAcc 0.000001 --saveToys --saveHybridResult --toysH 100 --setParameterRanges llpEff=0.5,1.5 --cminDefaultMinimizerStrategy 0 -d out.txt"
+                    "combine -M HybridNew -t 1 --frequentist --testStat LHC --singlePoint 0.01 --rule CLs --rAbsAcc 0.000001 --saveToys --saveHybridResult --toysH 100 --setParameterRanges llpEff=0.75,1.25 --cminDefaultMinimizerStrategy 0 -d out.txt"
                 ]
             })
             
@@ -314,7 +330,7 @@ for ctau in ctauValues:
                 jobToysArrayCfg.append({
                     "path":datacardPath,
                     "cmd": [
-                        "combine -M Significance --verbose -1 -t 1000 -s 123%02i45%02i --rMax 1000 --setParameterRanges llpEff=0.5,1.5 --maxTries 10 --cminDefaultMinimizerStrategy 0 --expectSignal=0 -d out.txt"%(i*21+1,i*7+3)
+                        "combine -M Significance --verbose -1 -t 1000 -s 123%02i45%02i --rMax 1000 --setParameterRanges llpEff=0.75,1.25 --maxTries 10 --cminDefaultMinimizerStrategy 0 --expectSignal=0 -d out.txt"%(i*21+1,i*7+3)
                     ]
                 })
             

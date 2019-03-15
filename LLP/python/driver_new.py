@@ -784,7 +784,7 @@ for region in ["A","B","C","D"]:
                     integralNeg+=processHistNeg.Integral()
                     
                 rootFile.Close()
-                #break
+                break
         
         removeNegEntries(
             histBackground,
@@ -793,7 +793,59 @@ for region in ["A","B","C","D"]:
         histBackgroundSum.Add(histBackground)
         print "    -> ",histBackground.GetEntries(),"/",histBackground.Integral()," entries/integral"
         
-  
+        
+if args.syst=="nominal":
+    for region in ["A","B","C","D"]:
+        print "  data: ",region
+        setWeight = globalDataWeight(region=region)
+        histData = ROOT.TH1F(histBinning["name"]+region+"_data"+systPostfix,"",len(histBinning["binning"])-1,histBinning["binning"]) #<channel>_<process>_<syst>
+        histData.SetDirectory(0)
+        histograms.append(histData)
+        histData.Sumw2()
+        
+        sumPos = 0
+        sumNeg = 0
+        integralPos = 0
+        integralNeg = 0
+        
+        for process in mcSetDict[backgroundMCSet]["processes"]:
+            processWeight = "1"
+            if type(process)==type(list()):
+                processWeight+="*"+process[1]
+                process = process[0]
+            processWeight+="*"+processDict[process]["weight"]
+            #print histBinningWeight+"*"+setWeight+"*"+processWeight
+            for ifile,f in enumerate(processDict[process]["files"]):
+                rootFile = ROOT.TFile.Open(f)
+                tree = rootFile.Get("Friends")
+                if tree:
+                    processHistPos = ROOT.TH1F(histBinning["name"]+"_pos_"+backgroundMCSet+"_"+process+str(random.random())+str(ifile),"",len(histBinning["binning"])-1,histBinning["binning"])
+                    tree.Project(processHistPos.GetName(),histBinning["var"],histBinningWeight+"*"+setWeight+"*"+processWeight+"*(genweight>0)")
+                    
+                    processHistNeg = ROOT.TH1F(histBinning["name"]+"_neg_"+backgroundMCSet+"_"+process+str(random.random())+str(ifile),"",len(histBinning["binning"])-1,histBinning["binning"])
+                    tree.Project(processHistNeg.GetName(),histBinning["var"],histBinningWeight+"*"+setWeight+"*"+processWeight+"*(genweight<0)")
+                    
+                    processHistPos.SetDirectory(0)
+                    processHistNeg.SetDirectory(0)
+                    histBackground.Add(processHistPos)
+                    histBackground.Add(processHistNeg)
+                    
+                    sumPos+=processHistPos.GetEntries()
+                    sumNeg+=processHistNeg.GetEntries()
+                    integralPos+=processHistPos.Integral()
+                    integralNeg+=processHistNeg.Integral()
+                    
+                rootFile.Close()
+                break
+        
+        removeNegEntries(
+            histBackground,
+            avgWeight=(integralPos-integralNeg)/(sumPos+sumNeg) if (sumPos+sumNeg)>0 else -1
+        )
+        histBackgroundSum.Add(histBackground)
+        print "    -> ",histBackground.GetEntries(),"/",histBackground.Integral()," entries/integral"
+        
+
 for signalCfg in signalConfigs:
     for region in ["D"]:
         signalHistSum = ROOT.TH1F(histBinning["name"]+region+"_"+signalCfg["name"]+systPostfix,"",len(histBinning["binning"])-1,histBinning["binning"]) #<channel>_<process>_<syst>
