@@ -1,17 +1,25 @@
 import os
 import sys
 
-basePath = '/vols/build/cms/mkomm/LLP/CMSSW_8_1_0/src/hists_new'
+basePath = '/vols/build/cms/mkomm/LLP/CMSSW_8_1_0/src/hists_crazy'
 '''
 htBins = [200,700,1300,10000]
 mhtBins = [300,600,10000]
 jetBins = [3,4,5,50]
 '''
 ctauValues = ["0p001","0p01","0p1","1","10","100","1000","10000"]
+ctauValues = ["0p1","1","10","100","1000","10000"]
 systematics = [ 
-    "nominal","jesUp","jesDown","jerUp","jerDown","unclEnUp","unclEnDown","puUp","puDown",
+    "nominal","jesUp","jesDown","jerUp","jerDown","unclEnUp","unclEnDown","puUp","puDown","triggerEffUp","triggerEffDown",
     "wjetsScaleUp","wjetsScaleDown","ttbarScaleUp","ttbarScaleDown","stScaleUp","stScaleDown",
     "znunuScaleUp","znunuScaleDown"
+]
+
+for lhe in range(0,101):
+    systematics.append("lheweight_%i"%lhe)
+    
+systematics = [ 
+    "nominal"
 ]
 
 jobArrayCfg = []

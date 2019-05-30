@@ -196,6 +196,7 @@ with open('eventyields.json',) as f:
     genweights = json.load(f)
 
 ctauValues = ["0p001","0p01","0p1","1","10","100","1000","10000"]
+ctauValues = ["0p1","1","10","100","1000","10000"]
 #ctauValues = ["10"]
 ctauLabels = {
     "0p001":"1#kern[-0.5]{ }#mum",
@@ -603,7 +604,7 @@ for ctau in results.keys():
     
     #print limitFct(600,0)
     
-    
+    '''
     limitHistSmooth = interpolatedHist(
         limitFct,
         numpy.linspace(xmin-0.025,xmax+0.025,(xmax-xmin)/0.010),
@@ -612,9 +613,9 @@ for ctau in results.keys():
     
     limitHistSmooth.GetZaxis().SetRangeUser(zmin,zmax)
     limitHistSmooth.Draw("colSame")
-    
+    '''
     limitHist.GetZaxis().SetRangeUser(zmin,zmax)
-    #limitHist.Draw("colSame")
+    limitHist.Draw("colSame")
     
     for box in boxes:
         box.Draw("L")
@@ -781,14 +782,17 @@ for ctau in limitsU.keys():
     print ctau,limitsC[ctau],limitsU[ctau]
     
 cv = ROOT.TCanvas("summary","",800,650)
-cv.SetGridx(True)
-cv.SetGridy(True)
+#cv.SetGridx(True)
+#cv.SetGridy(True)
 cv.SetLogx(1)
 cv.SetMargin(0.155,0.04,0.15,0.09)
 ROOT.gStyle.SetGridColor(ROOT.kBlack)
 ROOT.gStyle.SetGridStyle(2)
 ROOT.gStyle.SetGridWidth(1)
-axis = ROOT.TH2F("axis",";c#tau (m); 95% CL lower limit on m#lower[0.2]{#scale[0.8]{#tilde{g}}} (TeV)",50,10**-6.2,10**1.2,50,0.5,2.6)
+axis = ROOT.TH2F("axis",";c#tau (m); 95% CL lower limit on m#lower[0.2]{#scale[0.8]{#tilde{g}}} (TeV)",
+    50,10**-4.2,10**1.2,
+    50,0.5,2.6
+)
 axis.Draw("AXIS")
 graphC = ROOT.TGraph(8,xvalues,yvaluesC)
 graphC.SetLineColor(ROOT.kOrange+7)
@@ -797,7 +801,7 @@ graphC.SetLineStyle(2)
 graphC.SetMarkerStyle(20)
 graphC.SetMarkerSize(1.5)
 graphC.SetMarkerColor(ROOT.kOrange+7)
-graphC.Draw("PL")
+#graphC.Draw("PL")
 graphU = ROOT.TGraph(8,xvalues,yvaluesU)
 graphU.SetLineColor(ROOT.kRed+1)
 graphU.SetLineWidth(2)
@@ -835,7 +839,7 @@ legend.SetTextFont(43)
 legend.SetTextSize(30)
 legend.AddEntry(graphU,"#kern[-0.5]{ }m#lower[0.2]{#scale[0.8]{#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.2]{#lower[0.6]{#scale[0.65]{1}}}}}#kern[-0.4]{ }=#kern[-0.5]{ }100#kern[-0.6]{ }GeV","PL")
 legend.AddEntry(graphC,"m#lower[0.2]{#scale[0.8]{#tilde{g}}}#kern[-0.5]{ }-#kern[-0.5]{ }m#lower[0.2]{#scale[0.8]{#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.2]{#lower[0.6]{#scale[0.65]{1}}}}}#kern[-0.4]{ }=#kern[-0.5]{ }100#kern[-0.6]{ }GeV","PL")
-legend.Draw("Same")
+#legend.Draw("Same")
 
 cv.Print("summary.pdf")
 cv.Print("summary.png")

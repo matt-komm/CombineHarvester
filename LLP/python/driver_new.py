@@ -155,7 +155,7 @@ def llpdnnxNLLPtrueTaggedLLP(syst,ctau):
 def baseSelection(syst="nominal",region="D"):
     # B | D   
     # A | C   => C/A=D/B => D = B*C/A
-    selection = "((MonoCentralPFJet80_PFMETNoMu_PFMHTNoMu_IDTight>0) || (PFHT900>0))"
+    selection = "(signalTrigger_flag>0)" #this is always =1 for MC; only evaluated in data
     selection += "*(nvetoMuons==0)*(nvetoElectrons==0)"
     selection += "*("+nVetoFwdJetVar(syst)+"==0)"
     selection += "*("+nJetVar(syst)+">2)"
@@ -185,6 +185,18 @@ def mcWeight(sampleName,syst="nominal",lumi="35.822"):
         mcWeight+="*(puweightDown)"
     else:
         mcWeight+="*(puweight)"
+        
+    if args.syst=="triggerEffUp":
+        mcWeight+="*(signalTrigger_weight_trigger_up)"
+    elif args.syst=="triggerEffDown":
+        mcWeight+="*(signalTrigger_weight_trigger_down)"
+    else:
+        mcWeight+="*(signalTrigger_weight_trigger_nominal)"
+        
+    if args.syst.startswith("lheweight"):
+        mcWeight+="*TMath::Range(0,5,"+args.syst+"/lheweight_0)"
+        
+        
     if sampleName=="WJets":
         if args.syst=="wjetsScaleUp":
             mcWeight+="*TMath::Range(-2,2,scaleweight_0/scaleweight_4)"
@@ -607,6 +619,7 @@ ctauHack = args.ctau
 if args.ctau=="1":
     ctauHack = "0"
 
+'''
 thresholds = {      
     "0p001": 0.37245617939,
     "0p01": 0.368606702814,
@@ -616,6 +629,16 @@ thresholds = {
     "100": 0.64487092329,
     "1000": 0.565088437328,
     "10000": 0.590826915035
+}
+'''
+
+thresholds = {      
+    "0p1": 0.8894235789775848,
+    "0": 0.999157440662384,
+    "10": 0.9992863893508911,
+    "100": 0.99794100522995,
+    "1000": 0.9982752680778504,
+    "10000": 0.9988686084747315
 }
 
 signalConfigs = []
@@ -762,7 +785,7 @@ for region in ["A","B","C","D"]:
                 processWeight+="*"+process[1]
                 process = process[0]
             processWeight+="*"+processDict[process]["weight"]
-            #print histBinningWeight+"*"+setWeight+"*"+processWeight
+            #print process,histBinningWeight+"*"+setWeight+"*"+processWeight
             for ifile,f in enumerate(processDict[process]["files"]):
                 rootFile = ROOT.TFile.Open(f)
                 tree = rootFile.Get("Friends")
@@ -784,7 +807,7 @@ for region in ["A","B","C","D"]:
                     integralNeg+=processHistNeg.Integral()
                     
                 rootFile.Close()
-                break
+                #break
         
         removeNegEntries(
             histBackground,
@@ -836,7 +859,7 @@ if args.syst=="nominal":
                     integralNeg+=processHistNeg.Integral()
                     
                 rootFile.Close()
-                break
+                #break
         
         removeNegEntries(
             histBackground,

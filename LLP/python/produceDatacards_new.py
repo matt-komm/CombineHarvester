@@ -87,11 +87,11 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,llpMCEff=1.,systematic
 
     cb.cp().AddSyst(cb,"lumi","lnN",ch.SystMap("era")(["13TeV2016"],1.026))
     #cb.cp().process(['QCDHT']).AddSyst(cb,"qcd_$ERA","lnN",ch.SystMap("era")(["13TeV2016"],1.2))
-    cb.cp().process(['WJets']).AddSyst(cb,"wzjets_yield","lnN",ch.SystMap("era")(["13TeV2016"],1.2))
-    cb.cp().process(['st','ttbar']).AddSyst(cb,"topbkg_yield","lnN",ch.SystMap("era")(["13TeV2016"],1.2))
-    cb.cp().process(['ZNuNu']).AddSyst(cb,"znunnu_yield","lnN",ch.SystMap("era")(["13TeV2016"],1.2))
+    #cb.cp().process(['WJets']).AddSyst(cb,"wzjets_yield","lnN",ch.SystMap("era")(["13TeV2016"],1.2))
+    #cb.cp().process(['st','ttbar']).AddSyst(cb,"topbkg_yield","lnN",ch.SystMap("era")(["13TeV2016"],1.2))
+    #cb.cp().process(['ZNuNu']).AddSyst(cb,"znunnu_yield","lnN",ch.SystMap("era")(["13TeV2016"],1.2))
     
-    #
+    
         
     for syst in systematics:
         cb.cp().AddSyst(cb,syst, "shape", ch.SystMap("era")(["13TeV2016"],1.0))
@@ -101,6 +101,7 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,llpMCEff=1.,systematic
           "$BIN_$PROCESS",
           "$BIN_$PROCESS_$SYSTEMATIC")
           
+    '''
     bbFactory = ch.BinByBinFactory()
     bbFactory.SetAddThreshold(0.1)
     #bbFactory.SetMergeThreshold(0.5)
@@ -109,9 +110,9 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,llpMCEff=1.,systematic
     bbFactory.SetPattern("bb_$BIN_$PROCESS_bin_$#")
     #bbFactory.MergeBinErrors(cb.cp().backgrounds())
     bbFactory.AddBinByBin(cb.cp().process(['WJets','st','ttbar','ZNuNu']), cb)
-          
-    #required for toys to know it's not unbinned
+    '''
     
+    #required for toys to know it's not unbinned
     dummyObs = []
     for cat in cats.keys():
         obs = ch.Observation()
@@ -129,6 +130,7 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,llpMCEff=1.,systematic
         
     #cb.AddObservations(['*'], ['*'], ['13TeV2016'], ['*'], cats.values())
     
+    '''
     for region in ["A","B","C"]:
         qcdHistNominal = getHist(
             os.path.join(histPath,"hists_%s.root"%ctau),
@@ -190,8 +192,8 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,llpMCEff=1.,systematic
             ))
         )
     
-    cb.cp().process(qcdProcessNamesInSR).AddSyst(cb,'qcd_yield',"lnN",ch.SystMap("era")(["13TeV2016"],1.5))
-    
+    cb.cp().process(qcdProcessNamesInSR).AddSyst(cb,'qcd_yield',"lnN",ch.SystMap("era")(["13TeV2016"],1.2))
+    '''
     
     
     
@@ -204,13 +206,14 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,llpMCEff=1.,systematic
     
 
 ctauValues = ["0p001","0p01","0p1","1","10","100","1000","10000"]
+ctauValues = ["0p1","1","10","100","1000","10000"]
 #ctauValues = ["1"]
 
 systematics = ["jes","jer","unclEn","pu","wjetsScale","ttbarScale","stScale","znunuScale"]
-#systematics = ["jes","jer","unclEn","pu","wjetsScale","ttbarScale","znunuScale"]
+systematics = []
 
 categories = {}
-for region in ['A','B','C','D']:
+for region in ['D']:#['A','B','C','D']:
     categories[region] = ((len(categories),"llp"+region))
 print categories
 
@@ -277,8 +280,8 @@ for ctau in ctauValues:
                     massesDict[ctau][llpMass].append(lspMass)
                 
 
-basePath = "cards_new"
-histPath = "hists_new"
+basePath = "cards_crazy"
+histPath = "hists_crazy"
 if os.path.exists(os.path.join(basePath,'log')):
     pass
 else:
@@ -301,7 +304,7 @@ for ctau in ctauValues:
                 ctauHack = "0"
             selectedJets = llpEfficiency[ctauHack][llpMass][lspMass]
             eff = 1.*selectedJets["tagged"]/selectedJets["total"] if selectedJets["total"]>0. else 1.
-            '''
+            
             makeDatacard(
                 categories,
                 ctau,
@@ -311,11 +314,11 @@ for ctau in ctauValues:
                 systematics=systematics,
                 llpMCEff=eff
             )
-            '''
+            
             jobLimitArrayCfg.append({
                 "path":datacardPath,
                 "cmd": [
-                    "combine -M AsymptoticLimits --setParameterRanges llpEff=0.75,1.25 --rAbsAcc 0.000001 --run expected --cminDefaultMinimizerStrategy 0 --X-rtd MINIMIZER_analytic --X-rtd MINIMIZER_MaxCalls=9999999 --cminPreScan -t -1 -d out.txt"
+                    "combine -M AsymptoticLimits --setParameterRanges llpEff=0.99,1.01 --rAbsAcc 0.000001 --run expected --cminDefaultMinimizerStrategy 0 --X-rtd MINIMIZER_analytic --X-rtd MINIMIZER_MaxCalls=9999999 --cminPreScan -t -1 -d out.txt"
                 ]
             })
             
@@ -339,9 +342,9 @@ for ctau in ctauValues:
                 "path":datacardPath,
                 "cmd": [
                     "text2workspace.py -m 120 out.txt -o workspace.root",
-                    "combineTool.py -M Impacts -d workspace.root -m 120 --setParameterRanges llpEff=0.5,1.5 --X-rtd MINIMIZER_analytic --robustFit 1 --doInitialFit -t -1 --expectSignal=%6.4e"%(xsec),
-                    "combineTool.py -M Impacts -d workspace.root -m 120 --setParameterRanges llpEff=0.5,1.5 --X-rtd MINIMIZER_analytic --robustFit 1 --doFits --exclude 'bb_.*,qcd_llp[ABC].*' -t -1 --expectSignal=%6.4e"%(xsec),
-                    "combineTool.py -M Impacts -d workspace.root -m 120 --setParameterRanges llpEff=0.5,1.5 --X-rtd MINIMIZER_analytic --exclude 'bb_.*,qcd_llp[ABC].*' -o impacts.json",
+                    "combineTool.py -M Impacts -d workspace.root -m 120 --setParameterRanges llpEff=0.75,1.25 --X-rtd MINIMIZER_analytic --robustFit 1 --doInitialFit -t -1 --expectSignal=%6.4e"%(xsec),
+                    "combineTool.py -M Impacts -d workspace.root -m 120 --setParameterRanges llpEff=0.75,1.25 --X-rtd MINIMIZER_analytic --robustFit 1 --doFits --exclude 'bb_.*,qcd_llp[ABC].*' -t -1 --expectSignal=%6.4e"%(xsec),
+                    "combineTool.py -M Impacts -d workspace.root -m 120 --setParameterRanges llpEff=0.75,1.25 --X-rtd MINIMIZER_analytic --exclude 'bb_.*,qcd_llp[ABC].*' -o impacts.json",
                     "plotImpacts.py -i impacts.json -o impacts"
                 ]
             })
