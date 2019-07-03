@@ -87,9 +87,9 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,llpMCEff=1.,systematic
 
     cb.cp().AddSyst(cb,"lumi","lnN",ch.SystMap("era")(["13TeV2016"],1.026))
     #cb.cp().process(['QCDHT']).AddSyst(cb,"qcd_$ERA","lnN",ch.SystMap("era")(["13TeV2016"],1.2))
-    #cb.cp().process(['WJets']).AddSyst(cb,"wzjets_yield","lnN",ch.SystMap("era")(["13TeV2016"],1.2))
-    #cb.cp().process(['st','ttbar']).AddSyst(cb,"topbkg_yield","lnN",ch.SystMap("era")(["13TeV2016"],1.2))
-    #cb.cp().process(['ZNuNu']).AddSyst(cb,"znunnu_yield","lnN",ch.SystMap("era")(["13TeV2016"],1.2))
+    cb.cp().process(['WJets']).AddSyst(cb,"wzjets_yield","lnN",ch.SystMap("era")(["13TeV2016"],1.2))
+    cb.cp().process(['st','ttbar']).AddSyst(cb,"topbkg_yield","lnN",ch.SystMap("era")(["13TeV2016"],1.2))
+    cb.cp().process(['ZNuNu']).AddSyst(cb,"znunnu_yield","lnN",ch.SystMap("era")(["13TeV2016"],1.2))
     
     
         
@@ -101,7 +101,7 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,llpMCEff=1.,systematic
           "$BIN_$PROCESS",
           "$BIN_$PROCESS_$SYSTEMATIC")
           
-    '''
+    
     bbFactory = ch.BinByBinFactory()
     bbFactory.SetAddThreshold(0.1)
     #bbFactory.SetMergeThreshold(0.5)
@@ -110,7 +110,7 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,llpMCEff=1.,systematic
     bbFactory.SetPattern("bb_$BIN_$PROCESS_bin_$#")
     #bbFactory.MergeBinErrors(cb.cp().backgrounds())
     bbFactory.AddBinByBin(cb.cp().process(['WJets','st','ttbar','ZNuNu']), cb)
-    '''
+    
     
     #required for toys to know it's not unbinned
     dummyObs = []
@@ -206,7 +206,7 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,llpMCEff=1.,systematic
     
 
 ctauValues = ["0p001","0p01","0p1","1","10","100","1000","10000"]
-ctauValues = ["0p1","1","10","100","1000","10000"]
+#ctauValues = ["0p1","1","10","100","1000","10000"]
 #ctauValues = ["1"]
 
 systematics = ["jes","jer","unclEn","pu","wjetsScale","ttbarScale","stScale","znunuScale"]
@@ -280,8 +280,8 @@ for ctau in ctauValues:
                     massesDict[ctau][llpMass].append(lspMass)
                 
 
-basePath = "cards_crazy"
-histPath = "hists_crazy"
+basePath = "cards_new"
+histPath = "hists_new"
 if os.path.exists(os.path.join(basePath,'log')):
     pass
 else:

@@ -270,6 +270,7 @@ def interpolate(grid):
 results = []
 
 basedir = "llpScan_ctau1_llp2000_lsp1800"
+output = "llpScan_ctau1_llp2000_lsp1800"
    
 for folderName in os.listdir(basedir):
     if folderName.startswith("signal_"):
@@ -293,6 +294,12 @@ muLimit = 0.0250
 
 grid = {'logmu':[],'llpEff':[],'deltaNLL':[]}
 
+signalCross = 1
+s1hicross = -1
+s1locross = -1
+s2hicross = -1
+s2locross = -1
+
 for signalStrength,path in results:
     significance = getSigResult(os.path.join(path,"higgsCombineTest.Significance.mH120.root"))
     fitResult = getScanResult(os.path.join(path,"higgsCombineTest.MultiDimFit.mH120.root"))
@@ -302,11 +309,19 @@ for signalStrength,path in results:
         grid['logmu'].append(math.log(signalStrength/muLimit))
         grid['llpEff'].append(fitResult['llpEff'][i])
         grid['deltaNLL'].append(fitResult['deltaNLL'][i])
+        
+    if (math.fabs(signalStrength/muLimit-1)<signalCross):
+        signalCross = math.fabs(signalStrength/muLimit-1)
+        s1locross = fitResult["1s"][0]
+        s1hicross = fitResult["1s"][1]
+        s2locross = fitResult["2s"][0]
+        s2hicross = fitResult["2s"][1]
     
     if fitResult["1s"][0]>0 and fitResult["1s"][1]>0:
         mu1s.append(signalStrength/muLimit)
         llp1slo.append(fitResult["1s"][0])
         llp1shi.append(fitResult["1s"][1])
+        
     if fitResult["2s"][0]>0 and fitResult["2s"][1]>0:
         mu2s.append(signalStrength/muLimit)
         llp2slo.append(fitResult["2s"][0])
@@ -330,10 +345,10 @@ graph2shi = ROOT.TGraph(len(mu2s),mu2s,llp2shi)
 
 cv = ROOT.TCanvas("cv","",800,670)
 
-cvxmin=0.14
+cvxmin=0.13
 cvxmax=0.82
 cvymin=0.135
-cvymax=0.93
+cvymax=0.935
 
 cv.SetLeftMargin(cvxmin)
 cv.SetRightMargin(1-cvxmax)
@@ -356,10 +371,16 @@ axis = ROOT.TH2F("axis",";;",
 axis.GetXaxis().SetTitle("#mu#kern[-0.6]{ }#lower[0.05]{#scale[1.1]{/}}#mu#lower[0.3]{#scale[0.7]{Limit}}")
 axis.GetYaxis().SetTitle("Tagging efficiency SF")
 axis.GetZaxis().SetTitle("-2#kern[-0.5]{ }#Delta#kern[-0.6]{ }ln(L)")
-
-axis.GetXaxis().SetTickLength(0.015/(1-cvxmin-(1-cvxmax)))
-axis.GetYaxis().SetTickLength(0.015/(1-cvymin-(1-cvymax)))
-axis.GetZaxis().SetTickLength(0.015/(1-cvymin-(1-cvymax)))
+padW = ROOT.gPad.GetWw()*ROOT.gPad.GetAbsWNDC()
+padH = ROOT.gPad.GetWh()*ROOT.gPad.GetAbsHNDC()
+print ROOT.gPad.GetWw(),ROOT.gPad.GetWh()
+print ROOT.gPad.GetAbsWNDC(),ROOT.gPad.GetAbsHNDC()
+tickScaleX = 1./(1-cvxmin-(1-cvxmax))
+tickScaleY = 1./(1-cvymin-(1-cvymax))/padW*padH
+print tickScaleX,tickScaleY
+axis.GetXaxis().SetTickLength(0.02*tickScaleX)
+axis.GetYaxis().SetTickLength(0.02*tickScaleY)
+axis.GetZaxis().SetTickLength(0.02*tickScaleY)
 axis.GetYaxis().SetNdivisions(512)
 
 for ibin in range(axis.GetNbinsX()):
@@ -368,11 +389,49 @@ for ibin in range(axis.GetNbinsX()):
     for jbin in range(axis.GetNbinsY()):
         llpEff = axis.GetYaxis().GetBinCenter(jbin+1)
         deltaNLL = deltaNLLfct(math.log(mu),llpEff)
+        if deltaNLL>8.1:
+            continue
         #print mu,llpEff,deltaNLL
         axis.SetBinContent(ibin+1,jbin+1,deltaNLL)
 
 axis.Draw("colz")
 axis.GetZaxis().SetRangeUser(0,8)
+
+if s1locross>0:
+    lines1lo = ROOT.TLine(axis.GetXaxis().GetXmin(),s1locross,1,s1locross)
+    lines1lo.SetLineWidth(1)
+    lines1lo.SetLineStyle(2)
+    lines1lo.SetLineColor(0)
+    lines1lo.Draw("L")
+    
+if s1hicross>0:
+    lines1hi = ROOT.TLine(axis.GetXaxis().GetXmin(),s1hicross,1,s1hicross)
+    lines1hi.SetLineWidth(1)
+    lines1hi.SetLineStyle(2)
+    lines1hi.SetLineColor(0)
+    lines1hi.Draw("L")
+    
+if s2locross>0:
+    lines2lo = ROOT.TLine(axis.GetXaxis().GetXmin(),s2locross,1,s2locross)
+    lines2lo.SetLineWidth(1)
+    lines2lo.SetLineStyle(2)
+    lines2lo.SetLineColor(0)
+    lines2lo.Draw("L")
+    
+if s2hicross>0:
+    lines2hi = ROOT.TLine(axis.GetXaxis().GetXmin(),s2hicross,1,s2hicross)
+    lines2hi.SetLineWidth(1)
+    lines2hi.SetLineStyle(2)
+    lines2hi.SetLineColor(0)
+    lines2hi.Draw("L")
+    
+limitLine = ROOT.TLine(1,axis.GetYaxis().GetXmin(),1,axis.GetYaxis().GetXmax())
+limitLine.SetLineColor(0)
+limitLine.SetLineWidth(1)
+limitLine.SetLineStyle(2)
+limitLine.Draw("L")
+    
+ROOT.gPad.RedrawAxis()
 
 color1s = newColorHLS(0.75,0.0,0.0)
 color2s = newColorHLS(0.77,0.0,0.0)
@@ -385,7 +444,6 @@ graph1shi.SetLineWidth(2)
 
 graph1slo.Draw("L")
 graph1shi.Draw("L")
-
 
 graph2slo.SetLineColor(color2s.GetNumber())
 graph2slo.SetLineWidth(3)
@@ -404,46 +462,50 @@ effLine.SetLineWidth(1)
 effLine.SetLineStyle(1)
 effLine.Draw("L")
 
-limitLine = ROOT.TLine(1,axis.GetYaxis().GetXmin(),1,axis.GetYaxis().GetXmax())
-limitLine.SetLineColor(1)
-limitLine.SetLineWidth(1)
-limitLine.SetLineStyle(2)
-limitLine.Draw("L")
-
-pTextCMS = ROOT.TPaveText(cv.GetLeftMargin(),1-cv.GetTopMargin()+0.055,cv.GetLeftMargin(),1-cv.GetTopMargin()+0.055,"NDC")
+pTextCMS = ROOT.TPaveText(cv.GetLeftMargin(),1-cv.GetTopMargin()+0.05,cv.GetLeftMargin(),1-cv.GetTopMargin()+0.05,"NDC")
 pTextCMS.AddText("CMS")
 pTextCMS.SetTextFont(63)
-pTextCMS.SetTextSize(32)
+pTextCMS.SetTextSize(31)
 pTextCMS.SetTextAlign(13)
 pTextCMS.Draw("Same")
 
-pTextPreliminary = ROOT.TPaveText(cv.GetLeftMargin()+0.09,1-cv.GetTopMargin()+0.055,cv.GetLeftMargin()+0.09,1-cv.GetTopMargin()+0.055,"NDC")
+pTextPreliminary = ROOT.TPaveText(cv.GetLeftMargin()+0.088,1-cv.GetTopMargin()+0.05,cv.GetLeftMargin()+0.088,1-cv.GetTopMargin()+0.05,"NDC")
 pTextPreliminary.AddText("Simulation")
 pTextPreliminary.SetTextFont(53)
-pTextPreliminary.SetTextSize(32)
+pTextPreliminary.SetTextSize(31)
 pTextPreliminary.SetTextAlign(13)
 pTextPreliminary.Draw("Same")
 
-pInfo = ROOT.TPaveText(1-cv.GetRightMargin(),1-cv.GetTopMargin()+0.06,1-cv.GetRightMargin(),1-cv.GetTopMargin()+0.06,"NDC")
-pInfo.AddText("p#kern[-0.6]{ }p#kern[-0.5]{ }#rightarrow#kern[-0.5]{ }#tilde{g}#kern[-0.6]{ }#tilde{g}, #tilde{g}#kern[-0.5]{ }#rightarrow#kern[-0.5]{ }q#kern[-0.6]{ }#bar{q}#kern[-0.6]{ }#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.2]{#lower[0.6]{#scale[0.65]{1}}}")
+pInfo2 = ROOT.TPaveText(1-cv.GetRightMargin(),1-cv.GetTopMargin()+0.056,1-cv.GetRightMargin(),1-cv.GetTopMargin()+0.056,"NDC")
+pInfo2.AddText("p#kern[-0.6]{ }p#kern[-0.5]{ }#rightarrow#kern[-0.5]{ }#tilde{g}#kern[-0.6]{ }#tilde{g}, #tilde{g}#kern[-0.5]{ }#rightarrow#kern[-0.5]{ }q#kern[-0.6]{ }#bar{q}#kern[-0.6]{ }#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.3]{#lower[0.6]{#scale[0.65]{1}}}")
+pInfo2.SetTextFont(43)
+pInfo2.SetTextSize(32)
+pInfo2.SetTextAlign(33)
+#pInfo2.Draw("Same")
+
+pInfo = ROOT.TPaveText(1-cv.GetRightMargin()-0.04,cv.GetBottomMargin()+0.03,1-cv.GetRightMargin()-0.04,cv.GetBottomMargin()+0.24,"NDC")
+pInfo.AddText("p#kern[-0.6]{ }p#kern[-0.5]{ }#rightarrow#kern[-0.5]{ }#tilde{g}#kern[-0.6]{ }#tilde{g}, #tilde{g}#kern[-0.5]{ }#rightarrow#kern[-0.5]{ }q#kern[-0.6]{ }#bar{q}#kern[-0.6]{ }#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.3]{#lower[0.6]{#scale[0.65]{1}}}")
+#pInfo.AddText("m#lower[0.2]{#scale[0.8]{#tilde{g}}}#kern[-0.4]{ }=#kern[-0.5]{ }2#kern[-0.6]{ }TeV, m#lower[0.2]{#scale[0.8]{#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.2]{#lower[0.6]{#scale[0.65]{1}}}}}#kern[-0.4]{ }=#kern[-0.5]{ }200#kern[-0.6]{ }GeV")
+pInfo.AddText("m#lower[0.2]{#scale[0.8]{#tilde{g}}}#kern[-0.4]{ }=#kern[-0.5]{ }2#kern[-0.6]{ }TeV, m#lower[0.2]{#scale[0.8]{#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.2]{#lower[0.6]{#scale[0.65]{1}}}}}#kern[-0.4]{ }=#kern[-0.5]{ }1.8#kern[-0.6]{ }TeV")
+pInfo.AddText("c#tau#kern[-0.5]{ }=#kern[-0.8]{ }1#kern[-0.5]{ }mm")
 pInfo.SetTextFont(43)
-pInfo.SetTextSize(32)
+pInfo.SetTextSize(29)
 pInfo.SetTextAlign(33)
 pInfo.Draw("Same")
 
-legend = ROOT.TLegend(1-cv.GetRightMargin()-0.04-0.17,cv.GetBottomMargin()+0.03+0.15,1-cv.GetRightMargin()-0.04,cv.GetBottomMargin()+0.07)
+legend = ROOT.TLegend(1-cv.GetRightMargin()-0.04-0.17,1-cv.GetTopMargin()-0.03-0.15,1-cv.GetRightMargin()-0.04,1-cv.GetTopMargin()-0.07)
 legend.SetFillStyle(0)
 legend.SetBorderSize(0)
 legend.SetTextFont(43)
-legend.SetTextSize(30)
+legend.SetTextSize(29)
 legend.AddEntry(graph1shi,"68#kern[-0.6]{ }% CL","L")
 legend.AddEntry(graph2shi,"95#kern[-0.6]{ }% CL","L")
 legend.Draw("Same")
     
 #ROOT.gPad.RedrawAxis()
 
-cv.Print("llpscan.pdf")
-cv.Print("llpscan.png")
-
+cv.Print(output+".pdf")
+cv.Print(output+".png")
+cv.Print(output+".C")
 cv.WaitPrimitive()
 
