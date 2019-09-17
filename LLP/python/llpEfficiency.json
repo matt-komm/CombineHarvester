@@ -2,32 +2,32 @@
   "0": {
     "1000": {
       "0": {
-        "tagged": 4772, 
-        "total": 8098
+        "tagged": 3318, 
+        "total": 8155
       }, 
       "1000": {
         "tagged": 0, 
-        "total": 1
+        "total": 2
       }, 
       "200": {
-        "tagged": 5043, 
-        "total": 8415
+        "tagged": 3420, 
+        "total": 8455
       }, 
       "400": {
-        "tagged": 5295, 
-        "total": 8974
+        "tagged": 3489, 
+        "total": 9035
       }, 
       "600": {
-        "tagged": 3121, 
-        "total": 5257
+        "tagged": 1916, 
+        "total": 5293
       }, 
       "800": {
-        "tagged": 986, 
-        "total": 1568
+        "tagged": 533, 
+        "total": 1588
       }, 
       "900": {
-        "tagged": 477, 
-        "total": 817
+        "tagged": 206, 
+        "total": 829
       }
     }, 
     "1100": {
@@ -38,394 +38,394 @@
     }, 
     "1200": {
       "0": {
-        "tagged": 7293, 
-        "total": 12267
+        "tagged": 5099, 
+        "total": 12331
       }, 
       "1000": {
-        "tagged": 1103, 
-        "total": 1805
+        "tagged": 537, 
+        "total": 1816
       }, 
       "1100": {
-        "tagged": 501, 
-        "total": 861
+        "tagged": 227, 
+        "total": 875
       }, 
       "1200": {
         "tagged": 0, 
         "total": 1
       }, 
       "200": {
-        "tagged": 6182, 
-        "total": 10446
+        "tagged": 4193, 
+        "total": 10540
       }, 
       "400": {
-        "tagged": 6939, 
-        "total": 11837
+        "tagged": 4612, 
+        "total": 11860
       }, 
       "600": {
-        "tagged": 5603, 
-        "total": 9683
+        "tagged": 3567, 
+        "total": 9743
       }, 
       "800": {
-        "tagged": 3683, 
-        "total": 6313
+        "tagged": 2166, 
+        "total": 6364
       }, 
       "900": {
-        "tagged": 2378, 
-        "total": 4048
+        "tagged": 1366, 
+        "total": 4062
       }
     }, 
     "1400": {
       "0": {
-        "tagged": 6029, 
-        "total": 10509
+        "tagged": 4257, 
+        "total": 10550
       }, 
       "1000": {
-        "tagged": 3852, 
-        "total": 6533
+        "tagged": 2308, 
+        "total": 6519
       }, 
       "1200": {
-        "tagged": 1167, 
-        "total": 1977
+        "tagged": 578, 
+        "total": 1982
       }, 
       "1300": {
-        "tagged": 464, 
-        "total": 786
+        "tagged": 185, 
+        "total": 783
       }, 
       "1400": {
         "tagged": 0, 
         "total": 0
       }, 
       "200": {
-        "tagged": 7209, 
-        "total": 12463
+        "tagged": 4998, 
+        "total": 12550
       }, 
       "400": {
-        "tagged": 8857, 
-        "total": 15181
+        "tagged": 5914, 
+        "total": 15253
       }, 
       "600": {
-        "tagged": 6749, 
-        "total": 11678
+        "tagged": 4518, 
+        "total": 11722
       }, 
       "800": {
-        "tagged": 7108, 
-        "total": 12436
+        "tagged": 4558, 
+        "total": 12533
       }, 
       "900": {
-        "tagged": 4536, 
-        "total": 7812
+        "tagged": 2910, 
+        "total": 7885
       }
     }, 
     "1600": {
       "0": {
-        "tagged": 8219, 
-        "total": 14422
+        "tagged": 5782, 
+        "total": 14503
       }, 
       "1000": {
-        "tagged": 6477, 
-        "total": 11447
+        "tagged": 4149, 
+        "total": 11529
       }, 
       "1200": {
-        "tagged": 4142, 
-        "total": 7386
+        "tagged": 2492, 
+        "total": 7391
       }, 
       "1400": {
-        "tagged": 992, 
-        "total": 1664
+        "tagged": 489, 
+        "total": 1691
       }, 
       "1500": {
-        "tagged": 945, 
-        "total": 1687
+        "tagged": 365, 
+        "total": 1707
       }, 
       "200": {
-        "tagged": 7899, 
-        "total": 13857
+        "tagged": 5504, 
+        "total": 13943
       }, 
       "400": {
-        "tagged": 8099, 
-        "total": 14381
+        "tagged": 5527, 
+        "total": 14474
       }, 
       "600": {
-        "tagged": 8542, 
-        "total": 14920
+        "tagged": 5825, 
+        "total": 14993
       }, 
       "800": {
-        "tagged": 7932, 
-        "total": 13977
+        "tagged": 5157, 
+        "total": 14035
       }, 
       "900": {
-        "tagged": 8373, 
-        "total": 14587
+        "tagged": 5472, 
+        "total": 14684
       }
     }, 
     "1800": {
       "0": {
-        "tagged": 7882, 
-        "total": 13876
+        "tagged": 5638, 
+        "total": 13909
       }, 
       "1000": {
-        "tagged": 7039, 
-        "total": 12569
+        "tagged": 4581, 
+        "total": 12614
       }, 
       "1200": {
-        "tagged": 6767, 
-        "total": 12124
+        "tagged": 4223, 
+        "total": 12165
       }, 
       "1400": {
-        "tagged": 3855, 
-        "total": 6755
+        "tagged": 2205, 
+        "total": 6777
       }, 
       "1600": {
-        "tagged": 2343, 
-        "total": 4018
+        "tagged": 1156, 
+        "total": 4051
       }, 
       "1700": {
-        "tagged": 908, 
-        "total": 1615
+        "tagged": 344, 
+        "total": 1630
       }, 
       "200": {
-        "tagged": 8900, 
-        "total": 15613
+        "tagged": 6173, 
+        "total": 15705
       }, 
       "400": {
-        "tagged": 7891, 
-        "total": 13879
+        "tagged": 5574, 
+        "total": 13982
       }, 
       "600": {
-        "tagged": 7969, 
-        "total": 14323
+        "tagged": 5345, 
+        "total": 14317
       }, 
       "800": {
-        "tagged": 6720, 
-        "total": 11922
+        "tagged": 4541, 
+        "total": 12019
       }
     }, 
     "2000": {
       "0": {
-        "tagged": 8829, 
-        "total": 15638
+        "tagged": 6299, 
+        "total": 15772
       }, 
       "1000": {
-        "tagged": 8543, 
-        "total": 15261
+        "tagged": 5702, 
+        "total": 15294
       }, 
       "1200": {
-        "tagged": 7329, 
-        "total": 13082
+        "tagged": 4783, 
+        "total": 13104
       }, 
       "1400": {
-        "tagged": 6208, 
-        "total": 11142
+        "tagged": 3967, 
+        "total": 11205
       }, 
       "1600": {
-        "tagged": 9839, 
-        "total": 17929
+        "tagged": 5854, 
+        "total": 18025
       }, 
       "1800": {
-        "tagged": 2191, 
-        "total": 3920
+        "tagged": 1062, 
+        "total": 3948
       }, 
       "1900": {
-        "tagged": 889, 
-        "total": 1576
+        "tagged": 338, 
+        "total": 1597
       }, 
       "200": {
-        "tagged": 8608, 
-        "total": 15531
+        "tagged": 6035, 
+        "total": 15609
       }, 
       "400": {
-        "tagged": 8789, 
-        "total": 15686
+        "tagged": 6143, 
+        "total": 15828
       }, 
       "600": {
-        "tagged": 7526, 
-        "total": 13578
+        "tagged": 5316, 
+        "total": 13706
       }, 
       "800": {
-        "tagged": 9473, 
-        "total": 16811
+        "tagged": 6487, 
+        "total": 16917
       }
     }, 
     "2100": {
       "1800": {
-        "tagged": 3, 
+        "tagged": 1, 
         "total": 3
       }
     }, 
     "2200": {
       "0": {
-        "tagged": 10257, 
-        "total": 18663
+        "tagged": 7184, 
+        "total": 18758
       }, 
       "1000": {
-        "tagged": 7635, 
-        "total": 13885
+        "tagged": 5199, 
+        "total": 14025
       }, 
       "1200": {
-        "tagged": 5909, 
-        "total": 10656
+        "tagged": 3908, 
+        "total": 10718
       }, 
       "1400": {
-        "tagged": 8648, 
-        "total": 15585
+        "tagged": 5524, 
+        "total": 15650
       }, 
       "1600": {
-        "tagged": 14245, 
-        "total": 26346
+        "tagged": 8841, 
+        "total": 26516
       }, 
       "1800": {
-        "tagged": 9392, 
-        "total": 17032
+        "tagged": 5530, 
+        "total": 17112
       }, 
       "200": {
-        "tagged": 8720, 
-        "total": 15839
+        "tagged": 6027, 
+        "total": 15827
       }, 
       "2000": {
-        "tagged": 2059, 
-        "total": 3689
+        "tagged": 1013, 
+        "total": 3704
       }, 
       "2100": {
-        "tagged": 772, 
-        "total": 1480
+        "tagged": 300, 
+        "total": 1497
       }, 
       "400": {
-        "tagged": 10820, 
-        "total": 19382
+        "tagged": 7578, 
+        "total": 19510
       }, 
       "600": {
-        "tagged": 9550, 
-        "total": 17256
+        "tagged": 6638, 
+        "total": 17356
       }, 
       "800": {
-        "tagged": 10492, 
-        "total": 18943
+        "tagged": 7161, 
+        "total": 19031
       }
     }, 
     "2400": {
       "0": {
-        "tagged": 9080, 
-        "total": 16333
+        "tagged": 6421, 
+        "total": 16382
       }, 
       "1000": {
-        "tagged": 8715, 
-        "total": 15493
+        "tagged": 5906, 
+        "total": 15606
       }, 
       "1200": {
-        "tagged": 8185, 
-        "total": 14817
+        "tagged": 5448, 
+        "total": 14884
       }, 
       "1400": {
-        "tagged": 9828, 
-        "total": 17789
+        "tagged": 6442, 
+        "total": 17824
       }, 
       "1600": {
-        "tagged": 18524, 
-        "total": 34216
+        "tagged": 11921, 
+        "total": 34395
       }, 
       "1800": {
-        "tagged": 14356, 
-        "total": 26560
+        "tagged": 8836, 
+        "total": 26651
       }, 
       "200": {
-        "tagged": 9255, 
-        "total": 16659
+        "tagged": 6519, 
+        "total": 16757
       }, 
       "2000": {
-        "tagged": 10013, 
-        "total": 18458
+        "tagged": 5877, 
+        "total": 18589
       }, 
       "2200": {
-        "tagged": 2198, 
-        "total": 3897
+        "tagged": 1047, 
+        "total": 3907
       }, 
       "2300": {
-        "tagged": 759, 
-        "total": 1423
+        "tagged": 309, 
+        "total": 1447
       }, 
       "400": {
-        "tagged": 8238, 
-        "total": 14625
+        "tagged": 5673, 
+        "total": 14678
       }, 
       "600": {
-        "tagged": 8987, 
-        "total": 16277
+        "tagged": 6186, 
+        "total": 16313
       }, 
       "800": {
-        "tagged": 6837, 
-        "total": 12383
+        "tagged": 4741, 
+        "total": 12465
       }
     }, 
     "2500": {
       "0": {
-        "tagged": 21810, 
-        "total": 39350
+        "tagged": 15185, 
+        "total": 39567
       }, 
       "1000": {
-        "tagged": 21662, 
-        "total": 39673
+        "tagged": 14665, 
+        "total": 39792
       }, 
       "1200": {
-        "tagged": 21948, 
-        "total": 39615
+        "tagged": 14663, 
+        "total": 39771
       }, 
       "1400": {
-        "tagged": 19599, 
-        "total": 35957
+        "tagged": 12946, 
+        "total": 36103
       }, 
       "1600": {
-        "tagged": 19702, 
-        "total": 36050
+        "tagged": 12714, 
+        "total": 36175
       }, 
       "1800": {
-        "tagged": 16736, 
-        "total": 30728
+        "tagged": 10542, 
+        "total": 30748
       }, 
       "200": {
-        "tagged": 22116, 
-        "total": 40057
+        "tagged": 15412, 
+        "total": 40322
       }, 
       "2000": {
-        "tagged": 12316, 
-        "total": 23013
+        "tagged": 7468, 
+        "total": 23139
       }, 
       "2200": {
-        "tagged": 6054, 
-        "total": 11234
+        "tagged": 3341, 
+        "total": 11363
       }, 
       "2400": {
-        "tagged": 754, 
-        "total": 1427
+        "tagged": 265, 
+        "total": 1449
       }, 
       "400": {
-        "tagged": 23222, 
-        "total": 42451
+        "tagged": 16025, 
+        "total": 42585
       }, 
       "600": {
-        "tagged": 22302, 
-        "total": 40501
+        "tagged": 15370, 
+        "total": 40771
       }, 
       "800": {
-        "tagged": 22038, 
-        "total": 39944
+        "tagged": 15180, 
+        "total": 40095
       }
     }, 
     "600": {
       "0": {
-        "tagged": 2428, 
-        "total": 3897
+        "tagged": 1567, 
+        "total": 3887
       }, 
       "200": {
-        "tagged": 2015, 
-        "total": 3282
+        "tagged": 1255, 
+        "total": 3283
       }, 
       "400": {
-        "tagged": 566, 
-        "total": 898
+        "tagged": 301, 
+        "total": 906
       }, 
       "500": {
-        "tagged": 292, 
-        "total": 455
+        "tagged": 132, 
+        "total": 458
       }, 
       "600": {
         "tagged": 0, 
@@ -434,906 +434,446 @@
     }, 
     "800": {
       "0": {
-        "tagged": 4412, 
-        "total": 7312
+        "tagged": 2970, 
+        "total": 7375
       }, 
       "200": {
-        "tagged": 3695, 
-        "total": 6111
+        "tagged": 2420, 
+        "total": 6114
       }, 
       "400": {
-        "tagged": 3154, 
-        "total": 5313
+        "tagged": 2047, 
+        "total": 5379
       }, 
       "600": {
-        "tagged": 818, 
-        "total": 1302
+        "tagged": 465, 
+        "total": 1321
       }, 
       "700": {
-        "tagged": 400, 
-        "total": 661
+        "tagged": 180, 
+        "total": 671
       }, 
-      "800": {
-        "tagged": 1, 
-        "total": 4
-      }
-    }
-  }, 
-  "0p001": {
-    "1000": {
-      "0": {
-        "tagged": 740, 
-        "total": 8727
-      }, 
-      "1000": {
-        "tagged": 0, 
-        "total": 1
-      }, 
-      "200": {
-        "tagged": 822, 
-        "total": 11178
-      }, 
-      "400": {
-        "tagged": 516, 
-        "total": 8391
-      }, 
-      "600": {
-        "tagged": 235, 
-        "total": 5511
-      }, 
-      "800": {
-        "tagged": 92, 
-        "total": 1962
-      }, 
-      "900": {
-        "tagged": 33, 
-        "total": 718
-      }
-    }, 
-    "1200": {
-      "0": {
-        "tagged": 1100, 
-        "total": 11291
-      }, 
-      "1000": {
-        "tagged": 91, 
-        "total": 2040
-      }, 
-      "1100": {
-        "tagged": 44, 
-        "total": 950
-      }, 
-      "1200": {
-        "tagged": 0, 
-        "total": 1
-      }, 
-      "200": {
-        "tagged": 1000, 
-        "total": 11032
-      }, 
-      "400": {
-        "tagged": 1061, 
-        "total": 12803
-      }, 
-      "600": {
-        "tagged": 561, 
-        "total": 8792
-      }, 
-      "800": {
-        "tagged": 276, 
-        "total": 6231
-      }, 
-      "900": {
-        "tagged": 182, 
-        "total": 3874
-      }
-    }, 
-    "1400": {
-      "0": {
-        "tagged": 1456, 
-        "total": 13108
-      }, 
-      "1000": {
-        "tagged": 327, 
-        "total": 6872
-      }, 
-      "1200": {
-        "tagged": 78, 
-        "total": 2158
-      }, 
-      "1300": {
-        "tagged": 34, 
-        "total": 878
-      }, 
-      "1400": {
-        "tagged": 0, 
-        "total": 0
-      }, 
-      "200": {
-        "tagged": 1382, 
-        "total": 12321
-      }, 
-      "400": {
-        "tagged": 1357, 
-        "total": 13707
-      }, 
-      "600": {
-        "tagged": 1046, 
-        "total": 12225
-      }, 
-      "800": {
-        "tagged": 706, 
-        "total": 10937
-      }, 
-      "900": {
-        "tagged": 495, 
-        "total": 8666
-      }
-    }, 
-    "1600": {
-      "0": {
-        "tagged": 1960, 
-        "total": 14754
-      }, 
-      "1000": {
-        "tagged": 977, 
-        "total": 13801
-      }, 
-      "1200": {
-        "tagged": 413, 
-        "total": 8551
-      }, 
-      "1400": {
-        "tagged": 66, 
-        "total": 2145
-      }, 
-      "1500": {
-        "tagged": 68, 
-        "total": 1721
-      }, 
-      "200": {
-        "tagged": 2093, 
-        "total": 16722
-      }, 
-      "400": {
-        "tagged": 1848, 
-        "total": 16027
-      }, 
-      "600": {
-        "tagged": 1559, 
-        "total": 14206
-      }, 
-      "800": {
-        "tagged": 1349, 
-        "total": 14983
-      }, 
-      "900": {
-        "tagged": 1072, 
-        "total": 13336
-      }
-    }, 
-    "1700": {
-      "1200": {
-        "tagged": 0, 
-        "total": 2
-      }
-    }, 
-    "1800": {
-      "0": {
-        "tagged": 1914, 
-        "total": 13346
-      }, 
-      "1000": {
-        "tagged": 1258, 
-        "total": 13475
-      }, 
-      "1200": {
-        "tagged": 814, 
-        "total": 11272
-      }, 
-      "1400": {
-        "tagged": 380, 
-        "total": 7550
-      }, 
-      "1600": {
-        "tagged": 202, 
-        "total": 4340
-      }, 
-      "1700": {
-        "tagged": 66, 
-        "total": 1613
-      }, 
-      "200": {
-        "tagged": 2020, 
-        "total": 14785
-      }, 
-      "400": {
-        "tagged": 2100, 
-        "total": 15708
-      }, 
-      "600": {
-        "tagged": 1893, 
-        "total": 14805
-      }, 
-      "800": {
-        "tagged": 1689, 
-        "total": 14673
-      }
-    }, 
-    "2000": {
-      "0": {
-        "tagged": 2393, 
-        "total": 15772
-      }, 
-      "1000": {
-        "tagged": 1771, 
-        "total": 15238
-      }, 
-      "1200": {
-        "tagged": 1632, 
-        "total": 16838
-      }, 
-      "1400": {
-        "tagged": 767, 
-        "total": 11128
-      }, 
-      "1600": {
-        "tagged": 905, 
-        "total": 17758
-      }, 
-      "1800": {
-        "tagged": 200, 
-        "total": 4643
-      }, 
-      "1900": {
-        "tagged": 79, 
-        "total": 1731
-      }, 
-      "200": {
-        "tagged": 2576, 
-        "total": 17818
-      }, 
-      "400": {
-        "tagged": 2876, 
-        "total": 19235
-      }, 
-      "600": {
-        "tagged": 2026, 
-        "total": 13959
-      }, 
-      "800": {
-        "tagged": 1936, 
-        "total": 15144
-      }
-    }, 
-    "2100": {
       "800": {
         "tagged": 0, 
         "total": 4
-      }
-    }, 
-    "2200": {
-      "0": {
-        "tagged": 2203, 
-        "total": 14314
-      }, 
-      "1000": {
-        "tagged": 2265, 
-        "total": 16626
-      }, 
-      "1200": {
-        "tagged": 2007, 
-        "total": 17107
-      }, 
-      "1400": {
-        "tagged": 1364, 
-        "total": 14253
-      }, 
-      "1600": {
-        "tagged": 1952, 
-        "total": 26859
-      }, 
-      "1800": {
-        "tagged": 896, 
-        "total": 18344
-      }, 
-      "200": {
-        "tagged": 2570, 
-        "total": 16192
-      }, 
-      "2000": {
-        "tagged": 164, 
-        "total": 4293
-      }, 
-      "2100": {
-        "tagged": 67, 
-        "total": 1554
-      }, 
-      "400": {
-        "tagged": 3240, 
-        "total": 20793
-      }, 
-      "600": {
-        "tagged": 2585, 
-        "total": 16773
-      }, 
-      "800": {
-        "tagged": 2782, 
-        "total": 18873
-      }
-    }, 
-    "2400": {
-      "0": {
-        "tagged": 3364, 
-        "total": 19883
-      }, 
-      "1000": {
-        "tagged": 2664, 
-        "total": 17758
-      }, 
-      "1200": {
-        "tagged": 2665, 
-        "total": 19703
-      }, 
-      "1400": {
-        "tagged": 1831, 
-        "total": 15690
-      }, 
-      "1600": {
-        "tagged": 3172, 
-        "total": 33322
-      }, 
-      "1800": {
-        "tagged": 2152, 
-        "total": 29709
-      }, 
-      "200": {
-        "tagged": 2226, 
-        "total": 12890
-      }, 
-      "2000": {
-        "tagged": 943, 
-        "total": 19175
-      }, 
-      "2200": {
-        "tagged": 161, 
-        "total": 4210
-      }, 
-      "2300": {
-        "tagged": 69, 
-        "total": 1584
-      }, 
-      "400": {
-        "tagged": 3010, 
-        "total": 17835
-      }, 
-      "600": {
-        "tagged": 3299, 
-        "total": 19625
-      }, 
-      "800": {
-        "tagged": 3493, 
-        "total": 22086
-      }
-    }, 
-    "2500": {
-      "0": {
-        "tagged": 6529, 
-        "total": 39379
-      }, 
-      "1000": {
-        "tagged": 6612, 
-        "total": 42492
-      }, 
-      "1200": {
-        "tagged": 6195, 
-        "total": 42730
-      }, 
-      "1400": {
-        "tagged": 4900, 
-        "total": 38225
-      }, 
-      "1600": {
-        "tagged": 4212, 
-        "total": 39241
-      }, 
-      "1800": {
-        "tagged": 2886, 
-        "total": 32324
-      }, 
-      "200": {
-        "tagged": 7283, 
-        "total": 43465
-      }, 
-      "2000": {
-        "tagged": 1784, 
-        "total": 27773
-      }, 
-      "2200": {
-        "tagged": 494, 
-        "total": 11349
-      }, 
-      "2400": {
-        "tagged": 61, 
-        "total": 1555
-      }, 
-      "400": {
-        "tagged": 6983, 
-        "total": 40792
-      }, 
-      "600": {
-        "tagged": 7011, 
-        "total": 41704
-      }, 
-      "800": {
-        "tagged": 7091, 
-        "total": 43197
-      }
-    }, 
-    "600": {
-      "0": {
-        "tagged": 182, 
-        "total": 4104
-      }, 
-      "200": {
-        "tagged": 141, 
-        "total": 3322
-      }, 
-      "400": {
-        "tagged": 32, 
-        "total": 942
-      }, 
-      "500": {
-        "tagged": 18, 
-        "total": 534
-      }, 
-      "600": {
-        "tagged": 0, 
-        "total": 2
-      }
-    }, 
-    "800": {
-      "0": {
-        "tagged": 537, 
-        "total": 9105
-      }, 
-      "200": {
-        "tagged": 464, 
-        "total": 7989
-      }, 
-      "400": {
-        "tagged": 248, 
-        "total": 5326
-      }, 
-      "600": {
-        "tagged": 61, 
-        "total": 1563
-      }, 
-      "700": {
-        "tagged": 21, 
-        "total": 719
-      }, 
-      "800": {
-        "tagged": 0, 
-        "total": 1
       }
     }
   }, 
   "0p01": {
     "1000": {
       "0": {
-        "tagged": 742, 
-        "total": 9803
+        "tagged": 82, 
+        "total": 9867
       }, 
       "1000": {
         "tagged": 0, 
         "total": 1
       }, 
       "200": {
-        "tagged": 758, 
-        "total": 10617
+        "tagged": 105, 
+        "total": 10716
       }, 
       "400": {
-        "tagged": 565, 
-        "total": 9061
+        "tagged": 96, 
+        "total": 9141
       }, 
       "600": {
-        "tagged": 245, 
-        "total": 5309
+        "tagged": 58, 
+        "total": 5336
       }, 
       "800": {
-        "tagged": 74, 
-        "total": 1663
+        "tagged": 24, 
+        "total": 1671
       }, 
       "900": {
-        "tagged": 40, 
-        "total": 834
+        "tagged": 17, 
+        "total": 859
       }
     }, 
     "1200": {
       "0": {
-        "tagged": 883, 
-        "total": 10045
+        "tagged": 95, 
+        "total": 10110
       }, 
       "1000": {
-        "tagged": 79, 
-        "total": 2112
+        "tagged": 41, 
+        "total": 2137
       }, 
       "1100": {
-        "tagged": 52, 
-        "total": 901
+        "tagged": 25, 
+        "total": 922
       }, 
       "1200": {
         "tagged": 0, 
         "total": 2
       }, 
       "200": {
-        "tagged": 1106, 
-        "total": 12206
+        "tagged": 90, 
+        "total": 12305
       }, 
       "400": {
-        "tagged": 868, 
-        "total": 10803
+        "tagged": 87, 
+        "total": 10876
       }, 
       "600": {
-        "tagged": 594, 
-        "total": 9939
+        "tagged": 83, 
+        "total": 10027
       }, 
       "800": {
-        "tagged": 307, 
-        "total": 6794
+        "tagged": 70, 
+        "total": 6874
       }, 
       "900": {
-        "tagged": 198, 
-        "total": 4705
+        "tagged": 64, 
+        "total": 4743
       }
     }, 
     "1400": {
       "0": {
-        "tagged": 1559, 
-        "total": 13821
+        "tagged": 103, 
+        "total": 13917
       }, 
       "1000": {
-        "tagged": 261, 
-        "total": 6039
+        "tagged": 84, 
+        "total": 6099
       }, 
       "1200": {
-        "tagged": 86, 
-        "total": 1939
+        "tagged": 32, 
+        "total": 1972
       }, 
       "1300": {
-        "tagged": 49, 
-        "total": 954
+        "tagged": 21, 
+        "total": 983
       }, 
       "1400": {
         "tagged": 0, 
         "total": 0
       }, 
       "200": {
-        "tagged": 1313, 
-        "total": 13201
+        "tagged": 120, 
+        "total": 13327
       }, 
       "400": {
-        "tagged": 1134, 
-        "total": 11661
+        "tagged": 92, 
+        "total": 11712
       }, 
       "600": {
-        "tagged": 993, 
-        "total": 12281
+        "tagged": 115, 
+        "total": 12371
       }, 
       "800": {
-        "tagged": 838, 
-        "total": 12446
+        "tagged": 131, 
+        "total": 12535
       }, 
       "900": {
-        "tagged": 507, 
-        "total": 9539
+        "tagged": 108, 
+        "total": 9623
       }
     }, 
     "1600": {
       "0": {
-        "tagged": 1887, 
-        "total": 14735
+        "tagged": 127, 
+        "total": 14834
       }, 
       "1000": {
-        "tagged": 752, 
-        "total": 11765
+        "tagged": 106, 
+        "total": 11842
       }, 
       "1200": {
-        "tagged": 364, 
-        "total": 7936
+        "tagged": 95, 
+        "total": 8041
       }, 
       "1400": {
-        "tagged": 122, 
-        "total": 2472
+        "tagged": 33, 
+        "total": 2494
       }, 
       "1500": {
-        "tagged": 81, 
-        "total": 1739
+        "tagged": 39, 
+        "total": 1769
       }, 
       "200": {
-        "tagged": 1637, 
-        "total": 13757
+        "tagged": 106, 
+        "total": 13812
       }, 
       "400": {
-        "tagged": 1591, 
-        "total": 13416
+        "tagged": 120, 
+        "total": 13497
       }, 
       "600": {
-        "tagged": 1248, 
-        "total": 12853
+        "tagged": 125, 
+        "total": 12935
       }, 
       "800": {
-        "tagged": 1102, 
-        "total": 12993
+        "tagged": 134, 
+        "total": 13078
       }, 
       "900": {
-        "tagged": 1088, 
-        "total": 13830
+        "tagged": 117, 
+        "total": 13961
       }
     }, 
     "1800": {
       "0": {
-        "tagged": 1960, 
-        "total": 14030
+        "tagged": 94, 
+        "total": 14082
       }, 
       "1000": {
-        "tagged": 1395, 
-        "total": 15823
+        "tagged": 137, 
+        "total": 15927
       }, 
       "1200": {
-        "tagged": 734, 
-        "total": 11091
+        "tagged": 132, 
+        "total": 11198
       }, 
       "1400": {
-        "tagged": 439, 
-        "total": 8782
+        "tagged": 109, 
+        "total": 8878
       }, 
       "1600": {
-        "tagged": 177, 
-        "total": 4137
+        "tagged": 71, 
+        "total": 4215
       }, 
       "1700": {
-        "tagged": 78, 
-        "total": 1586
+        "tagged": 38, 
+        "total": 1603
       }, 
       "200": {
-        "tagged": 2240, 
-        "total": 16605
+        "tagged": 125, 
+        "total": 16710
       }, 
       "400": {
-        "tagged": 2070, 
-        "total": 15923
+        "tagged": 115, 
+        "total": 15986
       }, 
       "600": {
-        "tagged": 2205, 
-        "total": 17869
+        "tagged": 144, 
+        "total": 18011
       }, 
       "800": {
-        "tagged": 1477, 
-        "total": 13832
+        "tagged": 123, 
+        "total": 13927
       }
     }, 
     "2000": {
       "0": {
-        "tagged": 2116, 
-        "total": 14240
+        "tagged": 96, 
+        "total": 14315
       }, 
       "1000": {
-        "tagged": 1807, 
-        "total": 16425
+        "tagged": 144, 
+        "total": 16525
       }, 
       "1200": {
-        "tagged": 1562, 
-        "total": 16783
+        "tagged": 162, 
+        "total": 16925
       }, 
       "1400": {
-        "tagged": 943, 
-        "total": 14050
+        "tagged": 121, 
+        "total": 14136
       }, 
       "1600": {
-        "tagged": 892, 
-        "total": 19479
+        "tagged": 217, 
+        "total": 19642
       }, 
       "1800": {
-        "tagged": 164, 
-        "total": 4177
+        "tagged": 63, 
+        "total": 4239
       }, 
       "1900": {
-        "tagged": 75, 
-        "total": 1696
+        "tagged": 41, 
+        "total": 1713
       }, 
       "200": {
-        "tagged": 2790, 
-        "total": 19266
+        "tagged": 127, 
+        "total": 19380
       }, 
       "400": {
-        "tagged": 2178, 
-        "total": 15100
+        "tagged": 113, 
+        "total": 15133
       }, 
       "600": {
-        "tagged": 2028, 
-        "total": 14745
+        "tagged": 125, 
+        "total": 14895
       }, 
       "800": {
-        "tagged": 2280, 
-        "total": 17386
+        "tagged": 148, 
+        "total": 17558
       }
     }, 
     "2200": {
       "0": {
-        "tagged": 3040, 
-        "total": 18735
+        "tagged": 130, 
+        "total": 18898
       }, 
       "1000": {
-        "tagged": 2510, 
-        "total": 19192
+        "tagged": 143, 
+        "total": 19359
       }, 
       "1200": {
-        "tagged": 2062, 
-        "total": 18496
+        "tagged": 152, 
+        "total": 18665
       }, 
       "1400": {
-        "tagged": 1252, 
-        "total": 13433
+        "tagged": 132, 
+        "total": 13549
       }, 
       "1600": {
-        "tagged": 1930, 
-        "total": 28373
+        "tagged": 273, 
+        "total": 28521
       }, 
       "1800": {
-        "tagged": 905, 
-        "total": 18997
+        "tagged": 242, 
+        "total": 19134
       }, 
       "200": {
-        "tagged": 2616, 
-        "total": 17501
+        "tagged": 135, 
+        "total": 17591
       }, 
       "2000": {
-        "tagged": 172, 
-        "total": 4019
+        "tagged": 69, 
+        "total": 4045
       }, 
       "2100": {
-        "tagged": 76, 
-        "total": 1514
+        "tagged": 32, 
+        "total": 1520
       }, 
       "400": {
-        "tagged": 3181, 
-        "total": 21197
+        "tagged": 151, 
+        "total": 21307
       }, 
       "600": {
-        "tagged": 2610, 
-        "total": 17340
+        "tagged": 113, 
+        "total": 17425
       }, 
       "800": {
-        "tagged": 2568, 
-        "total": 17752
+        "tagged": 122, 
+        "total": 17894
       }
     }, 
     "2400": {
       "0": {
-        "tagged": 3315, 
-        "total": 20000
+        "tagged": 125, 
+        "total": 20142
       }, 
       "1000": {
-        "tagged": 3009, 
-        "total": 20232
+        "tagged": 157, 
+        "total": 20371
       }, 
       "1200": {
-        "tagged": 2617, 
-        "total": 19053
+        "tagged": 163, 
+        "total": 19210
       }, 
       "1400": {
-        "tagged": 2363, 
-        "total": 19196
+        "tagged": 163, 
+        "total": 19359
       }, 
       "1600": {
-        "tagged": 3052, 
-        "total": 33316
+        "tagged": 280, 
+        "total": 33517
       }, 
       "1800": {
-        "tagged": 2296, 
-        "total": 31802
+        "tagged": 319, 
+        "total": 32070
       }, 
       "200": {
-        "tagged": 2869, 
-        "total": 17824
+        "tagged": 131, 
+        "total": 17897
       }, 
       "2000": {
-        "tagged": 921, 
-        "total": 18810
+        "tagged": 205, 
+        "total": 18918
       }, 
       "2200": {
-        "tagged": 181, 
-        "total": 4526
+        "tagged": 68, 
+        "total": 4540
       }, 
       "2300": {
-        "tagged": 83, 
-        "total": 1697
+        "tagged": 36, 
+        "total": 1734
       }, 
       "400": {
-        "tagged": 2670, 
-        "total": 16245
+        "tagged": 128, 
+        "total": 16329
       }, 
       "600": {
-        "tagged": 3005, 
-        "total": 19226
+        "tagged": 153, 
+        "total": 19317
       }, 
       "800": {
-        "tagged": 2904, 
-        "total": 19418
+        "tagged": 141, 
+        "total": 19577
       }
     }, 
     "2500": {
       "0": {
-        "tagged": 6709, 
-        "total": 40247
+        "tagged": 255, 
+        "total": 40509
       }, 
       "1000": {
-        "tagged": 5995, 
-        "total": 41583
+        "tagged": 334, 
+        "total": 41880
       }, 
       "1200": {
-        "tagged": 5877, 
-        "total": 41957
+        "tagged": 315, 
+        "total": 42275
       }, 
       "1400": {
-        "tagged": 4531, 
-        "total": 36621
+        "tagged": 296, 
+        "total": 36838
       }, 
       "1600": {
-        "tagged": 3646, 
-        "total": 34003
+        "tagged": 288, 
+        "total": 34208
       }, 
       "1800": {
-        "tagged": 2768, 
-        "total": 33320
+        "tagged": 331, 
+        "total": 33581
       }, 
       "200": {
-        "tagged": 7382, 
-        "total": 44384
+        "tagged": 287, 
+        "total": 44761
       }, 
       "2000": {
-        "tagged": 1459, 
-        "total": 23163
+        "tagged": 258, 
+        "total": 23348
       }, 
       "2200": {
-        "tagged": 493, 
-        "total": 12137
+        "tagged": 142, 
+        "total": 12221
       }, 
       "2400": {
-        "tagged": 85, 
-        "total": 1544
+        "tagged": 39, 
+        "total": 1577
       }, 
       "400": {
-        "tagged": 6912, 
-        "total": 42150
+        "tagged": 299, 
+        "total": 42381
       }, 
       "600": {
-        "tagged": 6902, 
-        "total": 42900
+        "tagged": 313, 
+        "total": 43067
       }, 
       "800": {
-        "tagged": 6443, 
-        "total": 40566
+        "tagged": 313, 
+        "total": 40864
       }
     }, 
     "600": {
       "0": {
-        "tagged": 143, 
-        "total": 3656
+        "tagged": 42, 
+        "total": 3704
       }, 
       "200": {
-        "tagged": 184, 
-        "total": 3778
+        "tagged": 53, 
+        "total": 3846
       }, 
       "400": {
-        "tagged": 39, 
-        "total": 1089
+        "tagged": 19, 
+        "total": 1093
       }, 
       "500": {
-        "tagged": 17, 
-        "total": 497
+        "tagged": 12, 
+        "total": 502
       }, 
       "600": {
         "tagged": 0, 
@@ -1342,23 +882,23 @@
     }, 
     "800": {
       "0": {
-        "tagged": 451, 
-        "total": 7225
+        "tagged": 60, 
+        "total": 7314
       }, 
       "200": {
-        "tagged": 461, 
-        "total": 7989
+        "tagged": 93, 
+        "total": 8018
       }, 
       "400": {
-        "tagged": 197, 
-        "total": 4902
+        "tagged": 54, 
+        "total": 4941
       }, 
       "600": {
-        "tagged": 61, 
-        "total": 1545
+        "tagged": 28, 
+        "total": 1539
       }, 
       "700": {
-        "tagged": 34, 
+        "tagged": 14, 
         "total": 728
       }, 
       "800": {
@@ -1370,154 +910,154 @@
   "0p1": {
     "1000": {
       "0": {
-        "tagged": 2250, 
-        "total": 10850
+        "tagged": 430, 
+        "total": 10919
       }, 
       "1000": {
         "tagged": 0, 
         "total": 6
       }, 
       "200": {
-        "tagged": 2481, 
-        "total": 12136
+        "tagged": 481, 
+        "total": 12252
       }, 
       "400": {
-        "tagged": 1893, 
-        "total": 9971
+        "tagged": 404, 
+        "total": 10076
       }, 
       "600": {
-        "tagged": 990, 
-        "total": 5834
+        "tagged": 198, 
+        "total": 5827
       }, 
       "800": {
-        "tagged": 315, 
-        "total": 1803
+        "tagged": 53, 
+        "total": 1809
       }, 
       "900": {
-        "tagged": 138, 
-        "total": 777
+        "tagged": 21, 
+        "total": 788
       }
     }, 
     "1200": {
       "0": {
-        "tagged": 2666, 
-        "total": 12496
+        "tagged": 515, 
+        "total": 12631
       }, 
       "1000": {
-        "tagged": 261, 
-        "total": 1736
+        "tagged": 54, 
+        "total": 1767
       }, 
       "1100": {
-        "tagged": 136, 
-        "total": 844
+        "tagged": 19, 
+        "total": 856
       }, 
       "1200": {
         "tagged": 0, 
         "total": 1
       }, 
       "200": {
-        "tagged": 2687, 
-        "total": 12610
+        "tagged": 513, 
+        "total": 12701
       }, 
       "400": {
-        "tagged": 2499, 
-        "total": 12734
+        "tagged": 490, 
+        "total": 12885
       }, 
       "600": {
-        "tagged": 2131, 
-        "total": 11913
+        "tagged": 419, 
+        "total": 11959
       }, 
       "800": {
-        "tagged": 1185, 
-        "total": 7463
+        "tagged": 254, 
+        "total": 7542
       }, 
       "900": {
-        "tagged": 707, 
-        "total": 4229
+        "tagged": 133, 
+        "total": 4240
       }
     }, 
     "1400": {
       "0": {
-        "tagged": 2249, 
-        "total": 9814
+        "tagged": 377, 
+        "total": 9926
       }, 
       "1000": {
-        "tagged": 1043, 
-        "total": 6480
+        "tagged": 223, 
+        "total": 6538
       }, 
       "1200": {
-        "tagged": 350, 
-        "total": 2203
+        "tagged": 66, 
+        "total": 2230
       }, 
       "1300": {
-        "tagged": 107, 
-        "total": 683
+        "tagged": 23, 
+        "total": 695
       }, 
       "1400": {
         "tagged": 0, 
         "total": 0
       }, 
       "200": {
-        "tagged": 3568, 
-        "total": 15958
+        "tagged": 614, 
+        "total": 16090
       }, 
       "400": {
-        "tagged": 2297, 
-        "total": 10753
+        "tagged": 439, 
+        "total": 10850
       }, 
       "600": {
-        "tagged": 2536, 
-        "total": 12584
+        "tagged": 460, 
+        "total": 12700
       }, 
       "800": {
-        "tagged": 1838, 
-        "total": 10369
+        "tagged": 341, 
+        "total": 10421
       }, 
       "900": {
-        "tagged": 1521, 
-        "total": 8999
+        "tagged": 293, 
+        "total": 9093
       }
     }, 
     "1600": {
       "0": {
-        "tagged": 3034, 
-        "total": 13149
+        "tagged": 459, 
+        "total": 13218
       }, 
       "1000": {
-        "tagged": 1907, 
-        "total": 10549
+        "tagged": 384, 
+        "total": 10602
       }, 
       "1200": {
-        "tagged": 1259, 
-        "total": 8327
+        "tagged": 250, 
+        "total": 8436
       }, 
       "1400": {
-        "tagged": 302, 
-        "total": 1919
+        "tagged": 59, 
+        "total": 1933
       }, 
       "1500": {
-        "tagged": 323, 
-        "total": 1828
+        "tagged": 63, 
+        "total": 1856
       }, 
       "200": {
-        "tagged": 3629, 
-        "total": 16268
+        "tagged": 578, 
+        "total": 16436
       }, 
       "400": {
-        "tagged": 2923, 
-        "total": 13415
+        "tagged": 497, 
+        "total": 13523
       }, 
       "600": {
-        "tagged": 3046, 
-        "total": 14312
+        "tagged": 515, 
+        "total": 14387
       }, 
       "800": {
-        "tagged": 2927, 
-        "total": 15044
+        "tagged": 503, 
+        "total": 15034
       }, 
       "900": {
-        "tagged": 2649, 
-        "total": 13982
+        "tagged": 474, 
+        "total": 14037
       }
     }, 
     "1700": {
@@ -1528,90 +1068,90 @@
     }, 
     "1800": {
       "0": {
-        "tagged": 3467, 
-        "total": 14257
+        "tagged": 501, 
+        "total": 14349
       }, 
       "1000": {
-        "tagged": 2629, 
-        "total": 13646
+        "tagged": 417, 
+        "total": 13783
       }, 
       "1200": {
-        "tagged": 2641, 
-        "total": 15378
+        "tagged": 451, 
+        "total": 15394
       }, 
       "1400": {
-        "tagged": 1115, 
-        "total": 7359
+        "tagged": 224, 
+        "total": 7418
       }, 
       "1600": {
-        "tagged": 648, 
-        "total": 4302
+        "tagged": 117, 
+        "total": 4389
       }, 
       "1700": {
-        "tagged": 233, 
-        "total": 1573
+        "tagged": 38, 
+        "total": 1587
       }, 
       "200": {
-        "tagged": 3405, 
-        "total": 14274
+        "tagged": 529, 
+        "total": 14353
       }, 
       "400": {
-        "tagged": 4019, 
-        "total": 17573
+        "tagged": 623, 
+        "total": 17652
       }, 
       "600": {
-        "tagged": 3707, 
+        "tagged": 562, 
         "total": 16873
       }, 
       "800": {
-        "tagged": 3260, 
-        "total": 15780
+        "tagged": 529, 
+        "total": 15880
       }
     }, 
     "2000": {
       "0": {
-        "tagged": 4225, 
-        "total": 17244
+        "tagged": 567, 
+        "total": 17354
       }, 
       "1000": {
-        "tagged": 3325, 
-        "total": 15973
+        "tagged": 542, 
+        "total": 16097
       }, 
       "1200": {
-        "tagged": 3397, 
-        "total": 17491
+        "tagged": 562, 
+        "total": 17591
       }, 
       "1400": {
-        "tagged": 2218, 
-        "total": 13357
+        "tagged": 399, 
+        "total": 13451
       }, 
       "1600": {
-        "tagged": 2759, 
-        "total": 18775
+        "tagged": 494, 
+        "total": 18959
       }, 
       "1800": {
-        "tagged": 578, 
-        "total": 4052
+        "tagged": 101, 
+        "total": 4090
       }, 
       "1900": {
-        "tagged": 282, 
-        "total": 1719
+        "tagged": 53, 
+        "total": 1746
       }, 
       "200": {
-        "tagged": 3835, 
-        "total": 15988
+        "tagged": 580, 
+        "total": 16076
       }, 
       "400": {
-        "tagged": 4553, 
-        "total": 18785
+        "tagged": 655, 
+        "total": 18701
       }, 
       "600": {
-        "tagged": 4136, 
-        "total": 17515
+        "tagged": 558, 
+        "total": 17386
       }, 
       "800": {
-        "tagged": 4162, 
-        "total": 18238
+        "tagged": 549, 
+        "total": 18356
       }
     }, 
     "2100": {
@@ -1622,160 +1162,160 @@
     }, 
     "2200": {
       "0": {
-        "tagged": 3169, 
-        "total": 12461
+        "tagged": 440, 
+        "total": 12558
       }, 
       "1000": {
-        "tagged": 3232, 
-        "total": 14051
+        "tagged": 476, 
+        "total": 14132
       }, 
       "1200": {
-        "tagged": 2941, 
-        "total": 13853
+        "tagged": 430, 
+        "total": 13923
       }, 
       "1400": {
-        "tagged": 2841, 
-        "total": 15103
+        "tagged": 475, 
+        "total": 15258
       }, 
       "1600": {
-        "tagged": 4604, 
-        "total": 28033
+        "tagged": 773, 
+        "total": 28290
       }, 
       "1800": {
-        "tagged": 2524, 
-        "total": 18074
+        "tagged": 529, 
+        "total": 18237
       }, 
       "200": {
-        "tagged": 3538, 
-        "total": 14076
+        "tagged": 492, 
+        "total": 14219
       }, 
       "2000": {
-        "tagged": 667, 
-        "total": 4301
+        "tagged": 121, 
+        "total": 4332
       }, 
       "2100": {
-        "tagged": 223, 
-        "total": 1653
+        "tagged": 38, 
+        "total": 1676
       }, 
       "400": {
-        "tagged": 5013, 
-        "total": 20087
+        "tagged": 672, 
+        "total": 20229
       }, 
       "600": {
-        "tagged": 5110, 
-        "total": 20873
+        "tagged": 638, 
+        "total": 21010
       }, 
       "800": {
-        "tagged": 3985, 
-        "total": 16369
+        "tagged": 590, 
+        "total": 16398
       }
     }, 
     "2400": {
       "0": {
-        "tagged": 4515, 
-        "total": 17357
+        "tagged": 574, 
+        "total": 17481
       }, 
       "1000": {
-        "tagged": 3769, 
-        "total": 15797
+        "tagged": 508, 
+        "total": 15891
       }, 
       "1200": {
-        "tagged": 3668, 
-        "total": 16384
+        "tagged": 478, 
+        "total": 16275
       }, 
       "1400": {
-        "tagged": 3704, 
-        "total": 17660
+        "tagged": 467, 
+        "total": 17779
       }, 
       "1600": {
-        "tagged": 6140, 
-        "total": 33115
+        "tagged": 988, 
+        "total": 33255
       }, 
       "1800": {
-        "tagged": 5299, 
-        "total": 32325
+        "tagged": 910, 
+        "total": 32546
       }, 
       "200": {
-        "tagged": 3707, 
-        "total": 14173
+        "tagged": 450, 
+        "total": 14265
       }, 
       "2000": {
-        "tagged": 2671, 
-        "total": 18922
+        "tagged": 470, 
+        "total": 19126
       }, 
       "2200": {
-        "tagged": 586, 
-        "total": 4220
+        "tagged": 102, 
+        "total": 4259
       }, 
       "2300": {
-        "tagged": 189, 
-        "total": 1515
+        "tagged": 38, 
+        "total": 1545
       }, 
       "400": {
-        "tagged": 4646, 
-        "total": 18498
+        "tagged": 604, 
+        "total": 18663
       }, 
       "600": {
-        "tagged": 3840, 
-        "total": 14805
+        "tagged": 469, 
+        "total": 14962
       }, 
       "800": {
-        "tagged": 3540, 
-        "total": 14518
+        "tagged": 451, 
+        "total": 14664
       }
     }, 
     "2500": {
       "0": {
-        "tagged": 11270, 
-        "total": 43759
+        "tagged": 1430, 
+        "total": 44050
       }, 
       "1000": {
-        "tagged": 9340, 
-        "total": 38944
+        "tagged": 1183, 
+        "total": 39187
       }, 
       "1200": {
-        "tagged": 8494, 
-        "total": 37659
+        "tagged": 1104, 
+        "total": 37963
       }, 
       "1400": {
-        "tagged": 8590, 
-        "total": 39211
+        "tagged": 1225, 
+        "total": 39524
       }, 
       "1600": {
-        "tagged": 7092, 
-        "total": 36241
+        "tagged": 1062, 
+        "total": 36526
       }, 
       "1800": {
-        "tagged": 5678, 
-        "total": 32853
+        "tagged": 900, 
+        "total": 33072
       }, 
       "200": {
-        "tagged": 10606, 
-        "total": 40978
+        "tagged": 1235, 
+        "total": 41224
       }, 
       "2000": {
-        "tagged": 3977, 
-        "total": 25808
+        "tagged": 707, 
+        "total": 25939
       }, 
       "2200": {
-        "tagged": 1413, 
-        "total": 10750
+        "tagged": 265, 
+        "total": 10862
       }, 
       "2400": {
-        "tagged": 210, 
-        "total": 1586
+        "tagged": 49, 
+        "total": 1605
       }, 
       "400": {
-        "tagged": 11239, 
-        "total": 43649
+        "tagged": 1392, 
+        "total": 43934
       }, 
       "600": {
-        "tagged": 10168, 
-        "total": 39802
+        "tagged": 1290, 
+        "total": 40097
       }, 
       "800": {
-        "tagged": 10760, 
-        "total": 42700
+        "tagged": 1351, 
+        "total": 42960
       }
     }, 
     "2600": {
@@ -1786,46 +1326,46 @@
     }, 
     "600": {
       "0": {
-        "tagged": 842, 
-        "total": 4444
+        "tagged": 212, 
+        "total": 4461
       }, 
       "200": {
-        "tagged": 727, 
-        "total": 3750
+        "tagged": 158, 
+        "total": 3769
       }, 
       "400": {
-        "tagged": 221, 
-        "total": 1117
+        "tagged": 41, 
+        "total": 1114
       }, 
       "500": {
-        "tagged": 67, 
-        "total": 432
+        "tagged": 11, 
+        "total": 440
       }, 
       "600": {
-        "tagged": 1, 
+        "tagged": 0, 
         "total": 3
       }
     }, 
     "800": {
       "0": {
-        "tagged": 1538, 
-        "total": 8007
+        "tagged": 368, 
+        "total": 8127
       }, 
       "200": {
-        "tagged": 1428, 
-        "total": 7528
+        "tagged": 338, 
+        "total": 7660
       }, 
       "400": {
-        "tagged": 1099, 
-        "total": 6121
+        "tagged": 228, 
+        "total": 6165
       }, 
       "600": {
-        "tagged": 294, 
-        "total": 1542
+        "tagged": 70, 
+        "total": 1545
       }, 
       "700": {
-        "tagged": 119, 
-        "total": 699
+        "tagged": 23, 
+        "total": 697
       }, 
       "800": {
         "tagged": 0, 
@@ -1836,444 +1376,444 @@
   "10": {
     "1000": {
       "0": {
-        "tagged": 7479, 
-        "total": 9284
+        "tagged": 7610, 
+        "total": 9325
       }, 
       "1000": {
         "tagged": 0, 
         "total": 0
       }, 
       "200": {
-        "tagged": 8148, 
-        "total": 10202
+        "tagged": 8205, 
+        "total": 10253
       }, 
       "400": {
-        "tagged": 6869, 
-        "total": 8566
+        "tagged": 6878, 
+        "total": 8603
       }, 
       "600": {
-        "tagged": 5128, 
-        "total": 6322
+        "tagged": 4863, 
+        "total": 6259
       }, 
       "800": {
-        "tagged": 1615, 
-        "total": 1959
+        "tagged": 1553, 
+        "total": 1971
       }, 
       "900": {
-        "tagged": 634, 
+        "tagged": 561, 
         "total": 769
       }
     }, 
     "1200": {
       "0": {
-        "tagged": 9616, 
-        "total": 12080
+        "tagged": 9743, 
+        "total": 12057
       }, 
       "1000": {
-        "tagged": 1759, 
-        "total": 2074
+        "tagged": 1637, 
+        "total": 2085
       }, 
       "1100": {
-        "tagged": 683, 
-        "total": 825
+        "tagged": 610, 
+        "total": 829
       }, 
       "1200": {
         "tagged": 1, 
         "total": 1
       }, 
       "200": {
-        "tagged": 9184, 
-        "total": 11538
+        "tagged": 9440, 
+        "total": 11628
       }, 
       "400": {
-        "tagged": 8891, 
-        "total": 11109
+        "tagged": 8996, 
+        "total": 11173
       }, 
       "600": {
-        "tagged": 9228, 
-        "total": 11520
+        "tagged": 9143, 
+        "total": 11541
       }, 
       "800": {
-        "tagged": 5481, 
-        "total": 6735
+        "tagged": 5234, 
+        "total": 6663
       }, 
       "900": {
-        "tagged": 3805, 
-        "total": 4656
+        "tagged": 3659, 
+        "total": 4641
       }
     }, 
     "1400": {
       "0": {
-        "tagged": 6982, 
-        "total": 8876
+        "tagged": 7255, 
+        "total": 8992
       }, 
       "1000": {
-        "tagged": 6473, 
-        "total": 7991
+        "tagged": 6189, 
+        "total": 7925
       }, 
       "1200": {
-        "tagged": 1378, 
-        "total": 1662
+        "tagged": 1243, 
+        "total": 1658
       }, 
       "1300": {
-        "tagged": 752, 
-        "total": 901
+        "tagged": 651, 
+        "total": 900
       }, 
       "1400": {
-        "tagged": 2, 
+        "tagged": 1, 
         "total": 2
       }, 
       "200": {
-        "tagged": 8486, 
-        "total": 10789
+        "tagged": 8729, 
+        "total": 10868
       }, 
       "400": {
-        "tagged": 9102, 
-        "total": 11567
+        "tagged": 9294, 
+        "total": 11652
       }, 
       "600": {
-        "tagged": 9931, 
-        "total": 12444
+        "tagged": 10056, 
+        "total": 12472
       }, 
       "800": {
-        "tagged": 8529, 
-        "total": 10662
+        "tagged": 8323, 
+        "total": 10653
       }, 
       "900": {
-        "tagged": 7019, 
-        "total": 8718
+        "tagged": 6754, 
+        "total": 8662
       }
     }, 
     "1600": {
       "0": {
-        "tagged": 10898, 
-        "total": 13936
+        "tagged": 11271, 
+        "total": 14022
       }, 
       "1000": {
-        "tagged": 8373, 
-        "total": 10420
+        "tagged": 8220, 
+        "total": 10400
       }, 
       "1200": {
-        "tagged": 6771, 
-        "total": 8396
+        "tagged": 6457, 
+        "total": 8388
       }, 
       "1400": {
-        "tagged": 1500, 
-        "total": 1823
+        "tagged": 1346, 
+        "total": 1812
       }, 
       "1500": {
-        "tagged": 1495, 
-        "total": 1844
+        "tagged": 1312, 
+        "total": 1876
       }, 
       "200": {
-        "tagged": 10620, 
-        "total": 13518
+        "tagged": 10997, 
+        "total": 13607
       }, 
       "400": {
-        "tagged": 11655, 
-        "total": 14750
+        "tagged": 11977, 
+        "total": 14860
       }, 
       "600": {
-        "tagged": 10215, 
-        "total": 12932
+        "tagged": 10397, 
+        "total": 13016
       }, 
       "800": {
-        "tagged": 11147, 
-        "total": 14100
+        "tagged": 11223, 
+        "total": 14161
       }, 
       "900": {
-        "tagged": 8026, 
-        "total": 10060
+        "tagged": 8030, 
+        "total": 10101
       }
     }, 
     "1800": {
       "0": {
-        "tagged": 9061, 
-        "total": 11537
+        "tagged": 9397, 
+        "total": 11622
       }, 
       "1000": {
-        "tagged": 10986, 
-        "total": 13890
+        "tagged": 11089, 
+        "total": 13979
       }, 
       "1200": {
-        "tagged": 10172, 
-        "total": 12711
+        "tagged": 9974, 
+        "total": 12710
       }, 
       "1400": {
-        "tagged": 6438, 
-        "total": 7999
+        "tagged": 6067, 
+        "total": 7882
       }, 
       "1600": {
-        "tagged": 3096, 
-        "total": 3799
+        "tagged": 2805, 
+        "total": 3833
       }, 
       "1700": {
-        "tagged": 1305, 
-        "total": 1592
+        "tagged": 1121, 
+        "total": 1610
       }, 
       "200": {
-        "tagged": 10488, 
-        "total": 13569
+        "tagged": 10947, 
+        "total": 13650
       }, 
       "400": {
-        "tagged": 12016, 
-        "total": 15492
+        "tagged": 12524, 
+        "total": 15563
       }, 
       "600": {
-        "tagged": 11878, 
-        "total": 15111
+        "tagged": 12151, 
+        "total": 15185
       }, 
       "800": {
-        "tagged": 12285, 
-        "total": 15614
+        "tagged": 12619, 
+        "total": 15734
       }
     }, 
     "2000": {
       "0": {
-        "tagged": 11354, 
-        "total": 14653
+        "tagged": 11989, 
+        "total": 14751
       }, 
       "1000": {
-        "tagged": 13793, 
-        "total": 17614
+        "tagged": 14018, 
+        "total": 17747
       }, 
       "1200": {
-        "tagged": 9711, 
-        "total": 12193
+        "tagged": 9639, 
+        "total": 12230
       }, 
       "1400": {
-        "tagged": 9130, 
-        "total": 11566
+        "tagged": 8961, 
+        "total": 11601
       }, 
       "1600": {
-        "tagged": 13496, 
-        "total": 16820
+        "tagged": 12659, 
+        "total": 16553
       }, 
       "1800": {
-        "tagged": 3089, 
-        "total": 3731
+        "tagged": 2750, 
+        "total": 3725
       }, 
       "1900": {
-        "tagged": 1448, 
-        "total": 1768
+        "tagged": 1198, 
+        "total": 1780
       }, 
       "200": {
-        "tagged": 9825, 
-        "total": 12786
+        "tagged": 10180, 
+        "total": 12879
       }, 
       "400": {
-        "tagged": 10215, 
-        "total": 13202
+        "tagged": 10663, 
+        "total": 13330
       }, 
       "600": {
-        "tagged": 12968, 
-        "total": 16764
+        "tagged": 13533, 
+        "total": 16907
       }, 
       "800": {
-        "tagged": 11667, 
-        "total": 14791
+        "tagged": 11917, 
+        "total": 14907
       }
     }, 
     "2200": {
       "0": {
-        "tagged": 11209, 
-        "total": 14582
+        "tagged": 11727, 
+        "total": 14609
       }, 
       "1000": {
-        "tagged": 10947, 
-        "total": 14072
+        "tagged": 11311, 
+        "total": 14214
       }, 
       "1200": {
-        "tagged": 11308, 
-        "total": 14398
+        "tagged": 11481, 
+        "total": 14477
       }, 
       "1400": {
-        "tagged": 11310, 
-        "total": 14340
+        "tagged": 11244, 
+        "total": 14390
       }, 
       "1600": {
-        "tagged": 20570, 
-        "total": 26083
+        "tagged": 19923, 
+        "total": 25941
       }, 
       "1800": {
-        "tagged": 13717, 
-        "total": 17072
+        "tagged": 12885, 
+        "total": 16835
       }, 
       "200": {
-        "tagged": 8512, 
-        "total": 11104
+        "tagged": 8990, 
+        "total": 11232
       }, 
       "2000": {
-        "tagged": 3058, 
-        "total": 3737
+        "tagged": 2733, 
+        "total": 3729
       }, 
       "2100": {
-        "tagged": 1109, 
-        "total": 1385
+        "tagged": 948, 
+        "total": 1404
       }, 
       "400": {
-        "tagged": 12413, 
-        "total": 16116
+        "tagged": 12924, 
+        "total": 16226
       }, 
       "600": {
-        "tagged": 11539, 
-        "total": 14851
+        "tagged": 12052, 
+        "total": 14979
       }, 
       "800": {
-        "tagged": 12542, 
-        "total": 16122
+        "tagged": 13010, 
+        "total": 16263
       }
     }, 
     "2400": {
       "0": {
-        "tagged": 12328, 
-        "total": 15984
+        "tagged": 12988, 
+        "total": 16132
       }, 
       "1000": {
-        "tagged": 12024, 
-        "total": 15654
+        "tagged": 12377, 
+        "total": 15759
       }, 
       "1200": {
-        "tagged": 10084, 
-        "total": 12896
+        "tagged": 10283, 
+        "total": 12951
       }, 
       "1400": {
-        "tagged": 10572, 
-        "total": 13425
+        "tagged": 10661, 
+        "total": 13470
       }, 
       "1600": {
-        "tagged": 25766, 
-        "total": 32816
+        "tagged": 25573, 
+        "total": 32909
       }, 
       "1800": {
-        "tagged": 21015, 
-        "total": 26786
+        "tagged": 20410, 
+        "total": 26724
       }, 
       "200": {
-        "tagged": 11966, 
-        "total": 15668
+        "tagged": 12696, 
+        "total": 15783
       }, 
       "2000": {
-        "tagged": 12970, 
-        "total": 16361
+        "tagged": 12166, 
+        "total": 16151
       }, 
       "2200": {
-        "tagged": 3072, 
-        "total": 3850
+        "tagged": 2742, 
+        "total": 3809
       }, 
       "2300": {
-        "tagged": 1284, 
-        "total": 1552
+        "tagged": 1051, 
+        "total": 1559
       }, 
       "400": {
-        "tagged": 10022, 
-        "total": 13168
+        "tagged": 10568, 
+        "total": 13252
       }, 
       "600": {
-        "tagged": 11347, 
-        "total": 14811
+        "tagged": 11881, 
+        "total": 14915
       }, 
       "800": {
-        "tagged": 10888, 
-        "total": 14076
+        "tagged": 11340, 
+        "total": 14164
       }
     }, 
     "2500": {
       "0": {
-        "tagged": 30027, 
-        "total": 39278
+        "tagged": 31570, 
+        "total": 39531
       }, 
       "1000": {
-        "tagged": 33005, 
-        "total": 42784
+        "tagged": 34209, 
+        "total": 43072
       }, 
       "1200": {
-        "tagged": 30838, 
-        "total": 39764
+        "tagged": 31636, 
+        "total": 39996
       }, 
       "1400": {
-        "tagged": 29872, 
-        "total": 38353
+        "tagged": 30454, 
+        "total": 38608
       }, 
       "1600": {
-        "tagged": 26303, 
-        "total": 33568
+        "tagged": 26328, 
+        "total": 33728
       }, 
       "1800": {
-        "tagged": 25639, 
-        "total": 32867
+        "tagged": 25193, 
+        "total": 32806
       }, 
       "200": {
-        "tagged": 28540, 
-        "total": 37453
+        "tagged": 30097, 
+        "total": 37738
       }, 
       "2000": {
-        "tagged": 18396, 
-        "total": 23340
+        "tagged": 17504, 
+        "total": 23099
       }, 
       "2200": {
-        "tagged": 8190, 
-        "total": 10276
+        "tagged": 7474, 
+        "total": 10147
       }, 
       "2400": {
-        "tagged": 1202, 
-        "total": 1486
+        "tagged": 1013, 
+        "total": 1494
       }, 
       "400": {
-        "tagged": 29900, 
-        "total": 38962
+        "tagged": 31205, 
+        "total": 39165
       }, 
       "600": {
-        "tagged": 31242, 
-        "total": 40777
+        "tagged": 32832, 
+        "total": 41133
       }, 
       "800": {
-        "tagged": 31776, 
-        "total": 41442
+        "tagged": 33114, 
+        "total": 41604
       }
     }, 
     "600": {
       "0": {
-        "tagged": 3151, 
-        "total": 3796
+        "tagged": 3107, 
+        "total": 3781
       }, 
       "200": {
-        "tagged": 2651, 
-        "total": 3214
+        "tagged": 2565, 
+        "total": 3179
       }, 
       "400": {
-        "tagged": 914, 
+        "tagged": 875, 
         "total": 1073
       }, 
       "500": {
-        "tagged": 450, 
-        "total": 529
+        "tagged": 417, 
+        "total": 538
       }, 
       "600": {
-        "tagged": 3, 
-        "total": 7
+        "tagged": 2, 
+        "total": 8
       }
     }, 
     "800": {
       "0": {
-        "tagged": 6048, 
-        "total": 7305
+        "tagged": 6071, 
+        "total": 7342
       }, 
       "200": {
-        "tagged": 6291, 
-        "total": 7752
+        "tagged": 6143, 
+        "total": 7673
       }, 
       "400": {
-        "tagged": 3442, 
-        "total": 4193
+        "tagged": 3292, 
+        "total": 4143
       }, 
       "600": {
-        "tagged": 1248, 
-        "total": 1457
+        "tagged": 1169, 
+        "total": 1490
       }, 
       "700": {
-        "tagged": 603, 
-        "total": 734
+        "tagged": 534, 
+        "total": 741
       }, 
       "800": {
         "tagged": 1, 
@@ -2284,32 +1824,32 @@
   "100": {
     "1000": {
       "0": {
-        "tagged": 8742, 
-        "total": 10287
+        "tagged": 9791, 
+        "total": 10243
       }, 
       "1000": {
         "tagged": 1, 
         "total": 2
       }, 
       "200": {
-        "tagged": 8024, 
-        "total": 9392
+        "tagged": 8909, 
+        "total": 9316
       }, 
       "400": {
-        "tagged": 7184, 
-        "total": 8392
+        "tagged": 7789, 
+        "total": 8155
       }, 
       "600": {
-        "tagged": 5817, 
-        "total": 6679
+        "tagged": 5993, 
+        "total": 6297
       }, 
       "800": {
-        "tagged": 1430, 
-        "total": 1609
+        "tagged": 1504, 
+        "total": 1588
       }, 
       "900": {
-        "tagged": 642, 
-        "total": 726
+        "tagged": 693, 
+        "total": 747
       }
     }, 
     "1100": {
@@ -2320,862 +1860,862 @@
     }, 
     "1200": {
       "0": {
-        "tagged": 9099, 
-        "total": 10822
+        "tagged": 10451, 
+        "total": 10905
       }, 
       "1000": {
-        "tagged": 1379, 
-        "total": 1520
+        "tagged": 1438, 
+        "total": 1487
       }, 
       "1100": {
-        "tagged": 750, 
-        "total": 845
+        "tagged": 781, 
+        "total": 848
       }, 
       "1200": {
         "tagged": 1, 
         "total": 1
       }, 
       "200": {
-        "tagged": 10363, 
-        "total": 12252
+        "tagged": 11752, 
+        "total": 12285
       }, 
       "400": {
-        "tagged": 8417, 
-        "total": 9936
+        "tagged": 9470, 
+        "total": 9878
       }, 
       "600": {
-        "tagged": 9735, 
-        "total": 11353
+        "tagged": 10507, 
+        "total": 11007
       }, 
       "800": {
-        "tagged": 5777, 
-        "total": 6595
+        "tagged": 5984, 
+        "total": 6283
       }, 
       "900": {
-        "tagged": 2926, 
-        "total": 3338
+        "tagged": 3010, 
+        "total": 3165
       }
     }, 
     "1400": {
       "0": {
-        "tagged": 9482, 
-        "total": 11461
+        "tagged": 10981, 
+        "total": 11464
       }, 
       "1000": {
-        "tagged": 5229, 
-        "total": 6006
+        "tagged": 5470, 
+        "total": 5776
       }, 
       "1200": {
-        "tagged": 1518, 
-        "total": 1704
+        "tagged": 1619, 
+        "total": 1701
       }, 
       "1300": {
-        "tagged": 692, 
-        "total": 791
+        "tagged": 734, 
+        "total": 783
       }, 
       "1400": {
         "tagged": 0, 
         "total": 0
       }, 
       "200": {
-        "tagged": 11838, 
-        "total": 14226
+        "tagged": 13724, 
+        "total": 14325
       }, 
       "400": {
-        "tagged": 10727, 
-        "total": 12762
+        "tagged": 12222, 
+        "total": 12754
       }, 
       "600": {
-        "tagged": 10813, 
-        "total": 12626
+        "tagged": 12024, 
+        "total": 12538
       }, 
       "800": {
-        "tagged": 6506, 
-        "total": 7580
+        "tagged": 7054, 
+        "total": 7398
       }, 
       "900": {
-        "tagged": 7988, 
-        "total": 9249
+        "tagged": 8510, 
+        "total": 8936
       }
     }, 
     "1600": {
       "0": {
-        "tagged": 9434, 
-        "total": 11482
+        "tagged": 11084, 
+        "total": 11534
       }, 
       "1000": {
-        "tagged": 9300, 
-        "total": 10838
+        "tagged": 10150, 
+        "total": 10640
       }, 
       "1200": {
-        "tagged": 6316, 
-        "total": 7198
+        "tagged": 6664, 
+        "total": 6969
       }, 
       "1400": {
-        "tagged": 1269, 
-        "total": 1446
+        "tagged": 1319, 
+        "total": 1410
       }, 
       "1500": {
-        "tagged": 1421, 
-        "total": 1597
+        "tagged": 1478, 
+        "total": 1605
       }, 
       "200": {
-        "tagged": 10522, 
-        "total": 12661
+        "tagged": 12217, 
+        "total": 12730
       }, 
       "400": {
-        "tagged": 11131, 
-        "total": 13510
+        "tagged": 12971, 
+        "total": 13563
       }, 
       "600": {
-        "tagged": 10181, 
-        "total": 12153
+        "tagged": 11687, 
+        "total": 12197
       }, 
       "800": {
-        "tagged": 11637, 
-        "total": 13752
+        "tagged": 13076, 
+        "total": 13695
       }, 
       "900": {
-        "tagged": 9525, 
-        "total": 11219
+        "tagged": 10547, 
+        "total": 11087
       }
     }, 
     "1800": {
       "0": {
-        "tagged": 12107, 
-        "total": 14906
+        "tagged": 14373, 
+        "total": 14974
       }, 
       "1000": {
-        "tagged": 12161, 
-        "total": 14345
+        "tagged": 13668, 
+        "total": 14321
       }, 
       "1200": {
-        "tagged": 8358, 
-        "total": 9767
+        "tagged": 9103, 
+        "total": 9582
       }, 
       "1400": {
-        "tagged": 5752, 
-        "total": 6634
+        "tagged": 5882, 
+        "total": 6204
       }, 
       "1600": {
-        "tagged": 3126, 
-        "total": 3520
+        "tagged": 3276, 
+        "total": 3489
       }, 
       "1700": {
-        "tagged": 1285, 
-        "total": 1453
+        "tagged": 1373, 
+        "total": 1473
       }, 
       "200": {
-        "tagged": 13349, 
-        "total": 16227
+        "tagged": 15655, 
+        "total": 16272
       }, 
       "400": {
-        "tagged": 10547, 
-        "total": 12712
+        "tagged": 12328, 
+        "total": 12838
       }, 
       "600": {
-        "tagged": 11980, 
-        "total": 14384
+        "tagged": 13839, 
+        "total": 14455
       }, 
       "800": {
-        "tagged": 11672, 
-        "total": 13898
+        "tagged": 13338, 
+        "total": 13943
       }
     }, 
     "2000": {
       "0": {
-        "tagged": 11471, 
-        "total": 14089
+        "tagged": 13580, 
+        "total": 14163
       }, 
       "1000": {
-        "tagged": 11844, 
-        "total": 14211
+        "tagged": 13601, 
+        "total": 14295
       }, 
       "1200": {
-        "tagged": 11210, 
-        "total": 13285
+        "tagged": 12606, 
+        "total": 13276
       }, 
       "1400": {
-        "tagged": 8963, 
-        "total": 10440
+        "tagged": 9642, 
+        "total": 10145
       }, 
       "1600": {
-        "tagged": 13587, 
-        "total": 15667
+        "tagged": 13995, 
+        "total": 14792
       }, 
       "1800": {
-        "tagged": 3308, 
-        "total": 3745
+        "tagged": 3491, 
+        "total": 3689
       }, 
       "1900": {
-        "tagged": 1410, 
-        "total": 1580
+        "tagged": 1477, 
+        "total": 1591
       }, 
       "200": {
-        "tagged": 12137, 
-        "total": 14886
+        "tagged": 14355, 
+        "total": 14959
       }, 
       "400": {
-        "tagged": 13212, 
-        "total": 16173
+        "tagged": 15566, 
+        "total": 16270
       }, 
       "600": {
-        "tagged": 13344, 
-        "total": 16218
+        "tagged": 15670, 
+        "total": 16329
       }, 
       "800": {
-        "tagged": 13380, 
-        "total": 16250
+        "tagged": 15556, 
+        "total": 16281
       }
     }, 
     "2200": {
       "0": {
-        "tagged": 12997, 
-        "total": 16068
+        "tagged": 15522, 
+        "total": 16221
       }, 
       "1000": {
-        "tagged": 11109, 
-        "total": 13374
+        "tagged": 12784, 
+        "total": 13391
       }, 
       "1200": {
-        "tagged": 13468, 
-        "total": 16116
+        "tagged": 15385, 
+        "total": 16107
       }, 
       "1400": {
-        "tagged": 12522, 
-        "total": 14738
+        "tagged": 13994, 
+        "total": 14681
       }, 
       "1600": {
-        "tagged": 21935, 
-        "total": 25593
+        "tagged": 23592, 
+        "total": 24862
       }, 
       "1800": {
-        "tagged": 13781, 
-        "total": 15769
+        "tagged": 14180, 
+        "total": 14925
       }, 
       "200": {
-        "tagged": 11214, 
-        "total": 13844
+        "tagged": 13331, 
+        "total": 13939
       }, 
       "2000": {
-        "tagged": 2886, 
-        "total": 3273
+        "tagged": 3042, 
+        "total": 3221
       }, 
       "2100": {
-        "tagged": 1269, 
-        "total": 1437
+        "tagged": 1340, 
+        "total": 1463
       }, 
       "400": {
-        "tagged": 12479, 
-        "total": 15313
+        "tagged": 14710, 
+        "total": 15400
       }, 
       "600": {
-        "tagged": 13850, 
-        "total": 17050
+        "tagged": 16389, 
+        "total": 17134
       }, 
       "800": {
-        "tagged": 13601, 
-        "total": 16575
+        "tagged": 16001, 
+        "total": 16722
       }
     }, 
     "2400": {
       "0": {
-        "tagged": 10816, 
-        "total": 13530
+        "tagged": 13047, 
+        "total": 13637
       }, 
       "1000": {
-        "tagged": 15807, 
-        "total": 19419
+        "tagged": 18659, 
+        "total": 19549
       }, 
       "1200": {
-        "tagged": 11988, 
-        "total": 14518
+        "tagged": 13919, 
+        "total": 14612
       }, 
       "1400": {
-        "tagged": 10757, 
-        "total": 12794
+        "tagged": 12255, 
+        "total": 12835
       }, 
       "1600": {
-        "tagged": 28845, 
-        "total": 34075
+        "tagged": 32377, 
+        "total": 33979
       }, 
       "1800": {
-        "tagged": 21595, 
-        "total": 25245
+        "tagged": 23315, 
+        "total": 24591
       }, 
       "200": {
-        "tagged": 11339, 
-        "total": 14189
+        "tagged": 13722, 
+        "total": 14293
       }, 
       "2000": {
-        "tagged": 14222, 
-        "total": 16309
+        "tagged": 14436, 
+        "total": 15266
       }, 
       "2200": {
-        "tagged": 3204, 
-        "total": 3632
+        "tagged": 3347, 
+        "total": 3559
       }, 
       "2300": {
-        "tagged": 1136, 
-        "total": 1290
+        "tagged": 1201, 
+        "total": 1300
       }, 
       "400": {
-        "tagged": 13544, 
-        "total": 16720
+        "tagged": 16154, 
+        "total": 16861
       }, 
       "600": {
-        "tagged": 13637, 
-        "total": 16853
+        "tagged": 16072, 
+        "total": 16873
       }, 
       "800": {
-        "tagged": 13160, 
-        "total": 16229
+        "tagged": 15632, 
+        "total": 16313
       }
     }, 
     "2500": {
       "0": {
-        "tagged": 33984, 
-        "total": 42409
+        "tagged": 40782, 
+        "total": 42661
       }, 
       "1000": {
-        "tagged": 33032, 
-        "total": 40364
+        "tagged": 38942, 
+        "total": 40718
       }, 
       "1200": {
-        "tagged": 29101, 
-        "total": 35483
+        "tagged": 33956, 
+        "total": 35636
       }, 
       "1400": {
-        "tagged": 31262, 
-        "total": 37508
+        "tagged": 35937, 
+        "total": 37682
       }, 
       "1600": {
-        "tagged": 29426, 
-        "total": 34974
+        "tagged": 33312, 
+        "total": 34966
       }, 
       "1800": {
-        "tagged": 26088, 
-        "total": 30598
+        "tagged": 28759, 
+        "total": 30240
       }, 
       "200": {
-        "tagged": 32099, 
-        "total": 40064
+        "tagged": 38507, 
+        "total": 40284
       }, 
       "2000": {
-        "tagged": 20664, 
-        "total": 23982
+        "tagged": 21727, 
+        "total": 22911
       }, 
       "2200": {
-        "tagged": 8820, 
-        "total": 10090
+        "tagged": 8953, 
+        "total": 9475
       }, 
       "2400": {
-        "tagged": 1188, 
-        "total": 1338
+        "tagged": 1236, 
+        "total": 1333
       }, 
       "400": {
-        "tagged": 35153, 
-        "total": 43580
+        "tagged": 41982, 
+        "total": 43848
       }, 
       "600": {
-        "tagged": 34096, 
-        "total": 42289
+        "tagged": 40713, 
+        "total": 42630
       }, 
       "800": {
-        "tagged": 33996, 
-        "total": 42125
+        "tagged": 40411, 
+        "total": 42358
       }
     }, 
     "600": {
       "0": {
-        "tagged": 2777, 
-        "total": 3164
+        "tagged": 2882, 
+        "total": 3011
       }, 
       "200": {
-        "tagged": 2612, 
-        "total": 3005
+        "tagged": 2690, 
+        "total": 2835
       }, 
       "400": {
-        "tagged": 794, 
-        "total": 909
+        "tagged": 842, 
+        "total": 886
       }, 
       "500": {
-        "tagged": 344, 
-        "total": 397
+        "tagged": 377, 
+        "total": 408
       }, 
       "600": {
-        "tagged": 1, 
-        "total": 1
+        "tagged": 2, 
+        "total": 2
       }
     }, 
     "800": {
       "0": {
-        "tagged": 4746, 
-        "total": 5501
+        "tagged": 5201, 
+        "total": 5405
       }, 
       "200": {
-        "tagged": 6398, 
-        "total": 7434
+        "tagged": 6871, 
+        "total": 7211
       }, 
       "400": {
-        "tagged": 3804, 
-        "total": 4332
+        "tagged": 3951, 
+        "total": 4155
       }, 
       "600": {
-        "tagged": 1144, 
-        "total": 1300
+        "tagged": 1218, 
+        "total": 1289
       }, 
       "700": {
-        "tagged": 520, 
-        "total": 594
+        "tagged": 543, 
+        "total": 588
       }, 
       "800": {
         "tagged": 1, 
-        "total": 2
+        "total": 3
       }
     }
   }, 
   "1000": {
     "1000": {
       "0": {
-        "tagged": 4178, 
-        "total": 4843
+        "tagged": 4684, 
+        "total": 4797
       }, 
       "1000": {
-        "tagged": 0, 
+        "tagged": 1, 
         "total": 1
       }, 
       "200": {
-        "tagged": 3857, 
-        "total": 4448
+        "tagged": 4299, 
+        "total": 4413
       }, 
       "400": {
-        "tagged": 3602, 
-        "total": 4115
+        "tagged": 3924, 
+        "total": 4009
       }, 
       "600": {
-        "tagged": 2190, 
-        "total": 2511
+        "tagged": 2319, 
+        "total": 2387
       }, 
       "800": {
-        "tagged": 742, 
-        "total": 828
+        "tagged": 805, 
+        "total": 835
       }, 
       "900": {
-        "tagged": 344, 
-        "total": 384
+        "tagged": 368, 
+        "total": 382
       }
     }, 
     "1200": {
       "0": {
-        "tagged": 4393, 
-        "total": 5106
+        "tagged": 5011, 
+        "total": 5113
       }, 
       "1000": {
-        "tagged": 701, 
-        "total": 813
+        "tagged": 768, 
+        "total": 798
       }, 
       "1100": {
-        "tagged": 474, 
-        "total": 524
+        "tagged": 494, 
+        "total": 523
       }, 
       "1200": {
         "tagged": 0, 
         "total": 0
       }, 
       "200": {
-        "tagged": 5469, 
-        "total": 6351
+        "tagged": 6290, 
+        "total": 6396
       }, 
       "400": {
-        "tagged": 5439, 
-        "total": 6216
+        "tagged": 6059, 
+        "total": 6204
       }, 
       "600": {
-        "tagged": 4203, 
-        "total": 4801
+        "tagged": 4472, 
+        "total": 4591
       }, 
       "800": {
-        "tagged": 2460, 
-        "total": 2805
+        "tagged": 2532, 
+        "total": 2611
       }, 
       "900": {
-        "tagged": 1332, 
-        "total": 1514
+        "tagged": 1360, 
+        "total": 1407
       }
     }, 
     "1400": {
       "0": {
-        "tagged": 6212, 
-        "total": 7326
+        "tagged": 7347, 
+        "total": 7474
       }, 
       "1000": {
-        "tagged": 2704, 
-        "total": 3071
+        "tagged": 2838, 
+        "total": 2921
       }, 
       "1200": {
-        "tagged": 949, 
-        "total": 1059
+        "tagged": 1020, 
+        "total": 1056
       }, 
       "1300": {
-        "tagged": 424, 
-        "total": 485
+        "tagged": 458, 
+        "total": 487
       }, 
       "1400": {
         "tagged": 0, 
         "total": 0
       }, 
       "200": {
-        "tagged": 6577, 
-        "total": 7675
+        "tagged": 7659, 
+        "total": 7820
       }, 
       "400": {
-        "tagged": 6794, 
-        "total": 7893
+        "tagged": 7887, 
+        "total": 8042
       }, 
       "600": {
-        "tagged": 6130, 
-        "total": 7033
+        "tagged": 6884, 
+        "total": 7036
       }, 
       "800": {
-        "tagged": 4202, 
-        "total": 4775
+        "tagged": 4469, 
+        "total": 4571
       }, 
       "900": {
-        "tagged": 4158, 
-        "total": 4785
+        "tagged": 4441, 
+        "total": 4570
       }
     }, 
     "1600": {
       "0": {
-        "tagged": 6747, 
-        "total": 8001
+        "tagged": 8046, 
+        "total": 8214
       }, 
       "1000": {
-        "tagged": 5278, 
-        "total": 6029
+        "tagged": 5623, 
+        "total": 5771
       }, 
       "1200": {
-        "tagged": 3236, 
-        "total": 3649
+        "tagged": 3370, 
+        "total": 3444
       }, 
       "1400": {
-        "tagged": 658, 
-        "total": 741
+        "tagged": 720, 
+        "total": 737
       }, 
       "1500": {
-        "tagged": 816, 
-        "total": 935
+        "tagged": 894, 
+        "total": 947
       }, 
       "200": {
-        "tagged": 7001, 
-        "total": 8235
+        "tagged": 8281, 
+        "total": 8421
       }, 
       "400": {
-        "tagged": 8257, 
-        "total": 9678
+        "tagged": 9618, 
+        "total": 9814
       }, 
       "600": {
-        "tagged": 7466, 
-        "total": 8776
+        "tagged": 8698, 
+        "total": 8860
       }, 
       "800": {
-        "tagged": 5752, 
-        "total": 6641
+        "tagged": 6457, 
+        "total": 6604
       }, 
       "900": {
-        "tagged": 5837, 
-        "total": 6707
+        "tagged": 6392, 
+        "total": 6546
       }
     }, 
     "1800": {
       "0": {
-        "tagged": 6341, 
-        "total": 7548
+        "tagged": 7587, 
+        "total": 7723
       }, 
       "1000": {
-        "tagged": 6815, 
-        "total": 7791
+        "tagged": 7604, 
+        "total": 7753
       }, 
       "1200": {
-        "tagged": 5801, 
-        "total": 6610
+        "tagged": 6195, 
+        "total": 6342
       }, 
       "1400": {
-        "tagged": 3000, 
-        "total": 3375
+        "tagged": 3109, 
+        "total": 3179
       }, 
       "1600": {
-        "tagged": 1712, 
-        "total": 1936
+        "tagged": 1828, 
+        "total": 1907
       }, 
       "1700": {
-        "tagged": 765, 
-        "total": 862
+        "tagged": 827, 
+        "total": 865
       }, 
       "200": {
-        "tagged": 7097, 
-        "total": 8512
+        "tagged": 8393, 
+        "total": 8556
       }, 
       "400": {
-        "tagged": 5822, 
-        "total": 6904
+        "tagged": 6921, 
+        "total": 7060
       }, 
       "600": {
-        "tagged": 7013, 
-        "total": 8219
+        "tagged": 8200, 
+        "total": 8344
       }, 
       "800": {
-        "tagged": 6427, 
-        "total": 7499
+        "tagged": 7454, 
+        "total": 7610
       }
     }, 
     "2000": {
       "0": {
-        "tagged": 8422, 
-        "total": 10088
+        "tagged": 10120, 
+        "total": 10268
       }, 
       "1000": {
-        "tagged": 9223, 
-        "total": 10673
+        "tagged": 10716, 
+        "total": 10907
       }, 
       "1200": {
-        "tagged": 7003, 
-        "total": 8070
+        "tagged": 7904, 
+        "total": 8059
       }, 
       "1400": {
-        "tagged": 5444, 
-        "total": 6156
+        "tagged": 5844, 
+        "total": 5979
       }, 
       "1600": {
-        "tagged": 7269, 
-        "total": 8287
+        "tagged": 7551, 
+        "total": 7781
       }, 
       "1800": {
-        "tagged": 1781, 
-        "total": 2016
+        "tagged": 1923, 
+        "total": 1996
       }, 
       "1900": {
-        "tagged": 748, 
-        "total": 839
+        "tagged": 806, 
+        "total": 845
       }, 
       "200": {
-        "tagged": 7803, 
-        "total": 9386
+        "tagged": 9372, 
+        "total": 9547
       }, 
       "400": {
-        "tagged": 9548, 
-        "total": 11376
+        "tagged": 11496, 
+        "total": 11673
       }, 
       "600": {
-        "tagged": 9201, 
-        "total": 10844
+        "tagged": 10934, 
+        "total": 11097
       }, 
       "800": {
-        "tagged": 8859, 
-        "total": 10416
+        "tagged": 10325, 
+        "total": 10531
       }
     }, 
     "2200": {
       "0": {
-        "tagged": 8323, 
-        "total": 10067
+        "tagged": 10178, 
+        "total": 10322
       }, 
       "1000": {
-        "tagged": 8367, 
-        "total": 9823
+        "tagged": 9742, 
+        "total": 9927
       }, 
       "1200": {
-        "tagged": 9986, 
-        "total": 11691
+        "tagged": 11555, 
+        "total": 11784
       }, 
       "1400": {
-        "tagged": 8216, 
-        "total": 9469
+        "tagged": 9306, 
+        "total": 9456
       }, 
       "1600": {
-        "tagged": 12590, 
-        "total": 14325
+        "tagged": 13543, 
+        "total": 13868
       }, 
       "1800": {
-        "tagged": 6725, 
-        "total": 7583
+        "tagged": 6908, 
+        "total": 7094
       }, 
       "200": {
-        "tagged": 8805, 
-        "total": 10640
+        "tagged": 10651, 
+        "total": 10800
       }, 
       "2000": {
-        "tagged": 1796, 
-        "total": 2006
+        "tagged": 1896, 
+        "total": 1967
       }, 
       "2100": {
-        "tagged": 833, 
-        "total": 929
+        "tagged": 912, 
+        "total": 943
       }, 
       "400": {
-        "tagged": 8713, 
-        "total": 10487
+        "tagged": 10531, 
+        "total": 10710
       }, 
       "600": {
-        "tagged": 9956, 
-        "total": 11938
+        "tagged": 12027, 
+        "total": 12225
       }, 
       "800": {
-        "tagged": 8433, 
-        "total": 9961
+        "tagged": 10065, 
+        "total": 10244
       }
     }, 
     "2400": {
       "0": {
-        "tagged": 10338, 
-        "total": 12574
+        "tagged": 12670, 
+        "total": 12865
       }, 
       "1000": {
-        "tagged": 10855, 
-        "total": 12866
+        "tagged": 12969, 
+        "total": 13181
       }, 
       "1200": {
-        "tagged": 8958, 
-        "total": 10557
+        "tagged": 10522, 
+        "total": 10688
       }, 
       "1400": {
-        "tagged": 7937, 
-        "total": 9291
+        "tagged": 9204, 
+        "total": 9393
       }, 
       "1600": {
-        "tagged": 18460, 
-        "total": 21287
+        "tagged": 20782, 
+        "total": 21196
       }, 
       "1800": {
-        "tagged": 13921, 
-        "total": 15998
+        "tagged": 15100, 
+        "total": 15430
       }, 
       "200": {
-        "tagged": 8835, 
-        "total": 10636
+        "tagged": 10708, 
+        "total": 10860
       }, 
       "2000": {
-        "tagged": 7563, 
-        "total": 8590
+        "tagged": 7713, 
+        "total": 7939
       }, 
       "2200": {
-        "tagged": 1679, 
-        "total": 1880
+        "tagged": 1796, 
+        "total": 1865
       }, 
       "2300": {
-        "tagged": 836, 
-        "total": 921
+        "tagged": 888, 
+        "total": 922
       }, 
       "400": {
-        "tagged": 8829, 
-        "total": 10659
+        "tagged": 10697, 
+        "total": 10839
       }, 
       "600": {
-        "tagged": 9587, 
-        "total": 11549
+        "tagged": 11599, 
+        "total": 11793
       }, 
       "800": {
-        "tagged": 10600, 
-        "total": 12714
+        "tagged": 12664, 
+        "total": 12863
       }
     }, 
     "2500": {
       "0": {
-        "tagged": 22127, 
-        "total": 27056
+        "tagged": 27176, 
+        "total": 27605
       }, 
       "1000": {
-        "tagged": 23722, 
-        "total": 28194
+        "tagged": 28384, 
+        "total": 28865
       }, 
       "1200": {
-        "tagged": 21670, 
-        "total": 25654
+        "tagged": 25692, 
+        "total": 26124
       }, 
       "1400": {
-        "tagged": 20127, 
-        "total": 23585
+        "tagged": 23467, 
+        "total": 23878
       }, 
       "1600": {
-        "tagged": 20053, 
-        "total": 23349
+        "tagged": 23101, 
+        "total": 23561
       }, 
       "1800": {
-        "tagged": 16145, 
-        "total": 18479
+        "tagged": 17793, 
+        "total": 18148
       }, 
       "200": {
-        "tagged": 22904, 
-        "total": 27861
+        "tagged": 28014, 
+        "total": 28469
       }, 
       "2000": {
-        "tagged": 11523, 
-        "total": 13144
+        "tagged": 12074, 
+        "total": 12377
       }, 
       "2200": {
-        "tagged": 4070, 
-        "total": 4595
+        "tagged": 4176, 
+        "total": 4318
       }, 
       "2400": {
-        "tagged": 796, 
-        "total": 901
+        "tagged": 846, 
+        "total": 896
       }, 
       "400": {
-        "tagged": 23061, 
-        "total": 27876
+        "tagged": 27930, 
+        "total": 28388
       }, 
       "600": {
-        "tagged": 23711, 
-        "total": 28592
+        "tagged": 28676, 
+        "total": 29160
       }, 
       "800": {
-        "tagged": 22120, 
-        "total": 26472
+        "tagged": 26655, 
+        "total": 27091
       }
     }, 
     "600": {
       "0": {
-        "tagged": 1028, 
-        "total": 1182
+        "tagged": 1101, 
+        "total": 1123
       }, 
       "200": {
-        "tagged": 996, 
-        "total": 1107
+        "tagged": 1000, 
+        "total": 1029
       }, 
       "400": {
-        "tagged": 355, 
-        "total": 416
+        "tagged": 404, 
+        "total": 423
       }, 
       "500": {
-        "tagged": 176, 
-        "total": 200
+        "tagged": 188, 
+        "total": 201
       }, 
       "600": {
-        "tagged": 2, 
-        "total": 4
+        "tagged": 1, 
+        "total": 5
       }
     }, 
     "800": {
       "0": {
-        "tagged": 2339, 
-        "total": 2673
+        "tagged": 2502, 
+        "total": 2571
       }, 
       "200": {
-        "tagged": 2554, 
-        "total": 2934
+        "tagged": 2714, 
+        "total": 2787
       }, 
       "400": {
-        "tagged": 1560, 
-        "total": 1786
+        "tagged": 1617, 
+        "total": 1673
       }, 
       "600": {
-        "tagged": 485, 
-        "total": 545
+        "tagged": 515, 
+        "total": 543
       }, 
       "700": {
-        "tagged": 251, 
-        "total": 289
+        "tagged": 276, 
+        "total": 294
       }, 
       "800": {
         "tagged": 3, 
@@ -3186,444 +2726,444 @@
   "10000": {
     "1000": {
       "0": {
-        "tagged": 745, 
-        "total": 915
+        "tagged": 824, 
+        "total": 880
       }, 
       "1000": {
-        "tagged": 0, 
-        "total": 0
+        "tagged": 1, 
+        "total": 1
       }, 
       "200": {
-        "tagged": 622, 
-        "total": 748
+        "tagged": 646, 
+        "total": 691
       }, 
       "400": {
-        "tagged": 686, 
-        "total": 816
+        "tagged": 705, 
+        "total": 760
       }, 
       "600": {
-        "tagged": 344, 
-        "total": 404
+        "tagged": 346, 
+        "total": 362
       }, 
       "800": {
-        "tagged": 165, 
-        "total": 206
+        "tagged": 177, 
+        "total": 210
       }, 
       "900": {
-        "tagged": 92, 
-        "total": 113
+        "tagged": 94, 
+        "total": 110
       }
     }, 
     "1200": {
       "0": {
-        "tagged": 804, 
-        "total": 959
+        "tagged": 880, 
+        "total": 931
       }, 
       "1000": {
-        "tagged": 161, 
+        "tagged": 173, 
         "total": 193
       }, 
       "1100": {
-        "tagged": 77, 
-        "total": 91
+        "tagged": 85, 
+        "total": 94
       }, 
       "1200": {
         "tagged": 0, 
         "total": 0
       }, 
       "200": {
-        "tagged": 1109, 
-        "total": 1328
+        "tagged": 1184, 
+        "total": 1265
       }, 
       "400": {
-        "tagged": 743, 
-        "total": 873
+        "tagged": 773, 
+        "total": 826
       }, 
       "600": {
-        "tagged": 577, 
-        "total": 692
+        "tagged": 590, 
+        "total": 640
       }, 
       "800": {
-        "tagged": 416, 
-        "total": 494
+        "tagged": 427, 
+        "total": 459
       }, 
       "900": {
-        "tagged": 220, 
-        "total": 276
+        "tagged": 236, 
+        "total": 261
       }
     }, 
     "1400": {
       "0": {
-        "tagged": 1233, 
-        "total": 1475
+        "tagged": 1373, 
+        "total": 1456
       }, 
       "1000": {
-        "tagged": 435, 
-        "total": 534
+        "tagged": 469, 
+        "total": 512
       }, 
       "1200": {
-        "tagged": 148, 
+        "tagged": 160, 
         "total": 179
       }, 
       "1300": {
-        "tagged": 71, 
-        "total": 84
+        "tagged": 77, 
+        "total": 82
       }, 
       "1400": {
         "tagged": 0, 
         "total": 0
       }, 
       "200": {
-        "tagged": 1021, 
-        "total": 1237
+        "tagged": 1133, 
+        "total": 1218
       }, 
       "400": {
-        "tagged": 1022, 
-        "total": 1178
+        "tagged": 1098, 
+        "total": 1165
       }, 
       "600": {
-        "tagged": 813, 
-        "total": 957
+        "tagged": 842, 
+        "total": 895
       }, 
       "800": {
-        "tagged": 724, 
-        "total": 880
+        "tagged": 771, 
+        "total": 835
       }, 
       "900": {
-        "tagged": 512, 
-        "total": 638
+        "tagged": 553, 
+        "total": 598
       }
     }, 
     "1600": {
       "0": {
-        "tagged": 1229, 
-        "total": 1457
+        "tagged": 1392, 
+        "total": 1452
       }, 
       "1000": {
-        "tagged": 681, 
-        "total": 810
+        "tagged": 725, 
+        "total": 765
       }, 
       "1200": {
-        "tagged": 372, 
-        "total": 450
+        "tagged": 384, 
+        "total": 420
       }, 
       "1400": {
-        "tagged": 197, 
-        "total": 238
+        "tagged": 209, 
+        "total": 236
       }, 
       "1500": {
-        "tagged": 165, 
-        "total": 193
+        "tagged": 177, 
+        "total": 196
       }, 
       "200": {
-        "tagged": 1376, 
-        "total": 1639
+        "tagged": 1530, 
+        "total": 1609
       }, 
       "400": {
-        "tagged": 1029, 
-        "total": 1219
+        "tagged": 1131, 
+        "total": 1195
       }, 
       "600": {
-        "tagged": 1200, 
-        "total": 1401
+        "tagged": 1328, 
+        "total": 1391
       }, 
       "800": {
-        "tagged": 957, 
-        "total": 1142
+        "tagged": 992, 
+        "total": 1068
       }, 
       "900": {
-        "tagged": 818, 
-        "total": 966
+        "tagged": 877, 
+        "total": 923
       }
     }, 
     "1800": {
       "0": {
-        "tagged": 1469, 
-        "total": 1747
+        "tagged": 1675, 
+        "total": 1745
       }, 
       "1000": {
-        "tagged": 967, 
-        "total": 1116
+        "tagged": 1019, 
+        "total": 1067
       }, 
       "1200": {
-        "tagged": 827, 
-        "total": 971
+        "tagged": 870, 
+        "total": 912
       }, 
       "1400": {
-        "tagged": 451, 
-        "total": 545
+        "tagged": 473, 
+        "total": 511
       }, 
       "1600": {
-        "tagged": 311, 
-        "total": 369
+        "tagged": 338, 
+        "total": 372
       }, 
       "1700": {
-        "tagged": 180, 
-        "total": 216
+        "tagged": 191, 
+        "total": 214
       }, 
       "200": {
-        "tagged": 1549, 
-        "total": 1823
+        "tagged": 1743, 
+        "total": 1809
       }, 
       "400": {
-        "tagged": 994, 
-        "total": 1198
+        "tagged": 1122, 
+        "total": 1179
       }, 
       "600": {
-        "tagged": 1272, 
-        "total": 1513
+        "tagged": 1398, 
+        "total": 1471
       }, 
       "800": {
-        "tagged": 1450, 
-        "total": 1716
+        "tagged": 1574, 
+        "total": 1651
       }
     }, 
     "2000": {
       "0": {
-        "tagged": 1602, 
-        "total": 1911
+        "tagged": 1817, 
+        "total": 1885
       }, 
       "1000": {
-        "tagged": 1409, 
-        "total": 1668
+        "tagged": 1544, 
+        "total": 1616
       }, 
       "1200": {
-        "tagged": 1236, 
-        "total": 1467
+        "tagged": 1324, 
+        "total": 1386
       }, 
       "1400": {
-        "tagged": 746, 
-        "total": 880
+        "tagged": 781, 
+        "total": 817
       }, 
       "1600": {
-        "tagged": 999, 
-        "total": 1167
+        "tagged": 1012, 
+        "total": 1080
       }, 
       "1800": {
-        "tagged": 360, 
-        "total": 435
+        "tagged": 394, 
+        "total": 436
       }, 
       "1900": {
-        "tagged": 170, 
-        "total": 203
+        "tagged": 178, 
+        "total": 202
       }, 
       "200": {
-        "tagged": 1720, 
-        "total": 2061
+        "tagged": 1971, 
+        "total": 2050
       }, 
       "400": {
-        "tagged": 1439, 
-        "total": 1715
+        "tagged": 1645, 
+        "total": 1723
       }, 
       "600": {
-        "tagged": 1376, 
-        "total": 1641
+        "tagged": 1600, 
+        "total": 1666
       }, 
       "800": {
-        "tagged": 1503, 
-        "total": 1773
+        "tagged": 1648, 
+        "total": 1711
       }
     }, 
     "2200": {
       "0": {
-        "tagged": 1459, 
-        "total": 1713
+        "tagged": 1647, 
+        "total": 1707
       }, 
       "1000": {
-        "tagged": 1522, 
-        "total": 1845
+        "tagged": 1744, 
+        "total": 1821
       }, 
       "1200": {
-        "tagged": 1225, 
-        "total": 1498
+        "tagged": 1419, 
+        "total": 1472
       }, 
       "1400": {
-        "tagged": 1197, 
-        "total": 1404
+        "tagged": 1321, 
+        "total": 1365
       }, 
       "1600": {
-        "tagged": 1740, 
-        "total": 2065
+        "tagged": 1805, 
+        "total": 1924
       }, 
       "1800": {
-        "tagged": 938, 
-        "total": 1106
+        "tagged": 967, 
+        "total": 1039
       }, 
       "200": {
-        "tagged": 1874, 
-        "total": 2257
+        "tagged": 2204, 
+        "total": 2290
       }, 
       "2000": {
-        "tagged": 393, 
-        "total": 460
+        "tagged": 422, 
+        "total": 458
       }, 
       "2100": {
-        "tagged": 143, 
-        "total": 169
+        "tagged": 150, 
+        "total": 168
       }, 
       "400": {
-        "tagged": 1725, 
-        "total": 2043
+        "tagged": 2008, 
+        "total": 2086
       }, 
       "600": {
-        "tagged": 1498, 
-        "total": 1797
+        "tagged": 1752, 
+        "total": 1811
       }, 
       "800": {
-        "tagged": 1691, 
-        "total": 1990
+        "tagged": 1887, 
+        "total": 1959
       }
     }, 
     "2400": {
       "0": {
-        "tagged": 1819, 
-        "total": 2219
+        "tagged": 2197, 
+        "total": 2267
       }, 
       "1000": {
-        "tagged": 1408, 
-        "total": 1667
+        "tagged": 1617, 
+        "total": 1674
       }, 
       "1200": {
-        "tagged": 1396, 
-        "total": 1653
+        "tagged": 1543, 
+        "total": 1603
       }, 
       "1400": {
-        "tagged": 1202, 
-        "total": 1398
+        "tagged": 1316, 
+        "total": 1358
       }, 
       "1600": {
-        "tagged": 2767, 
-        "total": 3269
+        "tagged": 2897, 
+        "total": 3061
       }, 
       "1800": {
-        "tagged": 1965, 
-        "total": 2313
+        "tagged": 1970, 
+        "total": 2090
       }, 
       "200": {
-        "tagged": 1648, 
-        "total": 1951
+        "tagged": 1895, 
+        "total": 1957
       }, 
       "2000": {
-        "tagged": 900, 
-        "total": 1060
+        "tagged": 931, 
+        "total": 1001
       }, 
       "2200": {
-        "tagged": 364, 
-        "total": 427
+        "tagged": 379, 
+        "total": 414
       }, 
       "2300": {
-        "tagged": 155, 
-        "total": 185
+        "tagged": 164, 
+        "total": 183
       }, 
       "400": {
-        "tagged": 1588, 
-        "total": 1869
+        "tagged": 1832, 
+        "total": 1891
       }, 
       "600": {
-        "tagged": 1696, 
-        "total": 2034
+        "tagged": 1955, 
+        "total": 2035
       }, 
       "800": {
-        "tagged": 1639, 
-        "total": 1962
+        "tagged": 1920, 
+        "total": 2002
       }
     }, 
     "2500": {
       "0": {
-        "tagged": 4131, 
-        "total": 4969
+        "tagged": 4816, 
+        "total": 4990
       }, 
       "1000": {
-        "tagged": 3603, 
-        "total": 4303
+        "tagged": 4147, 
+        "total": 4289
       }, 
       "1200": {
-        "tagged": 3607, 
-        "total": 4293
+        "tagged": 4073, 
+        "total": 4220
       }, 
       "1400": {
-        "tagged": 3448, 
-        "total": 4060
+        "tagged": 3777, 
+        "total": 3932
       }, 
       "1600": {
-        "tagged": 3026, 
-        "total": 3565
+        "tagged": 3291, 
+        "total": 3432
       }, 
       "1800": {
-        "tagged": 2326, 
-        "total": 2763
+        "tagged": 2455, 
+        "total": 2580
       }, 
       "200": {
-        "tagged": 4053, 
-        "total": 4896
+        "tagged": 4729, 
+        "total": 4904
       }, 
       "2000": {
-        "tagged": 1485, 
-        "total": 1765
+        "tagged": 1529, 
+        "total": 1620
       }, 
       "2200": {
-        "tagged": 591, 
-        "total": 708
+        "tagged": 622, 
+        "total": 672
       }, 
       "2400": {
-        "tagged": 181, 
-        "total": 214
+        "tagged": 188, 
+        "total": 207
       }, 
       "400": {
-        "tagged": 3824, 
-        "total": 4570
+        "tagged": 4433, 
+        "total": 4596
       }, 
       "600": {
-        "tagged": 3527, 
-        "total": 4200
+        "tagged": 4039, 
+        "total": 4199
       }, 
       "800": {
-        "tagged": 3547, 
-        "total": 4282
+        "tagged": 4124, 
+        "total": 4291
       }
     }, 
     "600": {
       "0": {
-        "tagged": 338, 
-        "total": 405
+        "tagged": 332, 
+        "total": 360
       }, 
       "200": {
-        "tagged": 198, 
-        "total": 235
+        "tagged": 204, 
+        "total": 222
       }, 
       "400": {
-        "tagged": 105, 
-        "total": 124
+        "tagged": 110, 
+        "total": 119
       }, 
       "500": {
-        "tagged": 41, 
-        "total": 55
+        "tagged": 46, 
+        "total": 57
       }, 
       "600": {
-        "tagged": 0, 
-        "total": 0
+        "tagged": 1, 
+        "total": 1
       }
     }, 
     "800": {
       "0": {
-        "tagged": 527, 
-        "total": 640
+        "tagged": 551, 
+        "total": 601
       }, 
       "200": {
-        "tagged": 530, 
-        "total": 633
+        "tagged": 531, 
+        "total": 574
       }, 
       "400": {
-        "tagged": 396, 
-        "total": 471
+        "tagged": 416, 
+        "total": 453
       }, 
       "600": {
-        "tagged": 123, 
-        "total": 146
+        "tagged": 128, 
+        "total": 139
       }, 
       "700": {
-        "tagged": 80, 
-        "total": 94
+        "tagged": 85, 
+        "total": 91
       }, 
       "800": {
         "tagged": 0, 

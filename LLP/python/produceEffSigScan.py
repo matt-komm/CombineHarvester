@@ -6,25 +6,27 @@ import math
 import numpy
 import scipy.interpolate
 
-dataCard = "/vols/build/cms/mkomm/LLP/CMSSW_8_1_0/src/cards_new/ctau1_llp2000_lsp200/out.txt"
-basePath = "/vols/build/cms/mkomm/LLP/CMSSW_8_1_0/src/llpScan_ctau1_llp2000_lsp200"
+name = "llpScan_ctau10_llp2000_lsp1800_da"
+dataCard = "/vols/build/cms/mkomm/LLP/CMSSW_8_1_0/src/cards_da/ctau10_llp2000_lsp1800/out.txt"
+basePath = "/vols/build/cms/mkomm/LLP/CMSSW_8_1_0/src/"+name
 
-expectedSignalArray = numpy.logspace(-4,1,200)
+
+expectedSignalArray = numpy.logspace(-5,1,300)
 
 jobScanArrayCfg = []
 
 for expectedSignal in expectedSignalArray:
     cmdPath = os.path.join(basePath,"signal_%.6f"%(expectedSignal))
     try:
-        os.mkdir(cmdPath)
+        os.makedirs(cmdPath)
     except:
         pass
         
     jobScanArrayCfg.append({
         "path":cmdPath,
         "cmd": [
-            "combine -M MultiDimFit -t -1 --setParameterRanges llpEff=0,2 -d "+dataCard+" --setParameters r="+("%.6f"%expectedSignal)+" --redefineSignalPOIs llpEff --algo grid --points 1000  --cminDefaultMinimizerStrategy 0 --X-rtd MINIMIZER_analytic --fastScan", 
-            "combine -M Significance -t -1 --setParameterRanges llpEff=0,2 -d "+dataCard+" --expectSignal="+("%.6f"%expectedSignal)+" --rMin "+("%.6f"%(-20.*expectedSignal))+" --rMax "+("%.6f"%(20.*expectedSignal))+" --cminDefaultMinimizerStrategy 0 --X-rtd MINIMIZER_analytic"
+            "combine -M MultiDimFit -t -1 --setParameterRanges llpEff=0.01,2.0 -d "+dataCard+" --setParameters r="+("%.6f"%expectedSignal)+" --redefineSignalPOIs llpEff --algo grid --points 1000  --cminDefaultMinimizerStrategy 0 --X-rtd MINIMIZER_analytic --fastScan", 
+            #"combine -M Significance -t -1 --setParameterRanges llpEff=0,2 -d "+dataCard+" --expectSignal="+("%.6f"%expectedSignal)+" --rMin "+("%.6f"%(-20.*expectedSignal))+" --rMax "+("%.6f"%(20.*expectedSignal))+" --cminDefaultMinimizerStrategy 0 --X-rtd MINIMIZER_analytic"
         ]
     })
 
@@ -84,5 +86,5 @@ date
     ''')
     submitFile.close()
     
-makeSubmitFile(jobScanArrayCfg,"runllpEffScan.sh")
+makeSubmitFile(jobScanArrayCfg,"runllpEffScan_"+name+".sh")
 

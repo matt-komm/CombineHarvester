@@ -1,91 +1,27 @@
 {
   "DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8": {
-    "eff": 29386523.0, 
-    "neg": 5497434.0, 
-    "negfrac": 0.13613780664464975, 
-    "pos": 34883957.0, 
-    "sum": 40381391.0, 
-    "weighted": 1218104020992.9727
-  }, 
-  "DYJetsToLL_M-50_HT-100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 2751187.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 2751187.0, 
-    "sum": 2751187.0, 
-    "weighted": 2751187.0
-  }, 
-  "DYJetsToLL_M-50_HT-1200to2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 596079.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 596079.0, 
-    "sum": 596079.0, 
-    "weighted": 596079.0
-  }, 
-  "DYJetsToLL_M-50_HT-200to400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 962195.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 962195.0, 
-    "sum": 962195.0, 
-    "weighted": 962195.0
-  }, 
-  "DYJetsToLL_M-50_HT-2500toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 399492.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 399492.0, 
-    "sum": 399492.0, 
-    "weighted": 399492.0
-  }, 
-  "DYJetsToLL_M-50_HT-400to600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 1070454.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 1070454.0, 
-    "sum": 1070454.0, 
-    "weighted": 1070454.0
-  }, 
-  "DYJetsToLL_M-50_HT-600to800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 8292957.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 8292957.0, 
-    "sum": 8292957.0, 
-    "weighted": 8292957.0
-  }, 
-  "DYJetsToLL_M-50_HT-70to100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 9616188.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 9616188.0, 
-    "sum": 9616188.0, 
-    "weighted": 9616188.0
-  }, 
-  "DYJetsToLL_M-50_HT-800to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 2668730.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 2668730.0, 
-    "sum": 2668730.0, 
-    "weighted": 2668730.0
+    "eff": 26026016.0, 
+    "neg": 4868200.0, 
+    "negfrac": 0.13612614986638485, 
+    "pos": 30894216.0, 
+    "sum": 35762416.0, 
+    "weighted": 1078636847950.2695
   }, 
   "DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8": {
-    "eff": 81781064.0, 
-    "neg": 20137162.0, 
-    "negfrac": 0.1649838022718014, 
-    "pos": 101918226.0, 
-    "sum": 122055388.0, 
-    "weighted": 1917362228421.0137
+    "eff": 71704760.0, 
+    "neg": 17655137.0, 
+    "negfrac": 0.1649781001798308, 
+    "pos": 89359897.0, 
+    "sum": 107015034.0, 
+    "weighted": 1680976449590.3633
   }, 
   "DYJetsToNuNu_PtZ-100To250_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8": {
-    "eff": 1344764.0, 
-    "neg": 1218076.0, 
-    "negfrac": 0.32216425860823145, 
-    "pos": 2562840.0, 
-    "sum": 3780916.0, 
-    "weighted": 510108551.37158203
+    "eff": 1685489.0, 
+    "neg": 1523393.0, 
+    "negfrac": 0.32191556915014446, 
+    "pos": 3208882.0, 
+    "sum": 4732275.0, 
+    "weighted": 639420515.079834
   }, 
   "DYJetsToNuNu_PtZ-100To250_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ext1": {
     "eff": 1907796.0, 
@@ -93,23 +29,23 @@
     "negfrac": 0.3219234547407589, 
     "pos": 3632235.0, 
     "sum": 5356674.0, 
-    "weighted": 723709951.4372559
+    "weighted": 723754853.6018066
   }, 
   "DYJetsToNuNu_PtZ-100To250_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ext4": {
-    "eff": 18828067.0, 
-    "neg": 17055754.0, 
-    "negfrac": 0.3221739879853588, 
-    "pos": 35883821.0, 
-    "sum": 52939575.0, 
-    "weighted": 7142519034.920898
+    "eff": 15466303.0, 
+    "neg": 14011004.0, 
+    "negfrac": 0.3221786194455793, 
+    "pos": 29477307.0, 
+    "sum": 43488311.0, 
+    "weighted": 5867368435.18042
   }, 
   "DYJetsToNuNu_PtZ-250To400_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8": {
-    "eff": 338097.0, 
-    "neg": 290668.0, 
-    "negfrac": 0.31613831567933715, 
-    "pos": 628765.0, 
-    "sum": 919433.0, 
-    "weighted": 4505137.272924423
+    "eff": 387535.0, 
+    "neg": 332725.0, 
+    "negfrac": 0.3159826588223004, 
+    "pos": 720260.0, 
+    "sum": 1052985.0, 
+    "weighted": 5163630.729685783
   }, 
   "DYJetsToNuNu_PtZ-250To400_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ext1": {
     "eff": 388784.0, 
@@ -117,15 +53,15 @@
     "negfrac": 0.3165479778867043, 
     "pos": 724209.0, 
     "sum": 1059634.0, 
-    "weighted": 5180346.937846184
+    "weighted": 5180281.143572807
   }, 
   "DYJetsToNuNu_PtZ-250To400_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ext4": {
-    "eff": 7559028.0, 
-    "neg": 6515925.0, 
-    "negfrac": 0.3164471665559866, 
-    "pos": 14074953.0, 
-    "sum": 20590878.0, 
-    "weighted": 100719427.46130371
+    "eff": 7321306.0, 
+    "neg": 6309373.0, 
+    "negfrac": 0.3164170785512495, 
+    "pos": 13630679.0, 
+    "sum": 19940052.0, 
+    "weighted": 97551457.41727734
   }, 
   "DYJetsToNuNu_PtZ-400To650_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8": {
     "eff": 405125.0, 
@@ -133,87 +69,63 @@
     "negfrac": 0.30721277618361004, 
     "pos": 727915.0, 
     "sum": 1050705.0, 
-    "weighted": 683776.4394843578
+    "weighted": 683786.0731477737
   }, 
   "DYJetsToNuNu_PtZ-400To650_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ext1": {
-    "eff": 404610.0, 
-    "neg": 322991.0, 
-    "negfrac": 0.30743714020285706, 
-    "pos": 727601.0, 
-    "sum": 1050592.0, 
-    "weighted": 682921.7843182087
+    "eff": 367865.0, 
+    "neg": 294077.0, 
+    "negfrac": 0.3076058111815769, 
+    "pos": 661942.0, 
+    "sum": 956019.0, 
+    "weighted": 620891.6900827885
   }, 
   "DYJetsToNuNu_PtZ-50To100_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8": {
-    "eff": 7952352.0, 
-    "neg": 7000616.0, 
-    "negfrac": 0.3188826024944264, 
-    "pos": 14952968.0, 
-    "sum": 21953584.0, 
-    "weighted": 13590516172.269287
+    "eff": 7797358.0, 
+    "neg": 6864979.0, 
+    "negfrac": 0.3188961875228663, 
+    "pos": 14662337.0, 
+    "sum": 21527316.0, 
+    "weighted": 13325607958.96228
   }, 
   "DYJetsToNuNu_PtZ-650ToInf_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8": {
-    "eff": 422709.0, 
-    "neg": 299943.0, 
-    "negfrac": 0.29331553547592154, 
-    "pos": 722652.0, 
-    "sum": 1022595.0, 
-    "weighted": 62289.87290889025
+    "eff": 313694.0, 
+    "neg": 223417.0, 
+    "negfrac": 0.2937656470241727, 
+    "pos": 537111.0, 
+    "sum": 760528.0, 
+    "weighted": 46228.518365606666
   }, 
   "DYJetsToNuNu_PtZ-650ToInf_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8_ext1": {
-    "eff": 423162.0, 
-    "neg": 300729.0, 
-    "negfrac": 0.2935029571938865, 
-    "pos": 723891.0, 
-    "sum": 1024620.0, 
-    "weighted": 62358.15835556388
+    "eff": 388095.0, 
+    "neg": 276050.0, 
+    "negfrac": 0.2936093044527997, 
+    "pos": 664145.0, 
+    "sum": 940195.0, 
+    "weighted": 57193.01818701625
   }, 
   "DYJetsToNuNu_Zpt-0To50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8": {
-    "eff": 33049047.0, 
-    "neg": 7339780.0, 
-    "negfrac": 0.15378156751987335, 
-    "pos": 40388827.0, 
-    "sum": 47728607.0, 
-    "weighted": 468823822669.5244
+    "eff": 32592455.0, 
+    "neg": 7238380.0, 
+    "negfrac": 0.15378161713553115, 
+    "pos": 39830835.0, 
+    "sum": 47069215.0, 
+    "weighted": 462347070207.6924
   }, 
-  "GJets_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 5131873.0, 
+  "DisplacedSUSY_StopToBL_M-1200_CTau-1000_TuneCUETP8M1_13TeV_pythia8": {
+    "eff": 90000.0, 
     "neg": 0.0, 
     "negfrac": 0.0, 
-    "pos": 5131873.0, 
-    "sum": 5131873.0, 
-    "weighted": 5131873.0
+    "pos": 90000.0, 
+    "sum": 90000.0, 
+    "weighted": 90000.0
   }, 
-  "GJets_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 10067593.0, 
+  "DisplacedSUSY_StopToBL_M-1200_CTau-1_TuneCUETP8M1_13TeV_pythia8": {
+    "eff": 90000.0, 
     "neg": 0.0, 
     "negfrac": 0.0, 
-    "pos": 10067593.0, 
-    "sum": 10067593.0, 
-    "weighted": 10067593.0
-  }, 
-  "GJets_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 2529729.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 2529729.0, 
-    "sum": 2529729.0, 
-    "weighted": 2529729.0
-  }, 
-  "GJets_HT-40To100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 4467985.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 4467985.0, 
-    "sum": 4467985.0, 
-    "weighted": 4467985.0
-  }, 
-  "GJets_HT-600ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 2463946.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 2463946.0, 
-    "sum": 2463946.0, 
-    "weighted": 2463946.0
+    "pos": 90000.0, 
+    "sum": 90000.0, 
+    "weighted": 90000.0
   }, 
   "QCD_HT1000to1500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
     "eff": 4767100.0, 
@@ -224,36 +136,36 @@
     "weighted": 4767100.0
   }, 
   "QCD_HT100to200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 78408519.0, 
+    "eff": 35797530.0, 
     "neg": 0.0, 
     "negfrac": 0.0, 
-    "pos": 78408519.0, 
-    "sum": 78408519.0, 
-    "weighted": 78408519.0
+    "pos": 35797530.0, 
+    "sum": 35797530.0, 
+    "weighted": 35797530.0
   }, 
   "QCD_HT1500to2000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 3970819.0, 
+    "eff": 3809948.0, 
     "neg": 0.0, 
     "negfrac": 0.0, 
-    "pos": 3970819.0, 
-    "sum": 3970819.0, 
-    "weighted": 3970819.0
+    "pos": 3809948.0, 
+    "sum": 3809948.0, 
+    "weighted": 3809948.0
   }, 
   "QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 1991645.0, 
+    "eff": 1846774.0, 
     "neg": 0.0, 
     "negfrac": 0.0, 
-    "pos": 1991645.0, 
-    "sum": 1991645.0, 
-    "weighted": 1991645.0
+    "pos": 1846774.0, 
+    "sum": 1846774.0, 
+    "weighted": 1846774.0
   }, 
   "QCD_HT200to300_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 18722416.0, 
+    "eff": 15408484.0, 
     "neg": 0.0, 
     "negfrac": 0.0, 
-    "pos": 18722416.0, 
-    "sum": 18722416.0, 
-    "weighted": 18722416.0
+    "pos": 15408484.0, 
+    "sum": 15408484.0, 
+    "weighted": 15408484.0
   }, 
   "QCD_HT300to500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
     "eff": 17035891.0, 
@@ -272,124 +184,12 @@
     "weighted": 18929951.0
   }, 
   "QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 15079737.0, 
+    "eff": 12083468.0, 
     "neg": 0.0, 
     "negfrac": 0.0, 
-    "pos": 15079737.0, 
-    "sum": 15079737.0, 
-    "weighted": 15079737.0
-  }, 
-  "QCD_Pt_1000to1400_TuneCUETP8M1_13TeV_pythia8": {
-    "eff": 6982586.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 6982586.0, 
-    "sum": 6982586.0, 
-    "weighted": 6982586.0
-  }, 
-  "QCD_Pt_120to170_TuneCUETP8M1_13TeV_pythia8": {
-    "eff": 5748736.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 5748736.0, 
-    "sum": 5748736.0, 
-    "weighted": 5748804.090356827
-  }, 
-  "QCD_Pt_1400to1800_TuneCUETP8M1_13TeV_pythia8": {
-    "eff": 2477018.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 2477018.0, 
-    "sum": 2477018.0, 
-    "weighted": 2477018.0
-  }, 
-  "QCD_Pt_170to300_TuneCUETP8M1_13TeV_pythia8": {
-    "eff": 7838066.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 7838066.0, 
-    "sum": 7838066.0, 
-    "weighted": 7838066.0
-  }, 
-  "QCD_Pt_1800to2400_TuneCUETP8M1_13TeV_pythia8": {
-    "eff": 1552064.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 1552064.0, 
-    "sum": 1552064.0, 
-    "weighted": 1552064.0
-  }, 
-  "QCD_Pt_2400to3200_TuneCUETP8M1_13TeV_pythia8": {
-    "eff": 399226.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 399226.0, 
-    "sum": 399226.0, 
-    "weighted": 399226.0
-  }, 
-  "QCD_Pt_300to470_TuneCUETP8M1_13TeV_pythia8": {
-    "eff": 18253032.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 18253032.0, 
-    "sum": 18253032.0, 
-    "weighted": 18253032.0
-  }, 
-  "QCD_Pt_30to50_TuneCUETP8M1_13TeV_pythia8": {
-    "eff": 9980050.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 9980050.0, 
-    "sum": 9980050.0, 
-    "weighted": 9980061.141140938
-  }, 
-  "QCD_Pt_3200toInf_TuneCUETP8M1_13TeV_pythia8": {
-    "eff": 391735.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 391735.0, 
-    "sum": 391735.0, 
-    "weighted": 391735.0
-  }, 
-  "QCD_Pt_470to600_TuneCUETP8M1_13TeV_pythia8": {
-    "eff": 3959986.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 3959986.0, 
-    "sum": 3959986.0, 
-    "weighted": 3959999.8457775116
-  }, 
-  "QCD_Pt_50to80_TuneCUETP8M1_13TeV_pythia8": {
-    "eff": 9954370.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 9954370.0, 
-    "sum": 9954370.0, 
-    "weighted": 9954370.0
-  }, 
-  "QCD_Pt_600to800_TuneCUETP8M1_13TeV_pythia8": {
-    "eff": 9622896.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 9622896.0, 
-    "sum": 9622896.0, 
-    "weighted": 9622896.0
-  }, 
-  "QCD_Pt_800to1000_TuneCUETP8M1_13TeV_pythia8": {
-    "eff": 15704980.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 15704980.0, 
-    "sum": 15704980.0, 
-    "weighted": 15704981.021690369
-  }, 
-  "QCD_Pt_80to120_TuneCUETP8M1_13TeV_pythia8": {
-    "eff": 7608830.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 7608830.0, 
-    "sum": 7608830.0, 
-    "weighted": 7609662.540114403
+    "pos": 12083468.0, 
+    "sum": 12083468.0, 
+    "weighted": 12083468.0
   }, 
   "SMS-T1qqqq_ctau-0p001_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
     "600": {
@@ -2414,12 +2214,12 @@
         "weighted": 10649.0
       }, 
       "600": {
-        "eff": 9597.0, 
+        "eff": 9520.0, 
         "neg": 0.0, 
         "negfrac": 0.0, 
-        "pos": 9597.0, 
-        "sum": 9597.0, 
-        "weighted": 9597.0
+        "pos": 9520.0, 
+        "sum": 9520.0, 
+        "weighted": 9520.0
       }, 
       "800": {
         "eff": 10751.0, 
@@ -2430,12 +2230,12 @@
         "weighted": 10751.0
       }, 
       "900": {
-        "eff": 10031.0, 
+        "eff": 9948.0, 
         "neg": 0.0, 
         "negfrac": 0.0, 
-        "pos": 10031.0, 
-        "sum": 10031.0, 
-        "weighted": 10031.0
+        "pos": 9948.0, 
+        "sum": 9948.0, 
+        "weighted": 9948.0
       }, 
       "1000": {
         "eff": 9826.0, 
@@ -2636,12 +2436,12 @@
         "weighted": 9907.0
       }, 
       "800": {
-        "eff": 11049.0, 
+        "eff": 10944.0, 
         "neg": 0.0, 
         "negfrac": 0.0, 
-        "pos": 11049.0, 
-        "sum": 11049.0, 
-        "weighted": 11049.0
+        "pos": 10944.0, 
+        "sum": 10944.0, 
+        "weighted": 10944.0
       }, 
       "900": {
         "eff": 10834.0, 
@@ -2712,12 +2512,12 @@
         "weighted": 11063.0
       }, 
       "600": {
-        "eff": 10814.0, 
+        "eff": 10727.0, 
         "neg": 0.0, 
         "negfrac": 0.0, 
-        "pos": 10814.0, 
-        "sum": 10814.0, 
-        "weighted": 10814.0
+        "pos": 10727.0, 
+        "sum": 10727.0, 
+        "weighted": 10727.0
       }, 
       "800": {
         "eff": 10195.0, 
@@ -2736,12 +2536,12 @@
         "weighted": 9597.0
       }, 
       "1200": {
-        "eff": 12778.0, 
+        "eff": 12678.0, 
         "neg": 0.0, 
         "negfrac": 0.0, 
-        "pos": 12778.0, 
-        "sum": 12778.0, 
-        "weighted": 12778.0
+        "pos": 12678.0, 
+        "sum": 12678.0, 
+        "weighted": 12678.0
       }, 
       "1400": {
         "eff": 9092.0, 
@@ -2770,20 +2570,20 @@
         "weighted": 9692.0
       }, 
       "400": {
-        "eff": 10912.0, 
+        "eff": 10815.0, 
         "neg": 0.0, 
         "negfrac": 0.0, 
-        "pos": 10912.0, 
-        "sum": 10912.0, 
-        "weighted": 10912.0
+        "pos": 10815.0, 
+        "sum": 10815.0, 
+        "weighted": 10815.0
       }, 
       "600": {
-        "eff": 10333.0, 
+        "eff": 10214.0, 
         "neg": 0.0, 
         "negfrac": 0.0, 
-        "pos": 10333.0, 
-        "sum": 10333.0, 
-        "weighted": 10333.0
+        "pos": 10214.0, 
+        "sum": 10214.0, 
+        "weighted": 10214.0
       }, 
       "800": {
         "eff": 11173.0, 
@@ -2862,12 +2662,12 @@
         "weighted": 12073.0
       }, 
       "800": {
-        "eff": 9625.0, 
+        "eff": 9530.0, 
         "neg": 0.0, 
         "negfrac": 0.0, 
-        "pos": 9625.0, 
-        "sum": 9625.0, 
-        "weighted": 9625.0
+        "pos": 9530.0, 
+        "sum": 9530.0, 
+        "weighted": 9530.0
       }, 
       "1000": {
         "eff": 8277.0, 
@@ -2944,12 +2744,12 @@
         "weighted": 8926.0
       }, 
       "1200": {
-        "eff": 9555.0, 
+        "eff": 9449.0, 
         "neg": 0.0, 
         "negfrac": 0.0, 
-        "pos": 9555.0, 
-        "sum": 9555.0, 
-        "weighted": 9555.0
+        "pos": 9449.0, 
+        "sum": 9449.0, 
+        "weighted": 9449.0
       }, 
       "1400": {
         "eff": 10572.0, 
@@ -8431,23 +8231,23 @@
     "negfrac": 0.188505, 
     "pos": 811495.0, 
     "sum": 1000000.0, 
-    "weighted": 3370578.3569226265
+    "weighted": 3370620.682510376
   }, 
   "ST_t-channel_antitop_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1": {
-    "eff": 38811017.0, 
+    "eff": 35394882.0, 
     "neg": 0.0, 
     "negfrac": 0.0, 
-    "pos": 38811017.0, 
-    "sum": 38811017.0, 
-    "weighted": 38811017.0
+    "pos": 35394882.0, 
+    "sum": 35394882.0, 
+    "weighted": 35394882.0
   }, 
   "ST_t-channel_top_4f_inclusiveDecays_13TeV-powhegV2-madspin-pythia8_TuneCUETP8M1": {
-    "eff": 67240808.0, 
+    "eff": 56800248.0, 
     "neg": 0.0, 
     "negfrac": 0.0, 
-    "pos": 67240808.0, 
-    "sum": 67240808.0, 
-    "weighted": 67240808.0
+    "pos": 56800248.0, 
+    "sum": 56800248.0, 
+    "weighted": 56800248.0
   }, 
   "ST_tW_antitop_5f_inclusiveDecays_13TeV-powheg-pythia8_TuneCUETP8M1": {
     "eff": 6933094.0, 
@@ -8465,213 +8265,85 @@
     "sum": 6952830.0, 
     "weighted": 6952830.0
   }, 
-  "TTJets_HT-1200to2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 2667492.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 2667492.0, 
-    "sum": 2667492.0, 
-    "weighted": 2667492.0
-  }, 
-  "TTJets_HT-2500toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 1519815.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 1519815.0, 
-    "sum": 1519815.0, 
-    "weighted": 1519815.0
-  }, 
-  "TTJets_HT-600to800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 14277035.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 14277035.0, 
-    "sum": 14277035.0, 
-    "weighted": 14277035.0
-  }, 
-  "TTJets_HT-800to1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 10403610.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 10403610.0, 
-    "sum": 10403610.0, 
-    "weighted": 10403610.0
-  }, 
-  "TTJets_SingleLeptFromT_TuneCUETP8M2T4_13TeV-amcatnloFXFX-pythia8": {
-    "eff": 40537002.0, 
-    "neg": 34788319.0, 
-    "negfrac": 0.3159310599486131, 
-    "pos": 75325321.0, 
-    "sum": 110113640.0, 
-    "weighted": 50427667563.66101
-  }, 
-  "TTJets_SingleLeptFromTbar_TuneCUETP8M2T4_13TeV-amcatnloFXFX-pythia8": {
-    "eff": 40252564.0, 
-    "neg": 34503515.0, 
-    "negfrac": 0.31579391554392927, 
-    "pos": 74756079.0, 
-    "sum": 109259594.0, 
-    "weighted": 49839993531.50781
-  }, 
-  "TTJets_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 9739576.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 9739576.0, 
-    "sum": 9739576.0, 
-    "weighted": 9739576.0
-  }, 
-  "TTJets_TuneCUETP8M2T4_13TeV-amcatnloFXFX-pythia8": {
-    "eff": 15348367.0, 
-    "neg": 14501083.0, 
-    "negfrac": 0.32696524752024964, 
-    "pos": 29849450.0, 
-    "sum": 44350533.0, 
-    "weighted": 97983951630.47559
-  }, 
   "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8": {
-    "eff": 77081156.0, 
+    "eff": 66395816.0, 
     "neg": 0.0, 
     "negfrac": 0.0, 
-    "pos": 77081156.0, 
-    "sum": 77081156.0, 
-    "weighted": 77081156.0
+    "pos": 66395816.0, 
+    "sum": 66395816.0, 
+    "weighted": 66395816.0
   }, 
   "TT_TuneCUETP8M2T4_13TeV-powheg-pythia8-evtgen": {
-    "eff": 6489380.0, 
+    "eff": 8626487.0, 
     "neg": 0.0, 
     "negfrac": 0.0, 
-    "pos": 6489380.0, 
-    "sum": 6489380.0, 
-    "weighted": 6489380.0
-  }, 
-  "WJetsToLNu_HT-100To200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 10235198.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 10235198.0, 
-    "sum": 10235198.0, 
-    "weighted": 10235198.0
-  }, 
-  "WJetsToLNu_HT-1200To2500_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 244532.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 244532.0, 
-    "sum": 244532.0, 
-    "weighted": 244532.0
-  }, 
-  "WJetsToLNu_HT-200To400_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 4950373.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 4950373.0, 
-    "sum": 4950373.0, 
-    "weighted": 4950373.0
-  }, 
-  "WJetsToLNu_HT-2500ToInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 253561.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 253561.0, 
-    "sum": 253561.0, 
-    "weighted": 253561.0
-  }, 
-  "WJetsToLNu_HT-400To600_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 1963464.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 1963464.0, 
-    "sum": 1963464.0, 
-    "weighted": 1963464.0
-  }, 
-  "WJetsToLNu_HT-600To800_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 3779141.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 3779141.0, 
-    "sum": 3779141.0, 
-    "weighted": 3779141.0
-  }, 
-  "WJetsToLNu_HT-70To100_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 10094300.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 10094300.0, 
-    "sum": 10094300.0, 
-    "weighted": 10094300.0
-  }, 
-  "WJetsToLNu_HT-800To1200_TuneCUETP8M1_13TeV-madgraphMLM-pythia8": {
-    "eff": 1544513.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 1544513.0, 
-    "sum": 1544513.0, 
-    "weighted": 1544513.0
+    "pos": 8626487.0, 
+    "sum": 8626487.0, 
+    "weighted": 8626487.0
   }, 
   "WToLNu_0J_13TeV-amcatnloFXFX-pythia8": {
-    "eff": 39759707.0, 
-    "neg": 4591043.0, 
-    "negfrac": 0.09380618728047009, 
-    "pos": 44350750.0, 
-    "sum": 48941793.0, 
-    "weighted": 2840196988694.875
+    "eff": 39632695.0, 
+    "neg": 4576411.0, 
+    "negfrac": 0.09380675416435579, 
+    "pos": 44209106.0, 
+    "sum": 48785517.0, 
+    "weighted": 2831243779064.0
   }, 
   "WToLNu_0J_13TeV-amcatnloFXFX-pythia8_ext1": {
-    "eff": 39922623.0, 
-    "neg": 4609786.0, 
-    "negfrac": 0.09380504879767784, 
-    "pos": 44532409.0, 
-    "sum": 49142195.0, 
-    "weighted": 2851825324451.375
+    "eff": 37656152.0, 
+    "neg": 4348341.0, 
+    "negfrac": 0.09380960396078479, 
+    "pos": 42004493.0, 
+    "sum": 46352834.0, 
+    "weighted": 2690058150456.25
   }, 
   "WToLNu_1J_13TeV-amcatnloFXFX-pythia8": {
-    "eff": 19110222.0, 
-    "neg": 10814860.0, 
-    "negfrac": 0.26546085902625977, 
-    "pos": 29925082.0, 
-    "sum": 40739942.0, 
-    "weighted": 1775903736248.3672
+    "eff": 17778168.0, 
+    "neg": 10060741.0, 
+    "negfrac": 0.26545735910489937, 
+    "pos": 27838909.0, 
+    "sum": 37899650.0, 
+    "weighted": 1652140394561.6328
   }, 
   "WToLNu_1J_13TeV-amcatnloFXFX-pythia8_ext1": {
-    "eff": 22018047.0, 
-    "neg": 12453122.0, 
-    "negfrac": 0.2653875367024725, 
-    "pos": 34471169.0, 
-    "sum": 46924291.0, 
-    "weighted": 2046124283943.9922
+    "eff": 19948496.0, 
+    "neg": 11283125.0, 
+    "negfrac": 0.26539321203988847, 
+    "pos": 31231621.0, 
+    "sum": 42514746.0, 
+    "weighted": 1853829498317.211
   }, 
   "WToLNu_1J_13TeV-amcatnloFXFX-pythia8_ext3": {
-    "eff": 43124153.0, 
-    "neg": 24380349.0, 
-    "negfrac": 0.26533589307338595, 
-    "pos": 67504502.0, 
-    "sum": 91884851.0, 
-    "weighted": 4007497343977.8203
+    "eff": 38266832.0, 
+    "neg": 21635686.0, 
+    "negfrac": 0.265344156954941, 
+    "pos": 59902518.0, 
+    "sum": 81538204.0, 
+    "weighted": 3556170529540.6484
   }, 
   "WToLNu_2J_13TeV-amcatnloFXFX-pythia8_ext1": {
-    "eff": 15546277.0, 
-    "neg": 18794368.0, 
-    "negfrac": 0.3537096716246216, 
-    "pos": 34340645.0, 
-    "sum": 53135013.0, 
-    "weighted": 1102535150180.836
+    "eff": 11711388.0, 
+    "neg": 14159531.0, 
+    "negfrac": 0.35371900640637316, 
+    "pos": 25870919.0, 
+    "sum": 40030450.0, 
+    "weighted": 830573590277.7969
   }, 
   "WToLNu_2J_13TeV-amcatnloFXFX-pythia8_ext2": {
-    "eff": 29773262.0, 
-    "neg": 36022588.0, 
-    "negfrac": 0.3537923848330889, 
-    "pos": 65795850.0, 
-    "sum": 101818438.0, 
-    "weighted": 2283072572594.6484
+    "eff": 29358917.0, 
+    "neg": 35520874.0, 
+    "negfrac": 0.3537912223987759, 
+    "pos": 64879791.0, 
+    "sum": 100400665.0, 
+    "weighted": 2251296336439.8516
   }, 
   "WToLNu_2J_13TeV-amcatnloFXFX-pythia8_ext3": {
-    "eff": 30223155.0, 
-    "neg": 36525117.0, 
-    "negfrac": 0.35367404278753745, 
-    "pos": 66748272.0, 
-    "sum": 103273389.0, 
-    "weighted": 2310689463342.3984
+    "eff": 25612718.0, 
+    "neg": 30942325.0, 
+    "negfrac": 0.35363720883581323, 
+    "pos": 56555043.0, 
+    "sum": 87497368.0, 
+    "weighted": 1958200913195.5156
   }, 
   "WW_TuneCUETP8M1_13TeV-pythia8": {
     "eff": 6987124.0, 
@@ -8679,71 +8351,63 @@
     "negfrac": 0.0, 
     "pos": 6987124.0, 
     "sum": 6987124.0, 
-    "weighted": 6987234.145050049
+    "weighted": 6987234.142343521
   }, 
   "WZ_TuneCUETP8M1_13TeV-pythia8": {
-    "eff": 2995828.0, 
+    "eff": 2925788.0, 
     "neg": 0.0, 
     "negfrac": 0.0, 
-    "pos": 2995828.0, 
-    "sum": 2995828.0, 
-    "weighted": 2995828.0
+    "pos": 2925788.0, 
+    "sum": 2925788.0, 
+    "weighted": 2925788.0
   }, 
-  "ZJetsToNuNu_HT-100To200_13TeV-madgraph": {
-    "eff": 5246318.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 5246318.0, 
-    "sum": 5246318.0, 
-    "weighted": 5246318.0
+  "ZH_HToSSTobbbb_ZToLL_MH-125_MS-15_ctauS-1000_TuneCUETP8M1_13TeV-powheg-pythia8": {
+    "eff": 47044.0, 
+    "neg": 1478.0, 
+    "negfrac": 0.02956, 
+    "pos": 48522.0, 
+    "sum": 50000.0, 
+    "weighted": 3769.4602054804564
   }, 
-  "ZJetsToNuNu_HT-1200To2500_13TeV-madgraph": {
-    "eff": 369514.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 369514.0, 
-    "sum": 369514.0, 
-    "weighted": 369514.0
+  "ZH_HToSSTobbbb_ZToLL_MH-125_MS-15_ctauS-1_TuneCUETP8M1_13TeV-powheg-pythia8": {
+    "eff": 46926.0, 
+    "neg": 1537.0, 
+    "negfrac": 0.03074, 
+    "pos": 48463.0, 
+    "sum": 50000.0, 
+    "weighted": 3759.96464677155
   }, 
-  "ZJetsToNuNu_HT-200To400_13TeV-madgraph": {
-    "eff": 5132650.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 5132650.0, 
-    "sum": 5132650.0, 
-    "weighted": 5132650.0
+  "ZH_HToSSTobbbb_ZToLL_MH-125_MS-40_ctauS-1000_TuneCUETP8M1_13TeV-powheg-pythia8": {
+    "eff": 47200.0, 
+    "neg": 1399.0, 
+    "negfrac": 0.02798111924476979, 
+    "pos": 48599.0, 
+    "sum": 49998.0, 
+    "weighted": 3781.928278848529
   }, 
-  "ZJetsToNuNu_HT-2500ToInf_13TeV-madgraph": {
-    "eff": 810060.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 810060.0, 
-    "sum": 810060.0, 
-    "weighted": 810060.0
+  "ZH_HToSSTobbbb_ZToLL_MH-125_MS-40_ctauS-1_TuneCUETP8M1_13TeV-powheg-pythia8": {
+    "eff": 47131.0, 
+    "neg": 1434.0, 
+    "negfrac": 0.028680573611472228, 
+    "pos": 48565.0, 
+    "sum": 49999.0, 
+    "weighted": 3776.390545859933
   }, 
-  "ZJetsToNuNu_HT-400To600_13TeV-madgraph": {
-    "eff": 1020309.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 1020309.0, 
-    "sum": 1020309.0, 
-    "weighted": 1020309.0
+  "ZH_HToSSTobbbb_ZToLL_MH-125_MS-55_ctauS-1000_TuneCUETP8M1_13TeV-powheg-pythia8": {
+    "eff": 46789.0, 
+    "neg": 1602.0, 
+    "negfrac": 0.03204448622807193, 
+    "pos": 48391.0, 
+    "sum": 49993.0, 
+    "weighted": 3748.988082140684
   }, 
-  "ZJetsToNuNu_HT-600To800_13TeV-madgraph": {
-    "eff": 5763506.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 5763506.0, 
-    "sum": 5763506.0, 
-    "weighted": 5763506.0
-  }, 
-  "ZJetsToNuNu_HT-800to1200_13TeV-madgraph": {
-    "eff": 2170137.0, 
-    "neg": 0.0, 
-    "negfrac": 0.0, 
-    "pos": 2170137.0, 
-    "sum": 2170137.0, 
-    "weighted": 2170137.0
+  "ZH_HToSSTobbbb_ZToLL_MH-125_MS-55_ctauS-1_TuneCUETP8M1_13TeV-powheg-pythia8": {
+    "eff": 69198.0, 
+    "neg": 2245.0, 
+    "negfrac": 0.030466290305070025, 
+    "pos": 71443.0, 
+    "sum": 73688.0, 
+    "weighted": 5544.538127079606
   }, 
   "ZZ_TuneCUETP8M1_13TeV-pythia8": {
     "eff": 998034.0, 
@@ -8752,5 +8416,21 @@
     "pos": 998034.0, 
     "sum": 998034.0, 
     "weighted": 998034.0
+  }, 
+  "gluinoGMSB_M2500_ctau1000p0_TuneCUETP8M1_13TeV_pythia8": {
+    "eff": 49997.0, 
+    "neg": 0.0, 
+    "negfrac": 0.0, 
+    "pos": 49997.0, 
+    "sum": 49997.0, 
+    "weighted": 49997.0
+  }, 
+  "gluinoGMSB_M2500_ctau1p0_TuneCUETP8M1_13TeV_pythia8": {
+    "eff": 49999.0, 
+    "neg": 0.0, 
+    "negfrac": 0.0, 
+    "pos": 49999.0, 
+    "sum": 49999.0, 
+    "weighted": 49999.0
   }
 }

@@ -12,6 +12,9 @@ ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.WARNING)
 def getHist(fileName,histName):
     rootFile = ROOT.TFile(fileName)
     hist = rootFile.Get(histName)
+    if not hist:
+        print "Histogram '"+histName+"' not found in '"+fileName+"'"
+        sys.exit(1)
     hist = hist.Clone()
     hist.SetDirectory(0)
     rootFile.Close()
@@ -28,14 +31,6 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,llpMCEff=1.,systematic
         os.makedirs(outputPath)
         
         
-    shapeHist = getHist(
-        os.path.join(histPath,"hists_%s.root"%ctau),
-        "llpD_QCDHT"
-    )
-    shapeHist.Scale(0.)
-    nbins = shapeHist.GetNbinsX()
-    binMin = -0.5
-    binMax = nbins-0.5
         
     cb = ch.CombineHarvester()
     #cb.SetVerbosity(0)
@@ -50,7 +45,7 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,llpMCEff=1.,systematic
 	) 	
     '''
     cb.AddExtArgValue('llpEff', 1.0)
-    cb.GetParameter('llpEff').set_range(0.75, 1.25)
+    cb.GetParameter('llpEff').set_range(0.5, 1.5)
     
     '''
     llpEffFakeProc = ch.Process()
@@ -67,11 +62,13 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,llpMCEff=1.,systematic
     
     cb.AddProcesses(era=["13TeV2016"],procs=["WJets","st","ttbar","ZNuNu"],bin=cats.values(),signal=False)
 
+    signalProcesses = []
     
     #add signal only to region 'D'
     for nLLP in range(7):
         for nLLPTagged in range(nLLP+1):
             processSubName = signalProc+("_%illp%it"%(nLLP,nLLPTagged))
+            signalProcesses.append(processSubName)
             cb.AddProcesses(era=["13TeV2016"],procs=[processSubName],bin=[cats['D']],signal=True)
             cb.cp().process([processSubName]).AddSyst(cb,processSubName+"_rate","rateParam",
                 ch.SystMap("era")(["13TeV2016"],(
@@ -109,7 +106,7 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,llpMCEff=1.,systematic
     #bbFactory.SetPoissonErrors(True)
     bbFactory.SetPattern("bb_$BIN_$PROCESS_bin_$#")
     #bbFactory.MergeBinErrors(cb.cp().backgrounds())
-    bbFactory.AddBinByBin(cb.cp().process(['WJets','st','ttbar','ZNuNu']), cb)
+    bbFactory.AddBinByBin(cb.cp().process(['WJets','st','ttbar','ZNuNu']+signalProcesses), cb)
     
     
     #required for toys to know it's not unbinned
@@ -205,12 +202,12 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,llpMCEff=1.,systematic
     )
     
 
-ctauValues = ["0p001","0p01","0p1","1","10","100","1000","10000"]
+ctauValues = ["0p01","0p1","1","10","100","1000","10000"]
 #ctauValues = ["0p1","1","10","100","1000","10000"]
 #ctauValues = ["1"]
 
-systematics = ["jes","jer","unclEn","pu","wjetsScale","ttbarScale","stScale","znunuScale"]
-systematics = []
+systematics = ["jes","jer","unclEn","pu","wjetsScale","ttbarScale","stScale","znunuScale","mistag"]
+#systematics = []
 
 categories = {}
 for region in ['D']:#['A','B','C','D']:
@@ -280,8 +277,8 @@ for ctau in ctauValues:
                     massesDict[ctau][llpMass].append(lspMass)
                 
 
-basePath = "cards_new"
-histPath = "hists_new"
+basePath = "cards_da"
+histPath = "hists_da"
 if os.path.exists(os.path.join(basePath,'log')):
     pass
 else:
@@ -318,14 +315,14 @@ for ctau in ctauValues:
             jobLimitArrayCfg.append({
                 "path":datacardPath,
                 "cmd": [
-                    "combine -M AsymptoticLimits --setParameterRanges llpEff=0.99,1.01 --rAbsAcc 0.000001 --run expected --cminDefaultMinimizerStrategy 0 --X-rtd MINIMIZER_analytic --X-rtd MINIMIZER_MaxCalls=9999999 --cminPreScan -t -1 -d out.txt"
+                    "combine -M AsymptoticLimits --setParameterRanges llpEff=0.5,1.5 --rAbsAcc 0.000001 --run expected --cminDefaultMinimizerStrategy 0 --X-rtd MINIMIZER_analytic --X-rtd MINIMIZER_MaxCalls=9999999 --cminPreScan -t -1 -d out.txt"
                 ]
             })
             
             jobLimitHybridArrayCfg.append({
                 "path":datacardPath,
                 "cmd": [
-                    "combine -M HybridNew -t 1 --frequentist --testStat LHC --singlePoint 0.01 --rule CLs --rAbsAcc 0.000001 --saveToys --saveHybridResult --toysH 100 --setParameterRanges llpEff=0.75,1.25 --cminDefaultMinimizerStrategy 0 -d out.txt"
+                    "combine -M HybridNew --setParameterRanges llpEff=0.5,1.5 -t 1 --frequentist --testStat LHC --singlePoint 0.01 --rule CLs --rAbsAcc 0.000001 --saveToys --saveHybridResult --toysH 100 --cminDefaultMinimizerStrategy 0 -d out.txt"
                 ]
             })
             
@@ -333,7 +330,7 @@ for ctau in ctauValues:
                 jobToysArrayCfg.append({
                     "path":datacardPath,
                     "cmd": [
-                        "combine -M Significance --verbose -1 -t 1000 -s 123%02i45%02i --rMax 1000 --setParameterRanges llpEff=0.75,1.25 --maxTries 10 --cminDefaultMinimizerStrategy 0 --expectSignal=0 -d out.txt"%(i*21+1,i*7+3)
+                        "combine -M Significance --setParameterRanges llpEff=0.5,1.5 -1 -t 1000 -s 123%02i45%02i --rMax 1000 --maxTries 10 --cminDefaultMinimizerStrategy 0 --expectSignal=0 -d out.txt"%(i*21+1,i*7+3)
                     ]
                 })
             
@@ -342,9 +339,9 @@ for ctau in ctauValues:
                 "path":datacardPath,
                 "cmd": [
                     "text2workspace.py -m 120 out.txt -o workspace.root",
-                    "combineTool.py -M Impacts -d workspace.root -m 120 --setParameterRanges llpEff=0.75,1.25 --X-rtd MINIMIZER_analytic --robustFit 1 --doInitialFit -t -1 --expectSignal=%6.4e"%(xsec),
-                    "combineTool.py -M Impacts -d workspace.root -m 120 --setParameterRanges llpEff=0.75,1.25 --X-rtd MINIMIZER_analytic --robustFit 1 --doFits --exclude 'bb_.*,qcd_llp[ABC].*' -t -1 --expectSignal=%6.4e"%(xsec),
-                    "combineTool.py -M Impacts -d workspace.root -m 120 --setParameterRanges llpEff=0.75,1.25 --X-rtd MINIMIZER_analytic --exclude 'bb_.*,qcd_llp[ABC].*' -o impacts.json",
+                    "combineTool.py -M Impacts -d workspace.root -m 120 --setParameterRanges llpEff=0.5,1.5 --X-rtd MINIMIZER_analytic --robustFit 1 --doInitialFit -t -1 --expectSignal=%6.4e"%(xsec),
+                    "combineTool.py -M Impacts -d workspace.root -m 120 --setParameterRanges llpEff=0.5,1.5 --X-rtd MINIMIZER_analytic --robustFit 1 --doFits -t -1 --expectSignal=%6.4e"%(xsec),
+                    "combineTool.py -M Impacts -d workspace.root -m 120 --setParameterRanges llpEff=0.5,1.5 --X-rtd MINIMIZER_analytic -o impacts.json",
                     "plotImpacts.py -i impacts.json -o impacts"
                 ]
             })
@@ -406,26 +403,10 @@ date
     submitFile.close()
     
     
-    '''
-    #echo ${JOBS[$SGE_TASK_ID]}
-    #cd ${JOBS[$SGE_TASK_ID]}
-    #combine -M FitDiagnostics --plots --saveWithUncertainties -t -1 -d out.txt
-    #combine -M MultiDimFit --saveFitResult -t -1 -d out.txt
 
-    #expected impacts
-    #note: excluding regex only works in hacked combineTool.py
-    #text2workspace.py -m 120 out.txt -o workspace.root
-    #combineTool.py -M Impacts -d workspace.root -m 120 --X-rtd MINIMIZER_analytic --robustFit 1 --doInitialFit -t -1 --expectSignal=1 
-    #combineTool.py -M Impacts -d workspace.root -m 120 --X-rtd MINIMIZER_analytic --robustFit 1 --doFits --exclude "bb_.*,qcd_llp[ABC].*" -t -1 --expectSignal=1
-    #combineTool.py -M Impacts -d workspace.root -m 120 --X-rtd MINIMIZER_analytic --exclude "bb_.*,qcd_llp[ABC].*" -o impacts.json
-    #plotImpacts.py -i impacts.json -o impacts
-
-    #expected limits
-    #combine -M AsymptoticLimits --setParameterRanges llpEff=0.75,1.25 --rAbsAcc 0.000001 --run expected --X-rtd MINIMIZER_analytic --X-rtd MINIMIZER_MaxCalls=99999999999 -t -1 -d out.txt
-    '''
     
-makeSubmitFile(jobLimitHybridArrayCfg,"runHybridLimits.sh")
-makeSubmitFile(jobLimitArrayCfg,"runLimits.sh")
-makeSubmitFile(jobToysArrayCfg,"runToys.sh")
-makeSubmitFile(jobImpactArrayCfg,"runImpacts.sh")
+makeSubmitFile(jobLimitHybridArrayCfg,"runHybridLimits_"+basePath+".sh")
+makeSubmitFile(jobLimitArrayCfg,"runLimits_"+basePath+".sh")
+makeSubmitFile(jobToysArrayCfg,"runToys_"+basePath+".sh")
+makeSubmitFile(jobImpactArrayCfg,"runImpacts_"+basePath+".sh")
 

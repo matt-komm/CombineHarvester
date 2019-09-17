@@ -5,6 +5,7 @@ import math
 import ROOT
 import random
 import json
+import argparse
 import scipy
 import ctypes
 import scipy.interpolate
@@ -53,6 +54,7 @@ ROOT.gStyle.SetTitleOffset(1.32, "YZ")
 ROOT.gStyle.SetLabelColor(1, "XYZ")
 ROOT.gStyle.SetLabelFont(43, "XYZ")
 ROOT.gStyle.SetLabelSize(29, "XYZ")
+ROOT.gStyle.SetLabelOffset(0.012, "XY")
 
 ROOT.gStyle.SetAxisColor(1, "XYZ")
 ROOT.gStyle.SetAxisColor(1, "XYZ")
@@ -69,6 +71,7 @@ ROOT.gStyle.SetLineScalePS(2)
 
 
 ROOT.gStyle.SetPaintTextFormat("3.0f")
+ROOT.gStyle.SetLineStyleString(12,"7 6");
 
 colors = []
     
@@ -93,11 +96,20 @@ def newColorHLS(hue,light,sat):
     return newColorRGB(r,g,b)
     
 newColorRGB.colorindex=301
-
+'''
 colorList = [
     [0.,newColorHLS(0.6, 0.47,0.6)],
     [0.,newColorHLS(0.56, 0.65, 0.7)],
     [0.,newColorHLS(0.52, 1., 1.)],
+]
+'''
+colorList = [
+    [0.,newColorHLS(0.8, 0.6,0.95)],
+    [0.,newColorHLS(0.7, 0.61,0.95)],
+    [0.,newColorHLS(0.6, 0.63,0.95)],
+    [0.,newColorHLS(0.4, 0.65,0.9)],
+    [0.,newColorHLS(0.15, 0.68,0.9)],
+    [0.,newColorHLS(0.0, 0.72,0.9)],
 ]
 
 
@@ -132,65 +144,40 @@ chiSymbol = "#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.2]{#lower[0.6]{#s
 mchiSymbol = "m#lower[0.2]{#scale[0.8]{"+chiSymbol+"}}"
     
 
-SUS_16_038 = {
-    'ctau_values':range(0,10),
-    'exp':{'mchi_0':{'mgl':[1765,1758,1788,1925,1841,1664,1407,1087,1040],
-                     'mlsp':[1,0,0,1,0,1,1,0,0]},
-           'mchi_100':{'mgl':[1777,1774,1795,1931,1844,1673,1405,1096,1035],
-                       'mlsp':[102,101,100,101,100,101,101,101,101]},
-           'dm_100':{'mgl':[1110,1093,1123,1231,1203,1094,1020,1006,1002],
-                     'mlsp':[1010,993,1023,1132,1104,994,921,906,901]},
-           'dm_10':{'mgl':[1038,1027,1051,1129,1097,1485,1029,967,981,1004],
-                    'mlsp':[1029,1016,1040,1120,1087,1,1019,959,971,994]}},
-    'obs':{'mchi_0':{'mgl':[1629,1620,1589,1740,1630,1485,1301,966,886],
-                     'mlsp':[1,1,0,1,0,1,0,0,0]},
-           'mchi_100':{'mgl':[1624,1625,1605,1750,1631,1485,1293,984,901],
-                       'mlsp':[100,102,100,101,100,100,101,100,101]},
-           'dm_100':{'mgl':[1034,1061,1102,1141,1036,985,898,865,934],
-                     'mlsp':[934,960,1003,1041,936,884,796,766,825]},
-           'dm_10':{'mgl':[964,997,1013,1041,961,954,836,842,909],
-                    'mlsp':[953,988,1003,1030,951,943,827,831,900,]}},
-    'prompt':{'mchi_0':{'mgl':{'exp':1800,'obs':1628},
-                        'mlsp':{'exp':0,'obs':0}},
-              'mchi_100':{'mgl':{'exp':1792,'obs':1638},
-                          'mlsp':{'exp':102,'obs':102}},
-              'dm_100':{'mgl':{'exp':1017,'obs':942},
-                        'mlsp':{'exp':917,'obs':843}}},
-    'stable':{'mchi_0':{'mgl':{'exp':1003,'obs':906},
-                        'mlsp':{'exp':0,'obs':0}},
-              'mchi_100':{'mgl':{'exp':1003,'obs':906},
-                          'mlsp':{'exp':100,'obs':100}},
-              'dm_100':{'mgl':{'exp':1003,'obs':906},
-                        'mlsp':{'exp':903,'obs':806}},
-              'dm_10':{'mgl':{'exp':1003,'obs':906},
-                       'mlsp':{'exp':903,'obs':806}}},
-}
+parser = argparse.ArgumentParser(description='Process some integers.')
+parser.add_argument('-i', dest='input', type=str, help='Input folder',required=True)
+args = parser.parse_args()
+    
+basePath = args.input
+    
+
+
 
 with open('eventyields.json',) as f:
     genweights = json.load(f)
 
-ctauValues = ["0p001","0p01","0p1","1","10","100","1000","10000"]
+ctauValues = ["0p01","0p1","1","10","100","1000","10000"]
 #ctauValues = ["0p1","1","10","100","1000","10000"]
 #ctauValues = ["10"]
 ctauLabels = {
-    "0p001":"1#kern[-0.5]{ }#mum",
-    "0p01":"10#kern[-0.5]{ }#mum",
-    "0p1":"100#kern[-0.5]{ }#mum",
-    "1":"1#kern[-0.5]{ }mm",
-    "10":"10#kern[-0.5]{ }mm",
-    "100":"100#kern[-0.5]{ }mm",
-    "1000":"1#kern[-0.5]{ }m",
-    "10000":"10#kern[-0.5]{ }m",
+    #"0p001":"1#kern[-0.2]{ }#mum",
+    "0p01":"10#kern[-0.2]{ }#mum",
+    "0p1":"100#kern[-0.2]{ }#mum",
+    "1":"1#kern[-0.2]{ }mm",
+    "10":"10#kern[-0.2]{ }mm",
+    "100":"100#kern[-0.2]{ }mm",
+    "1000":"1#kern[-0.2]{ }m",
+    "10000":"10#kern[-0.2]{ }m",
 }
 ctauValueMap = {
-    "0p001":0,
-    "0p01":1,
-    "0p1":2,
-    "1":3,
-    "10":4,
-    "100":5,
-    "1000":6,
-    "10000":7,
+    #"0p001":0,
+    "0p01":0,
+    "0p1":1,
+    "1":2,
+    "10":3,
+    "100":4,
+    "1000":5,
+    "10000":6,
 }
 
 massesDict = {}
@@ -470,7 +457,6 @@ def parseCombineResult(filePath):
 
     return result
 
-basePath = "limits"
 
 results = {}
 
@@ -510,11 +496,12 @@ for ctau in results.keys():
     xmax = 2.400
     ymax = 2.400
     zmax = 0.35
-    zmin = 0.0005
+    zmin = 0.0004
+    
 
     axis = ROOT.TH2F("axis"+ctau,";m#lower[0.2]{#scale[0.8]{#tilde{g}}} (TeV); m#lower[0.2]{#scale[0.8]{#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.2]{#lower[0.6]{#scale[0.65]{1}}}}} (TeV)",
-        int(round((xmax-xmin)/0.050))+1,numpy.linspace(xmin-0.025,xmax+0.025,int(round((xmax-xmin)/0.050))+2),
-        int(round((ymax-ymin)/0.050))+1,numpy.linspace(ymin-0.025,ymax+0.025,int(round((ymax-ymin)/0.050))+2)
+        int(round((xmax-xmin)/0.050)),numpy.linspace(xmin,xmax,int(round((xmax-xmin)/0.050))+1),
+        int(round((ymax-ymin)/0.050)),numpy.linspace(ymin,ymax,int(round((ymax-ymin)/0.050))+1)
     )
     axis.Fill(-1,-1)
     '''
@@ -533,13 +520,13 @@ for ctau in results.keys():
     axis.GetXaxis().SetNdivisions(510)
     axis.GetYaxis().SetNdivisions(510)
     
-    
-    
+
     limitHist = ROOT.TH2F("limitHist"+ctau,";m#lower[0.2]{#scale[0.8]{#tilde{g}}} (TeV); m#lower[0.2]{#scale[0.8]{#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.2]{#lower[0.6]{#scale[0.65]{1}}}}} (TeV)",
-        int(round((xmax-xmin)/0.050))+1,numpy.linspace(xmin-0.025,xmax+0.025,int(round((xmax-xmin)/0.050))+2),
-        int(round((ymax-ymin)/0.050))+1,numpy.linspace(ymin-0.025,ymax+0.025,int(round((ymax-ymin)/0.050))+2)
+        int(round((xmax-xmin)/0.050))+1,numpy.linspace(xmin-0.025,xmax+0.025,int(round((xmax-xmin)/0.010))+2),
+        int(round((ymax-ymin)/0.050))+1,numpy.linspace(ymin-0.025,ymax+0.025,int(round((ymax-ymin)/0.010))+2)
     )
     boxes = []
+    
     for llpMass in sorted(results[ctau].keys()):
         for lspMass in sorted(results[ctau][llpMass].keys()):
         
@@ -548,13 +535,16 @@ for ctau in results.keys():
             if 0.001*int(lspMass)>ymax:
                 continue
             limitHist.Fill(0.001*int(llpMass),0.001*int(lspMass),results[ctau][llpMass][lspMass]["median"])
-            '''
-            box= ROOT.TBox(0.001*int(llpMass)-0.025,0.001*int(lspMass)-0.025,0.001*int(llpMass)+0.025,0.001*int(lspMass)+0.025)
-            box.SetFillColor(ROOT.kGray)
+            
+            box= ROOT.TBox(
+                max(xmin,min(xmax,0.001*int(llpMass)-0.018)),max(ymin,min(ymax,0.001*int(lspMass)-0.023)),
+                max(xmin,min(xmax,0.001*int(llpMass)+0.018)),max(ymin,min(ymax,0.001*int(lspMass)+0.023))
+            )
+            box.SetFillColor(ROOT.kWhite)
             box.SetLineWidth(0)
             box.SetFillStyle(1001)
             boxes.append(box)
-            '''
+            
             '''
             marker= ROOT.TMarker(0.001*int(llpMass),0.001*int(lspMass),20)
             marker.SetMarkerColor(ROOT.kWhite)
@@ -589,20 +579,22 @@ for ctau in results.keys():
     limitHistSmooth.Draw("colSame")
     '''
     limitHist.GetZaxis().SetRangeUser(zmin,zmax)
-    limitHist.Draw("colSame")
+    #limitHist.Draw("colSame")
     
     for box in boxes:
-        box.Draw("L")
+        box.Draw("F")
+        
     
-    
+
+    '''
     poly = ROOT.TPolyLine(3,
-        numpy.array([0.600-0.025,2.400+0.025,0.600-0.025],dtype=numpy.float32), 
-        numpy.array([0.600-0.025,2.400+0.025,2.400+0.025],dtype=numpy.float32),
+        numpy.array([0.600,2.400,0.600],dtype=numpy.float32), 
+        numpy.array([0.600,2.400,2.400],dtype=numpy.float32),
     )
     poly.SetFillColor(ROOT.kGray)
     poly.SetFillStyle(3445)
     poly.Draw("F")
-    
+    '''
     
     
     
@@ -618,11 +610,19 @@ for ctau in results.keys():
     llpMassExpDown = []
     lspMassExpDown = []
     
-    for angle in numpy.linspace(0.0,math.pi/4,5):
-        foundDown = False
+    llpMassTheoUp = []
+    lspMassTheoUp = []
+    
+    llpMassTheoDown = []
+    lspMassTheoDown = []
+    
+    for angle in numpy.linspace(0.0,math.pi/4,50):
         foundMedian = False
-        foundUp = False
-        for r in numpy.linspace(2.600,0.600,10):
+        foundExpDown = False
+        foundExpUp = False
+        foundTheoDown = False
+        foundTheoUp = False
+        for r in numpy.linspace(2.600,0.600,1200):
             llpMass = r*math.cos(angle)
             lspMass = r*math.sin(angle)
             #print llpMass,lspMass
@@ -635,50 +635,126 @@ for ctau in results.keys():
             #print llpMass,lspMass,xsecLimit,xsecTheo
             xsecLimitUp = limitFctUp(llpMass*1000.,lspMass*1000.)
             xsecLimitDown = limitFctDown(llpMass*1000.,lspMass*1000.)
-            if not foundDown and xsecLimitDown<xsecTheo:
-                llpMassExpDown.append(llpMass)
-                lspMassExpDown.append(lspMass)
-                foundDown = True
+            
             if not foundMedian and xsecLimit<xsecTheo:
                 llpMassExpMedian.append(llpMass)
                 lspMassExpMedian.append(lspMass)
                 foundMedian = True
-            if not foundUp and xsecLimitUp<xsecTheo:
+                
+            if not foundTheoDown and xsecLimit<xsecTheoDown:
+                llpMassTheoDown.append(llpMass)
+                lspMassTheoDown.append(lspMass)
+                foundTheoDown = True
+            if not foundTheoUp and xsecLimit<xsecTheoUp:
+                llpMassTheoUp.append(llpMass)
+                lspMassTheoUp.append(lspMass)
+                foundTheoUp = True
+                
+            if not foundExpDown and xsecLimitDown<xsecTheo:
+                llpMassExpDown.append(llpMass)
+                lspMassExpDown.append(lspMass)
+                foundExpDown = True
+            if not foundExpUp and xsecLimitUp<xsecTheo:
                 llpMassExpUp.append(llpMass)
                 lspMassExpUp.append(lspMass)
-                foundUp = True
-            if foundDown and foundMedian and foundUp:
+                foundExpUp = True
+                
+            if foundExpDown and foundExpUp and foundTheoDown and foundTheoUp and foundMedian:
                 break
-    #print llpMassExpMedian
-    #print lspMassExpMedian
+
                 
     foundC=False
     foundU=False
+    
+    foundCExpUp=False
+    foundUExpUp=False
+    
+    foundCExpDown=False
+    foundUExpDown=False
+    
+    foundCTheoUp=False
+    foundUTheoUp=False
+    
+    foundCTheoDown=False
+    foundUTheoDown=False
+    
+    limitsC[ctau] = {}
+    limitsU[ctau] = {}
+    
+    for k in ["mean","expUp","expDown","theoUp","theoDown"]:
+        limitsC[ctau][k] = 0.
+        limitsU[ctau][k] = 0.
+    
     for r in numpy.linspace(3.000,0.600,1200):
-        llpMassC = r
+        llpMass = r
         lspMassC = r-0.100
-        llpMassU = r
         lspMassU = 0.100
         
-        xsecTheoC,_,_ = xsecFct(llpMassC*1000.)
-        xsecLimitC = limitFct(llpMassC*1000.,lspMassC*1000.)
-        if not foundC and xsecLimitC<xsecTheoC:
-            limitsC[ctau]=llpMassC
-            foundC = True
+        xsecTheo,xsecTheoUp,xsecTheoDown = xsecFct(llpMass*1000.)
         
-        xsecTheoU,_,_ = xsecFct(llpMassU*1000.)
-        xsecLimitU = limitFct(llpMassU*1000.,lspMassU*1000.)
-        if not foundU and xsecLimitU<xsecTheoU:
-            limitsU[ctau]=llpMassU
+        xsecLimitC = limitFct(llpMass*1000.,lspMassC*1000.)
+        xsecLimitCUp = limitFctUp(llpMass*1000.,lspMassC*1000.)
+        xsecLimitCDown = limitFctDown(llpMass*1000.,lspMassC*1000.)
+        
+        if not foundC and xsecLimitC<xsecTheo:
+            limitsC[ctau]["mean"]=llpMass
+            foundC = True
+            
+        if not foundCExpUp and xsecLimitCUp<xsecTheo:
+            limitsC[ctau]["expUp"]=llpMass
+            foundCExpUp = True
+        if not foundCExpDown and xsecLimitCDown<xsecTheo:
+            limitsC[ctau]["expDown"]=llpMass
+            foundCExpDown = True
+            
+        if not foundCTheoUp and xsecLimitC<xsecTheoUp:
+            limitsC[ctau]["theoUp"]=llpMass
+            foundCTheoUp = True
+        if not foundCTheoDown and xsecLimitC<xsecTheoDown:
+            limitsC[ctau]["theoDown"]=llpMass
+            foundCTheoDown = True
+        
+        xsecLimitU = limitFct(llpMass*1000.,lspMassU*1000.)
+        xsecLimitUUp = limitFctUp(llpMass*1000.,lspMassU*1000.)
+        xsecLimitUDown = limitFctDown(llpMass*1000.,lspMassU*1000.)
+        
+        if not foundU and xsecLimitU<xsecTheo:
+            limitsU[ctau]["mean"]=llpMass
             foundU = True
             
-        if foundC and foundU:
-            break
+        if not foundUExpUp and xsecLimitUUp<xsecTheo:
+            limitsU[ctau]["expUp"]=llpMass
+            foundUExpUp = True
+        if not foundUExpDown and xsecLimitUDown<xsecTheo:
+            limitsU[ctau]["expDown"]=llpMass
+            foundUExpDown = True
+            
+        if not foundUTheoUp and xsecLimitU<xsecTheoUp:
+            limitsU[ctau]["theoUp"]=llpMass
+            foundUTheoUp = True
+        if not foundUTheoDown and xsecLimitU<xsecTheoDown:
+            limitsU[ctau]["theoDown"]=llpMass
+            foundUTheoDown = True
         
-    if not foundC:
-        limitsC[ctau]=0
-    if not foundU:
-        limitsU[ctau]=0
+    print ctau,"compress: %.3f %+.3f %+.3f (exp) %+.3f %+.3f (theo)"%(
+        limitsC[ctau]["mean"],
+        limitsC[ctau]["expUp"]-limitsC[ctau]["mean"],
+        limitsC[ctau]["expDown"]-limitsC[ctau]["mean"],
+        limitsC[ctau]["theoUp"]-limitsC[ctau]["mean"],
+        limitsC[ctau]["theoDown"]-limitsC[ctau]["mean"],
+    )
+    print ctau,"uncompress: %.3f %+.3f %+.3f (exp) %+.3f %+.3f (theo)"%(
+        limitsU[ctau]["mean"],
+        limitsU[ctau]["expUp"]-limitsU[ctau]["mean"],
+        limitsU[ctau]["expDown"]-limitsU[ctau]["mean"],
+        limitsU[ctau]["theoUp"]-limitsU[ctau]["mean"],
+        limitsU[ctau]["theoDown"]-limitsU[ctau]["mean"],
+    )
+    
+        
+    llpMassTheo = llpMassTheoUp+list(reversed(llpMassTheoDown))
+    lspMassTheo = lspMassTheoUp+list(reversed(lspMassTheoDown))
+        
         
     llpMassExpMedian = numpy.array(llpMassExpMedian)
     lspMassExpMedian = numpy.array(lspMassExpMedian)
@@ -688,6 +764,25 @@ for ctau in results.keys():
     
     llpMassExpDown = numpy.array(llpMassExpDown)
     lspMassExpDown = numpy.array(lspMassExpDown)
+    
+    llpMassTheoUp = numpy.array(llpMassTheoUp)
+    lspMassTheoUp = numpy.array(lspMassTheoUp)
+    
+    llpMassTheoDown = numpy.array(llpMassTheoDown)
+    lspMassTheoDown = numpy.array(lspMassTheoDown)
+    
+    llpMassTheo = numpy.array(llpMassTheo)
+    lspMassTheo = numpy.array(lspMassTheo)
+    
+    
+    polyTheoUp = ROOT.TPolyLine(
+        len(llpMassTheo),
+        llpMassTheo,
+        lspMassTheo
+    )
+    polyTheoUp.SetFillColor(ROOT.kGray)
+    polyTheoUp.SetFillStyle(3354)
+    polyTheoUp.Draw("F")
     
     polyExpMedian = ROOT.TPolyLine(
         len(llpMassExpMedian),
@@ -718,6 +813,83 @@ for ctau in results.keys():
     polyExpUp.SetLineStyle(2)
     polyExpUp.Draw("L")
     
+    '''
+    polyTheoDown = ROOT.TPolyLine(
+        len(llpMassTheoDown),
+        llpMassTheoDown,
+        lspMassTheoDown
+    )
+    polyTheoDown.SetLineColor(ROOT.kBlack)
+    polyTheoDown.SetLineWidth(2)
+    polyTheoDown.SetLineStyle(12)
+    polyTheoDown.Draw("L")
+    
+    polyTheoUp = ROOT.TPolyLine(
+        len(llpMassTheoUp),
+        llpMassTheoUp,
+        lspMassTheoUp
+    )
+    polyTheoUp.SetLineColor(ROOT.kBlack)
+    polyTheoUp.SetLineWidth(2)
+    polyTheoUp.SetLineStyle(12)
+    polyTheoUp.Draw("L")
+    '''
+    
+    '''
+    polyTheoUp2 = ROOT.TPolyLine(
+        len(llpMassTheo),
+        llpMassTheo,
+        lspMassTheo
+    )
+    polyTheoUp2.SetLineColor(ROOT.kGray+2)
+    polyTheoUp2.SetLineWidth(2)
+    polyTheoUp2.Draw("L")
+    '''
+    '''
+    pad = ROOT.TBox(xmin+0.15,ymax-0.15,xmin+0.7,ymax-0.7)
+    pad.SetFillColor(ROOT.kWhite)
+    pad.Draw("SameF")
+    '''
+    line1 = ROOT.TLine(xmin+0.2,ymax-0.25,xmin+0.4,ymax-0.25)
+    line1.SetLineWidth(3)
+    line1.SetLineColor(ROOT.kBlack)
+    line1.Draw("Same")
+    line2 = ROOT.TLine(xmin+0.2,ymax-0.2,xmin+0.4,ymax-0.2)
+    line2.SetLineWidth(2)
+    line2.SetLineStyle(2)
+    line2.SetLineColor(ROOT.kBlack)
+    line2.Draw("Same")
+    line3 = ROOT.TLine(xmin+0.2,ymax-0.3,xmin+0.4,ymax-0.3)
+    line3.SetLineWidth(2)
+    line3.SetLineStyle(2)
+    line3.SetLineColor(ROOT.kBlack)
+    line3.Draw("Same")
+    pText1 = ROOT.TPaveText(xmin+0.5,ymax-0.25,xmin+0.5,ymax-0.25)
+    pText1.SetFillStyle(0)
+    pText1.SetBorderSize(0)
+    pText1.SetTextFont(43)
+    pText1.SetTextSize(29)
+    pText1.SetTextAlign(12)
+    pText1.AddText("Syst. unc.")
+    pText1.Draw("Same")
+    
+    box1 = ROOT.TBox(xmin+0.2,ymax-0.45,xmin+0.4,ymax-0.55)
+    box1.SetFillColor(ROOT.kGray)
+    box1.SetFillStyle(3354)
+    box1.Draw("SameF")
+    line4 = ROOT.TLine(xmin+0.2,ymax-0.5,xmin+0.4,ymax-0.5)
+    line4.SetLineWidth(3)
+    line4.SetLineColor(ROOT.kBlack)
+    line4.Draw("Same")
+    pText2= ROOT.TPaveText(xmin+0.5,ymax-0.5,xmin+0.5,ymax-0.5)
+    pText2.SetFillStyle(0)
+    pText2.SetBorderSize(0)
+    pText2.SetTextFont(43)
+    pText2.SetTextSize(29)
+    pText2.SetTextAlign(12)
+    pText2.AddText("Theo. unc.")
+    pText2.Draw("Same")
+    
     ROOT.gPad.RedrawAxis()
     
     pTextCMS = ROOT.TPaveText(cv.GetLeftMargin(),1-cv.GetTopMargin()*0.4,cv.GetLeftMargin(),1-cv.GetTopMargin()*0.4,"NDC")
@@ -727,13 +899,13 @@ for ctau in results.keys():
     pTextCMS.SetTextAlign(13)
     pTextCMS.Draw("Same")
     
-    pTextPreliminary = ROOT.TPaveText(cv.GetLeftMargin()+0.08,1-cv.GetTopMargin()*0.4,cv.GetLeftMargin()+0.08,1-cv.GetTopMargin()*0.4,"NDC")
-    pTextPreliminary.AddText("Preliminary")
+    pTextPreliminary = ROOT.TPaveText(cv.GetLeftMargin()+0.088,1-cv.GetTopMargin()*0.4,cv.GetLeftMargin()+0.088,1-cv.GetTopMargin()*0.4,"NDC")
+    pTextPreliminary.AddText("Simulation")
     pTextPreliminary.SetTextFont(53)
     pTextPreliminary.SetTextSize(32)
     pTextPreliminary.SetTextAlign(13)
     pTextPreliminary.Draw("Same")
-    
+
     pTextCTau = ROOT.TPaveText(1-cv.GetRightMargin(),1-cv.GetTopMargin()*0.4,1-cv.GetRightMargin(),1-cv.GetTopMargin()*0.4,"NDC")
     pTextCTau.AddText("c#tau#kern[-0.5]{ }=#kern[-0.8]{ }%s"%ctauLabels[ctau])
     pTextCTau.SetTextFont(43)
@@ -741,210 +913,14 @@ for ctau in results.keys():
     pTextCTau.SetTextAlign(33)
     pTextCTau.Draw("Same")
     
-    cv.Print("limits_ctau%s.pdf"%ctau)
-    cv.Print("limits_ctau%s.png"%ctau)
+    #cv.Print(os.path.join(basePath,"limits_ctau%s.pdf"%ctau))
+    #cv.Print(os.path.join(basePath,"limits_ctau%s.png"%ctau))
     
-xvalues = numpy.logspace(-6,1,num=8)
-#xvalues = numpy.power(10,xvalues)
-yvaluesC = numpy.zeros(8)
-yvaluesU = numpy.zeros(8)
-
-yvaluesC_SUS = numpy.zeros(8)
-yvaluesU_SUS = numpy.zeros(8)
-
-for ctau in limitsU.keys():
-    yvaluesC[ctauValueMap[ctau]]=limitsC[ctau]
-    yvaluesU[ctauValueMap[ctau]]=limitsU[ctau]
     
-    yvaluesC_SUS[ctauValueMap[ctau]] = SUS_16_038['exp']['dm_100']['mgl'][ctauValueMap[ctau]]/1000.
-    
-    yvaluesU_SUS[ctauValueMap[ctau]] = SUS_16_038['exp']['mchi_100']['mgl'][ctauValueMap[ctau]]/1000.
-    
-    print ctau,limitsC[ctau],limitsU[ctau]
-    
-cv = ROOT.TCanvas("summary","",800,670)
-#cv.SetGridx(True)
-#cv.SetGridy(True)
-#cv.SetLogx(1)
-#cv.SetMargin(0.155,0.04,0.15,0.065)
+resultFile = open(os.path.join(basePath,"summary.json"),"w")
+json.dump({"compressed":limitsC,"uncompressed":limitsU}, resultFile)
+resultFile.close()
 
-cvxmin = 0.135
-cvxmax = 0.965
-cvymin = 0.125
-cvymax = 0.94
-
-cv.Divide(1,2,0,0)
-cv.GetPad(1).SetPad(0.0, 0.0, 1.0, 1.0)
-cv.GetPad(1).SetFillStyle(4000)
-cv.GetPad(2).SetPad(0.0, 0.00, 1.0,1.0)
-cv.GetPad(2).SetFillStyle(4000)
-        
-for i in [1,2]:
-    #for the canvas:
-    cv.GetPad(i).SetBorderMode(0)
-    cv.GetPad(i).SetGridx(False)
-    cv.GetPad(i).SetGridy(False)
-
-
-    #For the frame:
-    cv.GetPad(i).SetFrameBorderMode(0)
-    cv.GetPad(i).SetFrameBorderSize(1)
-    cv.GetPad(i).SetFrameFillColor(0)
-    cv.GetPad(i).SetFrameFillStyle(0)
-    cv.GetPad(i).SetFrameLineColor(1)
-    cv.GetPad(i).SetFrameLineStyle(1)
-    cv.GetPad(i).SetFrameLineWidth(1)
-
-    # Margins:
-    cv.GetPad(i).SetLeftMargin(cvxmin)
-    cv.GetPad(i).SetRightMargin(1-cvxmax)
-    
-    # For the Global title:
-    cv.GetPad(i).SetTitle("")
-    
-    # For the axis:
-    cv.GetPad(i).SetTickx(1)  # To get tick marks on the opposite side of the frame
-    cv.GetPad(i).SetTicky(1)
-
-    # Change for log plots:
-    cv.GetPad(i).SetLogx(1)
-    cv.GetPad(i).SetLogy(0)
-    cv.GetPad(i).SetLogz(0)
-
-cv.GetPad(2).SetTopMargin(1-cvymax)
-cv.GetPad(2).SetBottomMargin(cvymin+.5*(cvymax-cvymin)+0.007)
-cv.GetPad(1).SetTopMargin(1-(cvymin+.5*(cvymax-cvymin))+0.007)
-cv.GetPad(1).SetBottomMargin(cvymin)
-
-cv.cd(1)
-axis1 = ROOT.TH2F("axis",";c#tau (m);",
-    50,10**-6.2,10**1.2,
-    50,0.0,0.0+2.1
-)
-axis1.GetXaxis().SetTickLength(0.017/(1-cv.GetPad(1).GetLeftMargin()-cv.GetPad(1).GetRightMargin()))
-axis1.GetYaxis().SetTickLength(0.015/(1-cv.GetPad(1).GetTopMargin()-cv.GetPad(1).GetBottomMargin()))
-axis1.Draw("AXIS")
-
-cv.cd(2)
-axis2 = ROOT.TH2F("axis",";;95% CL lower limit on m#lower[0.2]{#scale[0.8]{#tilde{g}}} (TeV)",
-    50,10**-6.2,10**1.2,
-    50,0.6,0.6+2.1
-)
-axis2.GetXaxis().SetTickLength(0.017/(1-cv.GetPad(2).GetLeftMargin()-cv.GetPad(2).GetRightMargin()))
-axis2.GetYaxis().SetTickLength(0.015/(1-cv.GetPad(2).GetTopMargin()-cv.GetPad(2).GetBottomMargin()))
-axis2.GetXaxis().SetTitleSize(0)
-axis2.GetXaxis().SetLabelSize(0)
-axis2.Draw("AXIS")
-
-
-colorU = newColorHLS(0.76,0.7,0.95)
-colorU_SUS = newColorHLS(0.68,0.4,0.8)
-
-colorC = newColorHLS(0.07,0.6,0.95)
-colorC_SUS = newColorHLS(0.0,0.4,0.8)
-
-
-cv.cd(1)
-
-graphC_SUS = ROOT.TGraph(8,xvalues,yvaluesC_SUS)
-graphC_SUS.SetLineColor(colorC_SUS.GetNumber())
-graphC_SUS.SetLineWidth(3)
-graphC_SUS.SetLineStyle(2)
-graphC_SUS.SetMarkerStyle(24)
-graphC_SUS.SetMarkerSize(2)
-graphC_SUS.SetMarkerColor(colorC_SUS.GetNumber())
-graphC_SUS.Draw("PL")
-
-graphC = ROOT.TGraph(8,xvalues,yvaluesC)
-graphC.SetLineColor(colorC.GetNumber())
-graphC.SetLineWidth(2)
-graphC.SetLineStyle(1)
-graphC.SetMarkerStyle(20)
-graphC.SetMarkerSize(1.7)
-graphC.SetMarkerColor(colorC.GetNumber())
-graphC.Draw("PL")
-
-cv.cd(2)
-
-graphU_SUS = ROOT.TGraph(8,xvalues,yvaluesU_SUS)
-graphU_SUS.SetLineColor(colorU_SUS.GetNumber())
-graphU_SUS.SetLineWidth(3)
-graphU_SUS.SetLineStyle(2)
-graphU_SUS.SetMarkerStyle(24)
-graphU_SUS.SetMarkerSize(2)
-graphU_SUS.SetMarkerColor(colorU_SUS.GetNumber())
-graphU_SUS.Draw("PL")
-
-graphU = ROOT.TGraph(8,xvalues,yvaluesU)
-graphU.SetLineColor(colorU.GetNumber())
-graphU.SetLineWidth(2)
-graphU.SetLineStyle(1)
-graphU.SetMarkerStyle(20)
-graphU.SetMarkerSize(1.7)
-graphU.SetMarkerColor(colorU.GetNumber())
-graphU.Draw("PL")
-
-cv.cd(2)
-
-pTextCMS = ROOT.TPaveText(cvxmin,cvymax+0.05,cvxmin,cvymax+0.05,"NDC")
-pTextCMS.AddText("CMS")
-pTextCMS.SetTextFont(63)
-pTextCMS.SetTextSize(31)
-pTextCMS.SetTextAlign(13)
-pTextCMS.Draw("Same")
-
-pTextPreliminary = ROOT.TPaveText(cvxmin+0.09,cvymax+0.05,cvxmin+0.09,cvymax+0.05,"NDC")
-pTextPreliminary.AddText("Simulation")
-pTextPreliminary.SetTextFont(53)
-pTextPreliminary.SetTextSize(31)
-pTextPreliminary.SetTextAlign(13)
-pTextPreliminary.Draw("Same")
-
-pLumi = ROOT.TPaveText(cvxmax,cvymax+0.05,cvxmax,cvymax+0.05,"NDC")
-pLumi.AddText("35.9 fb#lower[-0.8]{#scale[0.7]{-1}} (13 TeV)")
-pLumi.SetTextFont(43)
-pLumi.SetTextSize(31)
-pLumi.SetTextAlign(33)
-pLumi.Draw("Same")
-
-pInfo1 = ROOT.TPaveText(cvxmin+0.03,1-cv.GetPad(1).GetTopMargin()-0.02,cvxmin+0.03,1-cv.GetPad(1).GetTopMargin()-0.02,"NDC")
-pInfo1.AddText("pp#kern[-0.5]{ }#rightarrow#kern[-0.5]{ }"+gSymbol+"#kern[-0.6]{ }"+gSymbol+", "+gSymbol+"#kern[-0.5]{ }#rightarrow#kern[-0.5]{ }q#kern[-0.7]{ }q#lower[-0.8]{#kern[-0.89]{#minus}}#kern[-0.6]{ }"+chiSymbol+"#kern[-0.8]{ }, "+mgSymbol+"#kern[-0.2]{ }#minus#kern[-0.2]{ }"+mchiSymbol+" =#kern[-0.2]{ }100#kern[-0.4]{ }GeV")
-pInfo1.SetTextFont(43)
-pInfo1.SetTextSize(27)
-pInfo1.SetTextAlign(13)
-pInfo1.Draw("Same")
-
-legend1 = ROOT.TLegend(cvxmin+0.03,cv.GetPad(1).GetBottomMargin()+0.02+0.085,cvxmin+0.03+0.45,cv.GetPad(1).GetBottomMargin()+0.02)
-legend1.SetFillStyle(0)
-legend1.SetBorderSize(0)
-legend1.SetTextFont(43)
-legend1.SetTextSize(27)
-legend1.AddEntry(graphC,"Displaced jet tagger","PL")
-legend1.AddEntry(graphC_SUS,"#scale[0.9]{#font[82]{arXiv:1802.02110}}","PL")
-legend1.Draw("Same")
-
-pInfo2 = ROOT.TPaveText(cvxmin+0.03,1-cv.GetPad(2).GetTopMargin()-0.02,cvxmin+0.03,1-cv.GetPad(2).GetTopMargin()-0.02,"NDC")
-pInfo2.AddText("pp#kern[-0.5]{ }#rightarrow#kern[-0.5]{ }"+gSymbol+"#kern[-0.6]{ }"+gSymbol+", "+gSymbol+"#kern[-0.5]{ }#rightarrow#kern[-0.5]{ }q#kern[-0.7]{ }q#lower[-0.8]{#kern[-0.89]{#minus}}#kern[-0.6]{ }"+chiSymbol+"#kern[-0.8]{ }, "+mchiSymbol+" =#kern[-0.2]{ }100#kern[-0.4]{ }GeV")
-pInfo2.SetTextFont(43)
-pInfo2.SetTextSize(27)
-pInfo2.SetTextAlign(13)
-pInfo2.Draw("Same")
-
-legend2 = ROOT.TLegend(cvxmin+0.03,cv.GetPad(2).GetBottomMargin()+0.02+0.085,cvxmin+0.03+0.45,cv.GetPad(2).GetBottomMargin()+0.02)
-legend2.SetFillStyle(0)
-legend2.SetBorderSize(0)
-legend2.SetTextFont(43)
-legend2.SetTextSize(27)
-legend2.AddEntry(graphU,"Displaced jet tagger","PL")
-legend2.AddEntry(graphU_SUS,"#scale[0.9]{#font[82]{arXiv:1802.02110}}","PL")
-
-#legend2.AddEntry(graphU,"#kern[-0.5]{ }m#lower[0.2]{#scale[0.8]{#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.2]{#lower[0.6]{#scale[0.65]{1}}}}}#kern[-0.4]{ }=#kern[-0.5]{ }100#kern[-0.6]{ }GeV","PL")
-#legend2.AddEntry(graphC,"m#lower[0.2]{#scale[0.8]{#tilde{g}}}#kern[-0.5]{ }-#kern[-0.5]{ }m#lower[0.2]{#scale[0.8]{#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.2]{#lower[0.6]{#scale[0.65]{1}}}}}#kern[-0.4]{ }=#kern[-0.5]{ }100#kern[-0.6]{ }GeV","PL")
-legend2.Draw("Same")
-
-cv.Print("summary.pdf")
-cv.Print("summary.C")
-cv.Print("summary.png")
 
 
 

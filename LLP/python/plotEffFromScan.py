@@ -82,7 +82,7 @@ ROOT.gStyle.SetTitleFont(43, "XYZ")
 ROOT.gStyle.SetTitleSize(33, "XYZ")
 # ROOT.gStyle.SetTitleXSize(Float_t size = 0.02) # Another way to set the size?
 # ROOT.gStyle.SetTitleYSize(Float_t size = 0.02)
-ROOT.gStyle.SetTitleXOffset(1.135)
+ROOT.gStyle.SetTitleXOffset(1.115)
 #ROOT.gStyle.SetTitleYOffset(1.2)
 ROOT.gStyle.SetTitleOffset(1.32, "YZ") # Another way to set the Offset
 
@@ -162,7 +162,7 @@ newColorRGB.colorindex=301
 
 
 colorList = [
-    [0.,newColorHLS(0.6, 0.47,0.6)],
+    [0.,newColorHLS(0.6, 0.47,0.63)],
     [0.,newColorHLS(0.56, 0.65, 0.7)],
     [0.,newColorHLS(0.52, 1., 1.)],
 ]
@@ -183,6 +183,20 @@ blue  = numpy.array(map(lambda x:x[1].GetBlue(),colorList))
 start=ROOT.TColor.CreateGradientColorTable(len(stops), stops, red, green, blue, 200)
 ROOT.gStyle.SetNumberContours(200)
 
+ptSymbol = "p#kern[-0.8]{ }#lower[0.3]{#scale[0.7]{T}}"
+metSymbol = ptSymbol+"#kern[-2.3]{ }#lower[-0.8]{#scale[0.7]{miss}}"
+metSymbol_lc = ptSymbol+"#kern[-2.3]{ }#lower[-0.8]{#scale[0.7]{miss,#kern[-0.5]{ }#mu-corr.}}}"
+minDPhiSymbol = "#Delta#phi#lower[-0.05]{*}#kern[-1.9]{ }#lower[0.3]{#scale[0.7]{min}}"
+htSymbol = "H#kern[-0.7]{ }#lower[0.3]{#scale[0.7]{T}}"
+mhtSymbol = "H#kern[-0.7]{ }#lower[0.3]{#scale[0.7]{T}}#kern[-2.2]{ }#lower[-0.8]{#scale[0.7]{miss}}"
+rSymbol = mhtSymbol+"#lower[0.05]{#scale[1.2]{/}}"+metSymbol
+rSymbol_lc = mhtSymbol+"#lower[0.05]{#scale[1.2]{/}}"+metSymbol_lc
+mzSymbol = "m#lower[0.3]{#scale[0.7]{#mu#mu}}"
+gSymbol = "#tilde{g}"
+qbarSymbol = "q#lower[-0.8]{#kern[-0.89]{#minus}}"
+mgSymbol = "m#lower[0.2]{#scale[0.8]{#kern[-0.75]{ }"+gSymbol+"}}"
+chiSymbol = "#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.2]{#lower[0.6]{#scale[0.65]{1}}}"
+mchiSymbol = "m#lower[0.2]{#scale[0.8]{"+chiSymbol+"}}"
 
 
 def getSigResult(f):
@@ -269,8 +283,8 @@ def interpolate(grid):
    
 results = []
 
-basedir = "llpScan_ctau1_llp2000_lsp1800"
-output = "llpScan_ctau1_llp2000_lsp1800"
+basedir = "llpScan_ctau10_llp2000_lsp0_da"
+output = "llpScan_ctau10_llp2000_lsp0_da"
    
 for folderName in os.listdir(basedir):
     if folderName.startswith("signal_"):
@@ -281,16 +295,27 @@ for folderName in os.listdir(basedir):
             pass
 results = sorted(results,key=lambda x: x[0])
 
-mu1s = []
-mu2s = []
+mu1slo = []
+mu2slo = []
+
+mu1shi = []
+mu2shi = []
+
 llp1slo = []
 llp2slo = []
 
 llp1shi = []
 llp2shi = []
 
-#muLimit = 0.0024
-muLimit = 0.0250
+#noda, llp2000_lsp0
+#muLimit = 0.0013313
+#noda, llp2000_lsp1800
+#muLimit = 0.0190
+
+#da, llp2000_lsp0
+muLimit = 0.0006
+#da, llp2000_lsp1800
+#muLimit = 0.0147
 
 grid = {'logmu':[],'llpEff':[],'deltaNLL':[]}
 
@@ -301,7 +326,7 @@ s2hicross = -1
 s2locross = -1
 
 for signalStrength,path in results:
-    significance = getSigResult(os.path.join(path,"higgsCombineTest.Significance.mH120.root"))
+    #significance = getSigResult(os.path.join(path,"higgsCombineTest.Significance.mH120.root"))
     fitResult = getScanResult(os.path.join(path,"higgsCombineTest.MultiDimFit.mH120.root"))
     #print signalStrength,significance,fitResult["1s"][0]
     
@@ -310,44 +335,54 @@ for signalStrength,path in results:
         grid['llpEff'].append(fitResult['llpEff'][i])
         grid['deltaNLL'].append(fitResult['deltaNLL'][i])
         
-    if (math.fabs(signalStrength/muLimit-1)<signalCross):
+    if ((signalStrength/muLimit-1)<signalCross):
         signalCross = math.fabs(signalStrength/muLimit-1)
         s1locross = fitResult["1s"][0]
         s1hicross = fitResult["1s"][1]
         s2locross = fitResult["2s"][0]
         s2hicross = fitResult["2s"][1]
     
-    if fitResult["1s"][0]>0 and fitResult["1s"][1]>0:
-        mu1s.append(signalStrength/muLimit)
+    if fitResult["1s"][0]>0:
+        mu1slo.append(signalStrength/muLimit)
         llp1slo.append(fitResult["1s"][0])
+        
+    if fitResult["1s"][1]>0:
+        mu1shi.append(signalStrength/muLimit)
         llp1shi.append(fitResult["1s"][1])
         
-    if fitResult["2s"][0]>0 and fitResult["2s"][1]>0:
-        mu2s.append(signalStrength/muLimit)
+    if fitResult["2s"][0]>0:
+        mu2slo.append(signalStrength/muLimit)
         llp2slo.append(fitResult["2s"][0])
+        
+    if fitResult["2s"][1]>0:
+        mu2shi.append(signalStrength/muLimit)
         llp2shi.append(fitResult["2s"][1])
         
 deltaNLLfct = interpolate(grid)
 
-mu1s = numpy.array(mu1s)
-mu2s = numpy.array(mu2s)
+mu1slo = numpy.array(mu1slo)
+mu2slo = numpy.array(mu2slo)
+mu1shi = numpy.array(mu1shi)
+mu2shi = numpy.array(mu2shi)
 llp1slo = numpy.array(llp1slo)
 llp1shi = numpy.array(llp1shi)
 llp2slo = numpy.array(llp2slo)
 llp2shi = numpy.array(llp2shi)
 
-graph1slo = ROOT.TGraph(len(mu1s),mu1s,llp1slo)
-graph1shi = ROOT.TGraph(len(mu1s),mu1s,llp1shi)
+graph1slo = ROOT.TGraph(len(mu1slo),mu1slo,llp1slo)
+graph1shi = ROOT.TGraph(len(mu1shi),mu1shi,llp1shi)
 
-graph2slo = ROOT.TGraph(len(mu2s),mu2s,llp2slo)
-graph2shi = ROOT.TGraph(len(mu2s),mu2s,llp2shi)
+graph2slo = ROOT.TGraph(len(mu2slo),mu2slo,llp2slo)
+graph2shi = ROOT.TGraph(len(mu2shi),mu2shi,llp2shi)
 
 
 cv = ROOT.TCanvas("cv","",800,670)
-
+#cv.Range(0,0,1,1)
+#cv.RangeAxis(0,0,1,1)
+        
 cvxmin=0.13
 cvxmax=0.82
-cvymin=0.135
+cvymin=0.275
 cvymax=0.935
 
 cv.SetLeftMargin(cvxmin)
@@ -360,8 +395,8 @@ cv.SetBottomMargin(cvymin)
 
 cv.SetLogx(1)
 
-xBinning = numpy.logspace(math.log10(mu1s[0]),math.log10(100),151)
-yBinning = numpy.linspace(0.2,1.5,151)
+xBinning = numpy.logspace(math.log10(0.5),math.log10(100),51)
+yBinning = numpy.linspace(0.0,1.2,51)
 
 axis = ROOT.TH2F("axis",";;",
     len(xBinning)-1,xBinning,
@@ -399,36 +434,36 @@ axis.GetZaxis().SetRangeUser(0,8)
 
 if s1locross>0:
     lines1lo = ROOT.TLine(axis.GetXaxis().GetXmin(),s1locross,1,s1locross)
-    lines1lo.SetLineWidth(1)
-    lines1lo.SetLineStyle(2)
+    lines1lo.SetLineWidth(2)
+    lines1lo.SetLineStyle(3)
     lines1lo.SetLineColor(0)
     lines1lo.Draw("L")
     
 if s1hicross>0:
     lines1hi = ROOT.TLine(axis.GetXaxis().GetXmin(),s1hicross,1,s1hicross)
-    lines1hi.SetLineWidth(1)
-    lines1hi.SetLineStyle(2)
+    lines1hi.SetLineWidth(2)
+    lines1hi.SetLineStyle(3)
     lines1hi.SetLineColor(0)
     lines1hi.Draw("L")
     
 if s2locross>0:
     lines2lo = ROOT.TLine(axis.GetXaxis().GetXmin(),s2locross,1,s2locross)
-    lines2lo.SetLineWidth(1)
-    lines2lo.SetLineStyle(2)
+    lines2lo.SetLineWidth(2)
+    lines2lo.SetLineStyle(3)
     lines2lo.SetLineColor(0)
     lines2lo.Draw("L")
     
 if s2hicross>0:
     lines2hi = ROOT.TLine(axis.GetXaxis().GetXmin(),s2hicross,1,s2hicross)
-    lines2hi.SetLineWidth(1)
-    lines2hi.SetLineStyle(2)
+    lines2hi.SetLineWidth(2)
+    lines2hi.SetLineStyle(3)
     lines2hi.SetLineColor(0)
     lines2hi.Draw("L")
     
 limitLine = ROOT.TLine(1,axis.GetYaxis().GetXmin(),1,axis.GetYaxis().GetXmax())
 limitLine.SetLineColor(0)
-limitLine.SetLineWidth(1)
-limitLine.SetLineStyle(2)
+limitLine.SetLineWidth(2)
+limitLine.SetLineStyle(3)
 limitLine.Draw("L")
     
 ROOT.gPad.RedrawAxis()
@@ -456,11 +491,25 @@ graph2shi.SetLineStyle(2)
 graph2slo.Draw("L")
 graph2shi.Draw("L")
 
-effLine = ROOT.TLine(mu1s[0],1,100,1)
+effLine = ROOT.TLine(xBinning[0],1,xBinning[-1],1)
 effLine.SetLineColor(1)
 effLine.SetLineWidth(1)
 effLine.SetLineStyle(1)
 effLine.Draw("L")
+
+axisXsec = ROOT.TGaxis(
+    0,-0.28,
+    100,-0.28,
+    muLimit*xBinning[0],muLimit*xBinning[-1],
+    512,"+SG"
+)
+axisXsec.SetTitleFont(43)
+axisXsec.SetTitleSize(33)
+axisXsec.SetLabelFont(43)
+axisXsec.SetLabelSize(29)
+axisXsec.SetTitleOffset(1.16)
+axisXsec.SetTitle("Cross section (pb)")
+axisXsec.Draw("Same")
 
 pTextCMS = ROOT.TPaveText(cv.GetLeftMargin(),1-cv.GetTopMargin()+0.05,cv.GetLeftMargin(),1-cv.GetTopMargin()+0.05,"NDC")
 pTextCMS.AddText("CMS")
@@ -476,28 +525,22 @@ pTextPreliminary.SetTextSize(31)
 pTextPreliminary.SetTextAlign(13)
 pTextPreliminary.Draw("Same")
 
-pInfo2 = ROOT.TPaveText(1-cv.GetRightMargin(),1-cv.GetTopMargin()+0.056,1-cv.GetRightMargin(),1-cv.GetTopMargin()+0.056,"NDC")
-pInfo2.AddText("p#kern[-0.6]{ }p#kern[-0.5]{ }#rightarrow#kern[-0.5]{ }#tilde{g}#kern[-0.6]{ }#tilde{g}, #tilde{g}#kern[-0.5]{ }#rightarrow#kern[-0.5]{ }q#kern[-0.6]{ }#bar{q}#kern[-0.6]{ }#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.3]{#lower[0.6]{#scale[0.65]{1}}}")
-pInfo2.SetTextFont(43)
-pInfo2.SetTextSize(32)
-pInfo2.SetTextAlign(33)
-#pInfo2.Draw("Same")
 
-pInfo = ROOT.TPaveText(1-cv.GetRightMargin()-0.04,cv.GetBottomMargin()+0.03,1-cv.GetRightMargin()-0.04,cv.GetBottomMargin()+0.24,"NDC")
-pInfo.AddText("p#kern[-0.6]{ }p#kern[-0.5]{ }#rightarrow#kern[-0.5]{ }#tilde{g}#kern[-0.6]{ }#tilde{g}, #tilde{g}#kern[-0.5]{ }#rightarrow#kern[-0.5]{ }q#kern[-0.6]{ }#bar{q}#kern[-0.6]{ }#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.3]{#lower[0.6]{#scale[0.65]{1}}}")
-#pInfo.AddText("m#lower[0.2]{#scale[0.8]{#tilde{g}}}#kern[-0.4]{ }=#kern[-0.5]{ }2#kern[-0.6]{ }TeV, m#lower[0.2]{#scale[0.8]{#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.2]{#lower[0.6]{#scale[0.65]{1}}}}}#kern[-0.4]{ }=#kern[-0.5]{ }200#kern[-0.6]{ }GeV")
-pInfo.AddText("m#lower[0.2]{#scale[0.8]{#tilde{g}}}#kern[-0.4]{ }=#kern[-0.5]{ }2#kern[-0.6]{ }TeV, m#lower[0.2]{#scale[0.8]{#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.2]{#lower[0.6]{#scale[0.65]{1}}}}}#kern[-0.4]{ }=#kern[-0.5]{ }1.8#kern[-0.6]{ }TeV")
-pInfo.AddText("c#tau#kern[-0.5]{ }=#kern[-0.8]{ }1#kern[-0.5]{ }mm")
+pInfo = ROOT.TPaveText(1-cv.GetRightMargin()-0.04,cv.GetBottomMargin()+0.03,1-cv.GetRightMargin()-0.04,cv.GetBottomMargin()+0.22,"NDC")
+pInfo.AddText("pp#kern[-0.5]{ }#rightarrow#kern[-0.5]{ }"+gSymbol+"#kern[-0.6]{ }"+gSymbol+", "+gSymbol+"#kern[-0.5]{ }#rightarrow#kern[-0.5]{ }q#kern[-0.7]{ }q#lower[-0.8]{#kern[-0.89]{#minus}}#kern[-0.6]{ }"+chiSymbol)
+#pInfo.AddText(mgSymbol+"#kern[-0.4]{ }=#kern[-0.5]{ }2 TeV, "+mchiSymbol+"#kern[-0.4]{ }=#kern[-0.5]{ }200 GeV")
+pInfo.AddText(mgSymbol+"#kern[-0.4]{ }=#kern[-0.5]{ }2 TeV, "+mchiSymbol+"#kern[-0.4]{ }=#kern[-0.5]{ }1.8 TeV")
+pInfo.AddText("c#tau#kern[-0.5]{ }=#kern[-0.8]{ }10 mm")
 pInfo.SetTextFont(43)
-pInfo.SetTextSize(29)
+pInfo.SetTextSize(27)
 pInfo.SetTextAlign(33)
 pInfo.Draw("Same")
 
-legend = ROOT.TLegend(1-cv.GetRightMargin()-0.04-0.17,1-cv.GetTopMargin()-0.03-0.15,1-cv.GetRightMargin()-0.04,1-cv.GetTopMargin()-0.07)
+legend = ROOT.TLegend(1-cv.GetRightMargin()-0.04-0.15,cv.GetBottomMargin()+0.23,1-cv.GetRightMargin()-0.04,cv.GetBottomMargin()+0.34)
 legend.SetFillStyle(0)
 legend.SetBorderSize(0)
 legend.SetTextFont(43)
-legend.SetTextSize(29)
+legend.SetTextSize(27)
 legend.AddEntry(graph1shi,"68#kern[-0.6]{ }% CL","L")
 legend.AddEntry(graph2shi,"95#kern[-0.6]{ }% CL","L")
 legend.Draw("Same")
