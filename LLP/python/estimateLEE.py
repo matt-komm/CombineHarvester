@@ -198,13 +198,13 @@ def getDarkerColor(color):
     darkerColor=newColor(color.GetRed()*0.6,color.GetGreen()*0.6,color.GetBlue()*0.6)
     return darkerColor
 
-basePath = 'cards_new'
+basePath = 'cards_da'
 
 mglu = "m#lower[0.2]{#scale[0.8]{#tilde{g}}}"
 mchi = "m#lower[0.2]{#scale[0.8]{#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.2]{#lower[0.6]{#scale[0.65]{1}}}}}"
 
 ctauLabels = {
-    "0p001":"1#kern[-0.5]{ }#mum",
+    #"0p001":"1#kern[-0.5]{ }#mum",
     "0p01":"10#kern[-0.5]{ }#mum",
     "0p1":"100#kern[-0.5]{ }#mum",
     "1":"1#kern[-0.5]{ }mm",
@@ -224,6 +224,7 @@ for ctau in ctauLabels.keys():
         if re.match('ctau'+ctau+'_llp[0-9]+_lsp[0-9]+',folder):
             llpMass = int(folder[folder.find('llp')+3:folder.find('_',folder.find('llp'))])
             lspMass = int(folder[folder.find('lsp')+3:])
+            print llpMass,lspMass
             for f in sorted(os.listdir(os.path.join(basePath,folder))):
                 if re.match('higgsCombineTest.Significance.mH120.[0-9]+.root',f):
                     if not fileDictPerSeed.has_key(f):

@@ -48,7 +48,7 @@ ROOT.gStyle.SetHatchesLineWidth(2)
 ROOT.gStyle.SetTitleColor(1, "XYZ")
 ROOT.gStyle.SetTitleFont(43, "XYZ")
 ROOT.gStyle.SetTitleSize(33, "XYZ")
-ROOT.gStyle.SetTitleXOffset(1.135)
+ROOT.gStyle.SetTitleOffset(1.3, "X")
 ROOT.gStyle.SetTitleOffset(1.32, "YZ")
 
 ROOT.gStyle.SetLabelColor(1, "XYZ")
@@ -71,7 +71,7 @@ ROOT.gStyle.SetLineScalePS(2)
 
 
 ROOT.gStyle.SetPaintTextFormat("3.0f")
-ROOT.gStyle.SetLineStyleString(12,"7 6");
+ROOT.gStyle.SetLineStyleString(12,"7 6")
 
 colors = []
     
@@ -94,6 +94,11 @@ def HLS2RGB(hue,light,sat):
 def newColorHLS(hue,light,sat):
     r,g,b = HLS2RGB(hue,light,sat)
     return newColorRGB(r,g,b)
+    
+def interpol(xval,yval,xnew):
+    fct = scipy.interpolate.interp1d(numpy.log10(xval), yval, kind='cubic')
+    ynew = fct(numpy.log10(xnew))
+    return ynew
     
 newColorRGB.colorindex=301
 '''
@@ -174,7 +179,7 @@ rSymbol_lc = mhtSymbol+"#lower[0.05]{#scale[1.2]{/}}"+metSymbol_lc
 mzSymbol = "m#lower[0.3]{#scale[0.7]{#mu#mu}}"
 gSymbol = "#tilde{g}"
 qbarSymbol = "q#lower[-0.8]{#kern[-0.89]{#minus}}"
-mgSymbol = "m#lower[0.2]{#scale[0.8]{#kern[-0.75]{ }"+gSymbol+"}}"
+mgSymbol = "m#lower[0.2]{#scale[0.8]{"+gSymbol+"}}"
 chiSymbol = "#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.2]{#lower[0.6]{#scale[0.65]{1}}}"
 mchiSymbol = "m#lower[0.2]{#scale[0.8]{"+chiSymbol+"}}"
     
@@ -210,10 +215,28 @@ with open("limits_da/summary.json") as f:
 limitsC = data["compressed"]
 limitsU = data["uncompressed"]
 
+with open("limits_noda/summary.json") as f:
+    data = json.load(f)
+limitsCnoda = data["compressed"]
+limitsUnoda = data["uncompressed"]
+
 
 xvalues = []
 yvaluesC = []
 yvaluesU = []
+
+yvaluesCnoda = []
+yvaluesUnoda = []
+
+yvaluesCexpUp = []
+yvaluesUexpUp = []
+yvaluesCexpDown= []
+yvaluesUexpDown = []
+
+yvaluesCtheoUp = []
+yvaluesUtheoUp = []
+yvaluesCtheoDown= []
+yvaluesUtheoDown = []
 
 yvaluesC_SUS = []
 yvaluesU_SUS = []
@@ -223,103 +246,130 @@ for ctau in ctauValues:
     yvaluesC.append(limitsC[ctau]["mean"])
     yvaluesU.append(limitsU[ctau]["mean"])
     
+    yvaluesCnoda.append(limitsCnoda[ctau]["mean"])
+    yvaluesUnoda.append(limitsUnoda[ctau]["mean"])
+    
+    yvaluesCexpUp.append(limitsC[ctau]["expUp"])
+    yvaluesUexpUp.append(limitsU[ctau]["expUp"])
+    yvaluesCexpDown.append(limitsC[ctau]["expDown"])
+    yvaluesUexpDown.append(limitsU[ctau]["expDown"])
+    
+    yvaluesCtheoUp.append(limitsC[ctau]["theoUp"])
+    yvaluesUtheoUp.append(limitsU[ctau]["theoUp"])
+    yvaluesCtheoDown.append(limitsC[ctau]["theoDown"])
+    yvaluesUtheoDown.append(limitsU[ctau]["theoDown"])
+    
     sus_index = numpy.argmin(numpy.abs(SUS_16_038["ctau_values"]-ctauValue[ctau]))
     yvaluesC_SUS.append(SUS_16_038['exp']['dm_100']['mgl'][sus_index]/1000.)
     yvaluesU_SUS.append(SUS_16_038['exp']['mchi_100']['mgl'][sus_index]/1000.)
     
     print ctau,limitsC[ctau]["mean"],limitsU[ctau]["mean"]
     
+
 xvalues = numpy.array(xvalues)
-    
+xvaluesRes = numpy.logspace(-5,1,50)
 yvaluesC = numpy.array(yvaluesC)
 yvaluesU = numpy.array(yvaluesU)
+
+yvaluesCnoda = numpy.array(yvaluesCnoda)
+yvaluesUnoda = numpy.array(yvaluesUnoda)
+
+
+yvaluesCexpUp = interpol(xvalues,numpy.array(yvaluesCexpUp),xvaluesRes)
+yvaluesUexpUp = interpol(xvalues,numpy.array(yvaluesUexpUp),xvaluesRes)
+yvaluesCexpDown = interpol(xvalues,numpy.array(yvaluesCexpDown),xvaluesRes)
+yvaluesUexpDown = interpol(xvalues,numpy.array(yvaluesUexpDown),xvaluesRes)
+
+
+xvaluesSys = numpy.array(list(xvaluesRes)+list(reversed(list(xvaluesRes))))
+yvaluesCexp = numpy.array(list(yvaluesCexpUp)+list(reversed(list(yvaluesCexpDown))))
+yvaluesUexp = numpy.array(list(yvaluesUexpUp)+list(reversed(list(yvaluesUexpDown))))
+
+
+
+yvaluesCtheo = numpy.array(yvaluesCtheoUp+list(reversed(yvaluesCtheoDown)))
+yvaluesUtheo = numpy.array(yvaluesUtheoUp+list(reversed(yvaluesUtheoDown)))
 
 yvaluesC_SUS = numpy.array(yvaluesC_SUS)
 yvaluesU_SUS = numpy.array(yvaluesU_SUS)
 
-cv = ROOT.TCanvas("summary","",800,670)
-#cv.SetGridx(True)
-#cv.SetGridy(True)
-#cv.SetLogx(1)
-#cv.SetMargin(0.155,0.04,0.15,0.065)
+rootObj = []
 
 cvxmin = 0.135
 cvxmax = 0.965
-cvymin = 0.125
+cvymin = 0.135
 cvymax = 0.94
 
-cv.Divide(1,2,0,0)
-cv.GetPad(1).SetPad(0.0, 0.0, 1.0, 1.0)
-cv.GetPad(1).SetFillStyle(4000)
-cv.GetPad(2).SetPad(0.0, 0.00, 1.0,1.0)
-cv.GetPad(2).SetFillStyle(4000)
+def makeCanvas(ymin=0,ymax=2.1):
+    cv = ROOT.TCanvas("summary"+str(random.random()),"",800,670)
+    #cv.SetGridx(True)
+    #cv.SetGridy(True)
+    #cv.SetLogx(1)
+    #cv.SetMargin(0.155,0.04,0.15,0.065)
 
-for i in [1,2]:
     #for the canvas:
-    cv.GetPad(i).SetBorderMode(0)
-    cv.GetPad(i).SetGridx(False)
-    cv.GetPad(i).SetGridy(False)
-
+    cv.SetBorderMode(0)
+    cv.SetGridx(False)
+    cv.SetGridy(False)
 
     #For the frame:
-    cv.GetPad(i).SetFrameBorderMode(0)
-    cv.GetPad(i).SetFrameBorderSize(1)
-    cv.GetPad(i).SetFrameFillColor(0)
-    cv.GetPad(i).SetFrameFillStyle(0)
-    cv.GetPad(i).SetFrameLineColor(1)
-    cv.GetPad(i).SetFrameLineStyle(1)
-    cv.GetPad(i).SetFrameLineWidth(1)
+    cv.SetFrameBorderMode(0)
+    cv.SetFrameBorderSize(1)
+    cv.SetFrameFillColor(0)
+    cv.SetFrameFillStyle(0)
+    cv.SetFrameLineColor(1)
+    cv.SetFrameLineStyle(1)
+    cv.SetFrameLineWidth(1)
 
     # Margins:
-    cv.GetPad(i).SetLeftMargin(cvxmin)
-    cv.GetPad(i).SetRightMargin(1-cvxmax)
-    
-    # For the Global title:
-    cv.GetPad(i).SetTitle("")
-    
+    cv.SetLeftMargin(cvxmin)
+    cv.SetRightMargin(1-cvxmax)
+
     # For the axis:
-    cv.GetPad(i).SetTickx(1)  # To get tick marks on the opposite side of the frame
-    cv.GetPad(i).SetTicky(1)
+    cv.SetTickx(1)  # To get tick marks on the opposite side of the frame
+    cv.SetTicky(1)
 
     # Change for log plots:
-    cv.GetPad(i).SetLogx(1)
-    cv.GetPad(i).SetLogy(0)
-    cv.GetPad(i).SetLogz(0)
+    cv.SetLogx(1)
+    cv.SetLogy(0)
+    cv.SetLogz(0)
 
-cv.GetPad(2).SetTopMargin(1-cvymax)
-cv.GetPad(2).SetBottomMargin(cvymin+.5*(cvymax-cvymin)+0.007)
-cv.GetPad(1).SetTopMargin(1-(cvymin+.5*(cvymax-cvymin))+0.007)
-cv.GetPad(1).SetBottomMargin(cvymin)
+    cv.SetTopMargin(1-cvymax)
+    cv.SetBottomMargin(cvymin)
 
-cv.cd(1)
-axis1 = ROOT.TH2F("axis",";c#tau (m);",
-    50,10**-5.2,10**1.2,
-    50,0.0,0.0+2.1
-)
-axis1.GetXaxis().SetTickLength(0.017/(1-cv.GetPad(1).GetLeftMargin()-cv.GetPad(1).GetRightMargin()))
-axis1.GetYaxis().SetTickLength(0.015/(1-cv.GetPad(1).GetTopMargin()-cv.GetPad(1).GetBottomMargin()))
-axis1.Draw("AXIS")
-
-cv.cd(2)
-axis2 = ROOT.TH2F("axis",";;95% CL lower limit on m#lower[0.2]{#scale[0.8]{#tilde{g}}} (TeV)",
-    50,10**-5.2,10**1.2,
-    50,0.6,0.6+2.1
-)
-axis2.GetXaxis().SetTickLength(0.017/(1-cv.GetPad(2).GetLeftMargin()-cv.GetPad(2).GetRightMargin()))
-axis2.GetYaxis().SetTickLength(0.015/(1-cv.GetPad(2).GetTopMargin()-cv.GetPad(2).GetBottomMargin()))
-axis2.GetXaxis().SetTitleSize(0)
-axis2.GetXaxis().SetLabelSize(0)
-axis2.Draw("AXIS")
+    cv.cd(1)
+    axis1 = ROOT.TH2F("axis"+str(random.random()),";c#tau (m);95% CL lower limit on m #kern[-0.5]{ }#lower[0.2]{#scale[0.8]{#tilde{g}}} (TeV)",
+        50,10**-5.2,10**1.2,
+        50,ymin,ymax
+    )
+    axis1.GetXaxis().SetTickLength(0.017/(1-cv.GetLeftMargin()-cv.GetRightMargin()))
+    axis1.GetYaxis().SetTickLength(0.015/(1-cv.GetTopMargin()-cv.GetBottomMargin()))
+    axis1.Draw("AXIS")
+    rootObj.append(axis1)
+    
+    return cv
 
 
-colorU = newColorHLS(0.76,0.7,0.95)
-colorU_SUS = newColorHLS(0.68,0.4,0.8)
 
-colorC = newColorHLS(0.07,0.6,0.95)
+
+
+colorU = newColorHLS(0.76,0.45,0.8)
+colorUsys = newColorHLS(0.72,0.9,0.5)
+colorU_SUS = newColorHLS(0.68,0.3,0.7)
+
+colorC = newColorHLS(0.07,0.45,0.8)
+colorCsys = newColorHLS(0.07,0.9,0.5)
 colorC_SUS = newColorHLS(0.0,0.4,0.8)
 
 
-cv.cd(1)
+polyCExp = ROOT.TPolyLine(len(xvaluesSys),xvaluesSys,yvaluesCexp)
+polyCExp.SetFillColor(colorCsys.GetNumber())
+polyCExp.SetFillStyle(1001)
+
+polyUExp = ROOT.TPolyLine(len(xvaluesSys),xvaluesSys,yvaluesUexp)
+polyUExp.SetFillColor(colorUsys.GetNumber())
+polyUExp.SetFillStyle(1001)
+
 
 graphC_SUS = ROOT.TGraph(len(xvalues),xvalues,yvaluesC_SUS)
 graphC_SUS.SetLineColor(colorC_SUS.GetNumber())
@@ -328,18 +378,6 @@ graphC_SUS.SetLineStyle(2)
 graphC_SUS.SetMarkerStyle(24)
 graphC_SUS.SetMarkerSize(2)
 graphC_SUS.SetMarkerColor(colorC_SUS.GetNumber())
-graphC_SUS.Draw("PL")
-
-graphC = ROOT.TGraph(len(xvalues),xvalues,yvaluesC)
-graphC.SetLineColor(colorC.GetNumber())
-graphC.SetLineWidth(2)
-graphC.SetLineStyle(1)
-graphC.SetMarkerStyle(20)
-graphC.SetMarkerSize(1.7)
-graphC.SetMarkerColor(colorC.GetNumber())
-graphC.Draw("PL")
-
-cv.cd(2)
 
 graphU_SUS = ROOT.TGraph(len(xvalues),xvalues,yvaluesU_SUS)
 graphU_SUS.SetLineColor(colorU_SUS.GetNumber())
@@ -348,78 +386,184 @@ graphU_SUS.SetLineStyle(2)
 graphU_SUS.SetMarkerStyle(24)
 graphU_SUS.SetMarkerSize(2)
 graphU_SUS.SetMarkerColor(colorU_SUS.GetNumber())
-graphU_SUS.Draw("PL")
 
-graphU = ROOT.TGraph(len(xvalues),xvalues,yvaluesU)
+
+yvaluesCRes = interpol(xvalues,yvaluesC,xvaluesRes)
+graphC = ROOT.TGraph(len(xvaluesRes),xvaluesRes,yvaluesCRes)
+graphC.SetLineColor(colorC.GetNumber())
+graphC.SetLineWidth(2)
+graphC.SetLineStyle(1)
+graphC.SetMarkerStyle(20)
+graphC.SetMarkerSize(1.7)
+graphC.SetFillColor(colorCsys.GetNumber())
+graphC.SetMarkerColor(colorC.GetNumber())
+
+yvaluesCnodaRes = interpol(xvalues,yvaluesCnoda,xvaluesRes)
+graphCnoda = ROOT.TGraph(len(xvaluesRes),xvaluesRes,yvaluesCnodaRes)
+graphCnoda.SetLineColor(colorC.GetNumber())
+graphCnoda.SetLineWidth(3)
+graphCnoda.SetLineStyle(12)
+graphCnoda.SetMarkerStyle(20)
+graphCnoda.SetMarkerSize(1.7)
+graphCnoda.SetFillColor(colorCsys.GetNumber())
+graphCnoda.SetMarkerColor(colorC.GetNumber())
+
+yvaluesURes = interpol(xvalues,yvaluesU,xvaluesRes)
+graphU = ROOT.TGraph(len(xvaluesRes),xvaluesRes,yvaluesURes)
 graphU.SetLineColor(colorU.GetNumber())
 graphU.SetLineWidth(2)
 graphU.SetLineStyle(1)
 graphU.SetMarkerStyle(20)
 graphU.SetMarkerSize(1.7)
+graphU.SetFillColor(colorUsys.GetNumber())
 graphU.SetMarkerColor(colorU.GetNumber())
-graphU.Draw("PL")
 
-cv.cd(2)
+yvaluesUnodaRes = interpol(xvalues,yvaluesUnoda,xvaluesRes)
+graphUnoda = ROOT.TGraph(len(xvaluesRes),xvaluesRes,yvaluesUnodaRes)
+graphUnoda.SetLineColor(colorU.GetNumber())
+graphUnoda.SetLineWidth(3)
+graphUnoda.SetLineStyle(12)
+graphUnoda.SetMarkerStyle(20)
+graphUnoda.SetMarkerSize(1.7)
+graphUnoda.SetFillColor(colorUsys.GetNumber())
+graphUnoda.SetMarkerColor(colorU.GetNumber())
+
+
+graphC2 = ROOT.TGraph(len(xvalues),xvalues,yvaluesC)
+graphC2.SetLineColor(colorC.GetNumber())
+graphC2.SetLineWidth(2)
+graphC2.SetLineStyle(1)
+graphC2.SetMarkerStyle(20)
+graphC2.SetMarkerSize(1.7)
+graphC2.SetMarkerColor(colorC.GetNumber())
+
+graphU2 = ROOT.TGraph(len(xvalues),xvalues,yvaluesU)
+graphU2.SetLineColor(colorU.GetNumber())
+graphU2.SetLineWidth(2)
+graphU2.SetLineStyle(1)
+graphU2.SetMarkerStyle(20)
+graphU2.SetMarkerSize(1.7)
+graphU2.SetMarkerColor(colorU.GetNumber())
+
+
 
 pTextCMS = ROOT.TPaveText(cvxmin,cvymax+0.05,cvxmin,cvymax+0.05,"NDC")
 pTextCMS.AddText("CMS")
 pTextCMS.SetTextFont(63)
 pTextCMS.SetTextSize(31)
 pTextCMS.SetTextAlign(13)
-pTextCMS.Draw("Same")
 
-pTextPreliminary = ROOT.TPaveText(cvxmin+0.09,cvymax+0.05,cvxmin+0.09,cvymax+0.05,"NDC")
-pTextPreliminary.AddText("Simulation")
-pTextPreliminary.SetTextFont(53)
-pTextPreliminary.SetTextSize(31)
-pTextPreliminary.SetTextAlign(13)
-pTextPreliminary.Draw("Same")
 
 pLumi = ROOT.TPaveText(cvxmax,cvymax+0.05,cvxmax,cvymax+0.05,"NDC")
 pLumi.AddText("35.9 fb#lower[-0.8]{#scale[0.7]{-1}} (13 TeV)")
 pLumi.SetTextFont(43)
 pLumi.SetTextSize(31)
 pLumi.SetTextAlign(33)
-pLumi.Draw("Same")
 
-pInfo1 = ROOT.TPaveText(cvxmin+0.03,1-cv.GetPad(1).GetTopMargin()-0.02,cvxmin+0.03,1-cv.GetPad(1).GetTopMargin()-0.02,"NDC")
-pInfo1.AddText("pp#kern[-0.5]{ }#rightarrow#kern[-0.5]{ }"+gSymbol+"#kern[-0.6]{ }"+gSymbol+", "+gSymbol+"#kern[-0.5]{ }#rightarrow#kern[-0.5]{ }q#kern[-0.7]{ }q#lower[-0.8]{#kern[-0.89]{#minus}}#kern[-0.6]{ }"+chiSymbol+"#kern[-0.8]{ }, "+mgSymbol+"#kern[-0.2]{ }#minus#kern[-0.2]{ }"+mchiSymbol+" =#kern[-0.2]{ }100#kern[-0.4]{ }GeV")
+pInfo1 = ROOT.TPaveText(cvxmin+0.03,cvymax-0.04,cvxmin+0.03,cvymax-0.04-0.11,"NDC")
+pInfo1.AddText("pp#kern[-0.5]{ }#rightarrow#kern[-0.5]{ }"+gSymbol+"#kern[-0.6]{ }"+gSymbol+", "+gSymbol+"#kern[-0.5]{ }#rightarrow#kern[-0.5]{ }q#kern[-0.7]{ }q#lower[-0.8]{#kern[-0.89]{#minus}}#kern[-0.6]{ }"+chiSymbol+"#kern[-0.8]{ }")
+pInfo1.AddText(mgSymbol+"#kern[-0.2]{ }#minus#kern[-0.2]{ }"+mchiSymbol+" =#kern[-0.2]{ }100#kern[-0.4]{ }GeV")
 pInfo1.SetTextFont(43)
 pInfo1.SetTextSize(27)
-pInfo1.SetTextAlign(13)
-pInfo1.Draw("Same")
+pInfo1.SetTextAlign(11)
 
-legend1 = ROOT.TLegend(cvxmin+0.03,cv.GetPad(1).GetBottomMargin()+0.02+0.085,cvxmin+0.03+0.45,cv.GetPad(1).GetBottomMargin()+0.02)
-legend1.SetFillStyle(0)
-legend1.SetBorderSize(0)
-legend1.SetTextFont(43)
-legend1.SetTextSize(27)
-legend1.AddEntry(graphC,"Displaced jet tagger","PL")
-legend1.AddEntry(graphC_SUS,"#scale[0.9]{#font[82]{arXiv:1802.02110}}","PL")
-legend1.Draw("Same")
-
-pInfo2 = ROOT.TPaveText(cvxmin+0.03,1-cv.GetPad(2).GetTopMargin()-0.02,cvxmin+0.03,1-cv.GetPad(2).GetTopMargin()-0.02,"NDC")
+pInfo2 = ROOT.TPaveText(cvxmin+0.03,cvymax-0.02,cvxmin+0.03,cvymax-0.02,"NDC")
 pInfo2.AddText("pp#kern[-0.5]{ }#rightarrow#kern[-0.5]{ }"+gSymbol+"#kern[-0.6]{ }"+gSymbol+", "+gSymbol+"#kern[-0.5]{ }#rightarrow#kern[-0.5]{ }q#kern[-0.7]{ }q#lower[-0.8]{#kern[-0.89]{#minus}}#kern[-0.6]{ }"+chiSymbol+"#kern[-0.8]{ }, "+mchiSymbol+" =#kern[-0.2]{ }100#kern[-0.4]{ }GeV")
 pInfo2.SetTextFont(43)
 pInfo2.SetTextSize(27)
 pInfo2.SetTextAlign(13)
-pInfo2.Draw("Same")
 
-legend2 = ROOT.TLegend(cvxmin+0.03,cv.GetPad(2).GetBottomMargin()+0.02+0.085,cvxmin+0.03+0.45,cv.GetPad(2).GetBottomMargin()+0.02)
+legend1 = ROOT.TLegend(cvxmin+0.03,cvymin+0.03+0.17,cvxmin+0.03+0.45,cvymin+0.03)
+legend1.SetFillStyle(0)
+legend1.SetBorderSize(0)
+legend1.SetTextFont(43)
+legend1.SetTextSize(27)
+legend1.AddEntry(graphC,"Displaced jet tagger","PLF")
+legend1.AddEntry(graphCnoda,"w/o DA","L")
+legend1.AddEntry(graphC_SUS,"#scale[0.9]{#font[82]{arXiv:1802.02110}}","PL")
+
+legend2 = ROOT.TLegend(cvxmin+0.03,cvymin+0.03+0.17,cvxmin+0.03+0.45,cvymin+0.03)
 legend2.SetFillStyle(0)
 legend2.SetBorderSize(0)
 legend2.SetTextFont(43)
 legend2.SetTextSize(27)
-legend2.AddEntry(graphU,"Displaced jet tagger","PL")
+legend2.AddEntry(graphU,"Displaced jet tagger","PLF")
+legend2.AddEntry(graphUnoda,"w/o DA","L")
 legend2.AddEntry(graphU_SUS,"#scale[0.9]{#font[82]{arXiv:1802.02110}}","PL")
 
-#legend2.AddEntry(graphU,"#kern[-0.5]{ }m#lower[0.2]{#scale[0.8]{#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.2]{#lower[0.6]{#scale[0.65]{1}}}}}#kern[-0.4]{ }=#kern[-0.5]{ }100#kern[-0.6]{ }GeV","PL")
-#legend2.AddEntry(graphC,"m#lower[0.2]{#scale[0.8]{#tilde{g}}}#kern[-0.5]{ }-#kern[-0.5]{ }m#lower[0.2]{#scale[0.8]{#tilde{#chi}#lower[-0.5]{#scale[0.65]{0}}#kern[-1.2]{#lower[0.6]{#scale[0.65]{1}}}}}#kern[-0.4]{ }=#kern[-0.5]{ }100#kern[-0.6]{ }GeV","PL")
-legend2.Draw("Same")
 
-cv.Print("summary.pdf")
-cv.Print("summary.C")
-cv.Print("summary.png")
+pTextPreliminary = ROOT.TPaveText(cvxmin+0.09,cvymax+0.05,cvxmin+0.09,cvymax+0.05,"NDC")
+pTextPreliminary.AddText("Simulation")
+pTextPreliminary.SetTextFont(53)
+pTextPreliminary.SetTextSize(31)
+pTextPreliminary.SetTextAlign(13)
+
+cvU = makeCanvas(ymax=2.5)
+polyUExp.Draw("F")
+graphU.Draw("SameL")
+graphU2.Draw("SameP")
+graphUnoda.Draw("SameL")
+graphU_SUS.Draw("SameLP")
+pInfo1.Draw("Same")
+legend2.Draw("Same")
+pTextCMS.Draw("Same")
+pTextPreliminary.Draw("Same")
+pLumi.Draw("Same")
+
+cvU.Print("summaryU.pdf")
+cvU.Print("summaryU.C")
+cvU.Print("summaryU.png")
+
+pTextPreliminary = ROOT.TPaveText(cvxmin+0.09,cvymax+0.05,cvxmin+0.09,cvymax+0.05,"NDC")
+pTextPreliminary.AddText("Simulation Preliminary")
+pTextPreliminary.SetTextFont(53)
+pTextPreliminary.SetTextSize(31)
+pTextPreliminary.SetTextAlign(13)
+pTextPreliminary.Draw("Same")
+
+cvU.Print("summaryU_pas.pdf")
+cvU.Print("summaryU_pas.C")
+cvU.Print("summaryU_pas.png")
+
+
+
+
+
+
+
+pTextPreliminary = ROOT.TPaveText(cvxmin+0.09,cvymax+0.05,cvxmin+0.09,cvymax+0.05,"NDC")
+pTextPreliminary.AddText("Simulation")
+pTextPreliminary.SetTextFont(53)
+pTextPreliminary.SetTextSize(31)
+pTextPreliminary.SetTextAlign(13)
+
+cvC = makeCanvas(ymax=2.)
+polyCExp.Draw("F")
+graphC.Draw("SameL")
+graphC2.Draw("SameP")
+graphCnoda.Draw("SameL")
+graphC_SUS.Draw("SameLP")
+pInfo2.Draw("Same")
+legend1.Draw("Same")
+pTextCMS.Draw("Same")
+pTextPreliminary.Draw("Same")
+pLumi.Draw("Same")
+
+cvC.Print("summaryC.pdf")
+cvC.Print("summaryC.C")
+cvC.Print("summaryC.png")
+
+pTextPreliminary = ROOT.TPaveText(cvxmin+0.09,cvymax+0.05,cvxmin+0.09,cvymax+0.05,"NDC")
+pTextPreliminary.AddText("Simulation Preliminary")
+pTextPreliminary.SetTextFont(53)
+pTextPreliminary.SetTextSize(31)
+pTextPreliminary.SetTextAlign(13)
+pTextPreliminary.Draw("Same")
+
+cvC.Print("summaryC_pas.pdf")
+cvC.Print("summaryC_pas.C")
+cvC.Print("summaryC_pas.png")
+
 
 
 

@@ -98,7 +98,7 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,llpMCEff=1.,systematic
           "$BIN_$PROCESS",
           "$BIN_$PROCESS_$SYSTEMATIC")
           
-    
+    '''
     bbFactory = ch.BinByBinFactory()
     bbFactory.SetAddThreshold(0.1)
     #bbFactory.SetMergeThreshold(0.5)
@@ -107,7 +107,7 @@ def makeDatacard(cats,ctau,signalProc,histPath,outputPath,llpMCEff=1.,systematic
     bbFactory.SetPattern("bb_$BIN_$PROCESS_bin_$#")
     #bbFactory.MergeBinErrors(cb.cp().backgrounds())
     bbFactory.AddBinByBin(cb.cp().process(['WJets','st','ttbar','ZNuNu']+signalProcesses), cb)
-    
+    '''
     
     #required for toys to know it's not unbinned
     dummyObs = []
@@ -277,8 +277,8 @@ for ctau in ctauValues:
                     massesDict[ctau][llpMass].append(lspMass)
                 
 
-basePath = "cards_da"
-histPath = "hists_da"
+basePath = "cards_noda_nomc"
+histPath = "hists_noda"
 if os.path.exists(os.path.join(basePath,'log')):
     pass
 else:
@@ -330,7 +330,7 @@ for ctau in ctauValues:
                 jobToysArrayCfg.append({
                     "path":datacardPath,
                     "cmd": [
-                        "combine -M Significance --setParameterRanges llpEff=0.5,1.5 -1 -t 1000 -s 123%02i45%02i --rMax 1000 --maxTries 10 --cminDefaultMinimizerStrategy 0 --expectSignal=0 -d out.txt"%(i*21+1,i*7+3)
+                        "combine -M Significance --setParameterRanges llpEff=0.5,1.5 -t 1000 -s 123%02i45%02i --rMax 1000 --maxTries 10 --cminDefaultMinimizerStrategy 0 --expectSignal=0 -d out.txt"%(i*21+1,i*7+3)
                     ]
                 })
             

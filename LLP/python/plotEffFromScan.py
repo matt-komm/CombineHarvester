@@ -308,14 +308,14 @@ llp1shi = []
 llp2shi = []
 
 #noda, llp2000_lsp0
-#muLimit = 0.0013313
+#muLimit = 0.0007
 #noda, llp2000_lsp1800
-#muLimit = 0.0190
+#muLimit = 0.050
 
 #da, llp2000_lsp0
 muLimit = 0.0006
 #da, llp2000_lsp1800
-#muLimit = 0.0147
+#muLimit = 0.049
 
 grid = {'logmu':[],'llpEff':[],'deltaNLL':[]}
 
@@ -382,7 +382,7 @@ cv = ROOT.TCanvas("cv","",800,670)
         
 cvxmin=0.13
 cvxmax=0.82
-cvymin=0.275
+cvymin=0.125
 cvymax=0.935
 
 cv.SetLeftMargin(cvxmin)
@@ -395,8 +395,8 @@ cv.SetBottomMargin(cvymin)
 
 cv.SetLogx(1)
 
-xBinning = numpy.logspace(math.log10(0.5),math.log10(100),51)
-yBinning = numpy.linspace(0.0,1.2,51)
+xBinning = numpy.logspace(math.log10(0.5),math.log10(50),151)
+yBinning = numpy.linspace(0.0,1.2,151)
 
 axis = ROOT.TH2F("axis",";;",
     len(xBinning)-1,xBinning,
@@ -496,7 +496,7 @@ effLine.SetLineColor(1)
 effLine.SetLineWidth(1)
 effLine.SetLineStyle(1)
 effLine.Draw("L")
-
+'''
 axisXsec = ROOT.TGaxis(
     0,-0.28,
     100,-0.28,
@@ -510,7 +510,7 @@ axisXsec.SetLabelSize(29)
 axisXsec.SetTitleOffset(1.16)
 axisXsec.SetTitle("Cross section (pb)")
 axisXsec.Draw("Same")
-
+'''
 pTextCMS = ROOT.TPaveText(cv.GetLeftMargin(),1-cv.GetTopMargin()+0.05,cv.GetLeftMargin(),1-cv.GetTopMargin()+0.05,"NDC")
 pTextCMS.AddText("CMS")
 pTextCMS.SetTextFont(63)
@@ -518,18 +518,13 @@ pTextCMS.SetTextSize(31)
 pTextCMS.SetTextAlign(13)
 pTextCMS.Draw("Same")
 
-pTextPreliminary = ROOT.TPaveText(cv.GetLeftMargin()+0.088,1-cv.GetTopMargin()+0.05,cv.GetLeftMargin()+0.088,1-cv.GetTopMargin()+0.05,"NDC")
-pTextPreliminary.AddText("Simulation")
-pTextPreliminary.SetTextFont(53)
-pTextPreliminary.SetTextSize(31)
-pTextPreliminary.SetTextAlign(13)
-pTextPreliminary.Draw("Same")
+
 
 
 pInfo = ROOT.TPaveText(1-cv.GetRightMargin()-0.04,cv.GetBottomMargin()+0.03,1-cv.GetRightMargin()-0.04,cv.GetBottomMargin()+0.22,"NDC")
 pInfo.AddText("pp#kern[-0.5]{ }#rightarrow#kern[-0.5]{ }"+gSymbol+"#kern[-0.6]{ }"+gSymbol+", "+gSymbol+"#kern[-0.5]{ }#rightarrow#kern[-0.5]{ }q#kern[-0.7]{ }q#lower[-0.8]{#kern[-0.89]{#minus}}#kern[-0.6]{ }"+chiSymbol)
-#pInfo.AddText(mgSymbol+"#kern[-0.4]{ }=#kern[-0.5]{ }2 TeV, "+mchiSymbol+"#kern[-0.4]{ }=#kern[-0.5]{ }200 GeV")
-pInfo.AddText(mgSymbol+"#kern[-0.4]{ }=#kern[-0.5]{ }2 TeV, "+mchiSymbol+"#kern[-0.4]{ }=#kern[-0.5]{ }1.8 TeV")
+pInfo.AddText(mgSymbol+"#kern[-0.4]{ }=#kern[-0.5]{ }2 TeV, "+mchiSymbol+"#kern[-0.4]{ }=#kern[-0.5]{ }0 GeV")
+#pInfo.AddText(mgSymbol+"#kern[-0.4]{ }=#kern[-0.5]{ }2 TeV, "+mchiSymbol+"#kern[-0.4]{ }=#kern[-0.5]{ }1.8 TeV")
 pInfo.AddText("c#tau#kern[-0.5]{ }=#kern[-0.8]{ }10 mm")
 pInfo.SetTextFont(43)
 pInfo.SetTextSize(27)
@@ -547,8 +542,26 @@ legend.Draw("Same")
     
 #ROOT.gPad.RedrawAxis()
 
+pTextPreliminary = ROOT.TPaveText(cv.GetLeftMargin()+0.088,1-cv.GetTopMargin()+0.05,cv.GetLeftMargin()+0.088,1-cv.GetTopMargin()+0.05,"NDC")
+pTextPreliminary.AddText("Simulation")
+pTextPreliminary.SetTextFont(53)
+pTextPreliminary.SetTextSize(31)
+pTextPreliminary.SetTextAlign(13)
+pTextPreliminary.Draw("Same")
+
 cv.Print(output+".pdf")
 cv.Print(output+".png")
 cv.Print(output+".C")
-cv.WaitPrimitive()
+
+pTextPreliminary = ROOT.TPaveText(cv.GetLeftMargin()+0.088,1-cv.GetTopMargin()+0.05,cv.GetLeftMargin()+0.088,1-cv.GetTopMargin()+0.05,"NDC")
+pTextPreliminary.AddText("Simulation Preliminary")
+pTextPreliminary.SetTextFont(53)
+pTextPreliminary.SetTextSize(31)
+pTextPreliminary.SetTextAlign(13)
+pTextPreliminary.Draw("Same")
+
+cv.Print(output+"_pas.pdf")
+cv.Print(output+"_pas.png")
+cv.Print(output+"_pas.C")
+
 
