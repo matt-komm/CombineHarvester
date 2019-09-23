@@ -330,7 +330,7 @@ for ctau in ctauValues:
                 jobToysArrayCfg.append({
                     "path":datacardPath,
                     "cmd": [
-                        "combine -M Significance --setParameterRanges llpEff=0.5,1.5 -t 1000 -s 123%02i45%02i --rMax 1000 --maxTries 10 --cminDefaultMinimizerStrategy 0 --expectSignal=0 -d out.txt"%(i*21+1,i*7+3)
+                        "combine -M Significance --setParameters llpEff=1.0 --freezeParameters llpEff -t 1000 -s 123%02i45%02i --rMax 1000 --maxTries 10 --X-rtd MINIMIZER_analytic --X-rtd MINIMIZER_MaxCalls=9999999 --cminPreScan --cminDefaultMinimizerStrategy 0 --expectSignal=0 -d out.txt"%(i*21+1,i*7+3)
                     ]
                 })
             

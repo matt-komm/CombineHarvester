@@ -317,6 +317,7 @@ muLimit = 0.0006
 #da, llp2000_lsp1800
 #muLimit = 0.049
 
+
 grid = {'logmu':[],'llpEff':[],'deltaNLL':[]}
 
 signalCross = 1
@@ -403,8 +404,8 @@ axis = ROOT.TH2F("axis",";;",
     len(yBinning)-1,yBinning
 )
 
-axis.GetXaxis().SetTitle("#mu#kern[-0.6]{ }#lower[0.05]{#scale[1.1]{/}}#mu#lower[0.3]{#scale[0.7]{Limit}}")
-axis.GetYaxis().SetTitle("Tagging efficiency SF")
+axis.GetXaxis().SetTitle("r#kern[-0.6]{ }#lower[0.05]{#scale[1.1]{/}}r#lower[0.3]{#scale[0.7]{UL}}")
+axis.GetYaxis().SetTitle("SF for efficiency (LLP label)")
 axis.GetZaxis().SetTitle("-2#kern[-0.5]{ }#Delta#kern[-0.6]{ }ln(L)")
 padW = ROOT.gPad.GetWw()*ROOT.gPad.GetAbsWNDC()
 padH = ROOT.gPad.GetWh()*ROOT.gPad.GetAbsHNDC()
@@ -435,35 +436,35 @@ axis.GetZaxis().SetRangeUser(0,8)
 if s1locross>0:
     lines1lo = ROOT.TLine(axis.GetXaxis().GetXmin(),s1locross,1,s1locross)
     lines1lo.SetLineWidth(2)
-    lines1lo.SetLineStyle(3)
+    lines1lo.SetLineStyle(2)
     lines1lo.SetLineColor(0)
     lines1lo.Draw("L")
     
 if s1hicross>0:
     lines1hi = ROOT.TLine(axis.GetXaxis().GetXmin(),s1hicross,1,s1hicross)
     lines1hi.SetLineWidth(2)
-    lines1hi.SetLineStyle(3)
+    lines1hi.SetLineStyle(2)
     lines1hi.SetLineColor(0)
     lines1hi.Draw("L")
     
 if s2locross>0:
     lines2lo = ROOT.TLine(axis.GetXaxis().GetXmin(),s2locross,1,s2locross)
     lines2lo.SetLineWidth(2)
-    lines2lo.SetLineStyle(3)
+    lines2lo.SetLineStyle(2)
     lines2lo.SetLineColor(0)
     lines2lo.Draw("L")
     
 if s2hicross>0:
     lines2hi = ROOT.TLine(axis.GetXaxis().GetXmin(),s2hicross,1,s2hicross)
     lines2hi.SetLineWidth(2)
-    lines2hi.SetLineStyle(3)
+    lines2hi.SetLineStyle(2)
     lines2hi.SetLineColor(0)
     lines2hi.Draw("L")
     
 limitLine = ROOT.TLine(1,axis.GetYaxis().GetXmin(),1,axis.GetYaxis().GetXmax())
 limitLine.SetLineColor(0)
 limitLine.SetLineWidth(2)
-limitLine.SetLineStyle(3)
+limitLine.SetLineStyle(2)
 limitLine.Draw("L")
     
 ROOT.gPad.RedrawAxis()
@@ -481,11 +482,11 @@ graph1slo.Draw("L")
 graph1shi.Draw("L")
 
 graph2slo.SetLineColor(color2s.GetNumber())
-graph2slo.SetLineWidth(3)
+graph2slo.SetLineWidth(2)
 graph2slo.SetLineStyle(2)
 
 graph2shi.SetLineColor(color2s.GetNumber())
-graph2shi.SetLineWidth(3)
+graph2shi.SetLineWidth(2)
 graph2shi.SetLineStyle(2)
 
 graph2slo.Draw("L")
@@ -525,7 +526,7 @@ pInfo = ROOT.TPaveText(1-cv.GetRightMargin()-0.04,cv.GetBottomMargin()+0.03,1-cv
 pInfo.AddText("pp#kern[-0.5]{ }#rightarrow#kern[-0.5]{ }"+gSymbol+"#kern[-0.6]{ }"+gSymbol+", "+gSymbol+"#kern[-0.5]{ }#rightarrow#kern[-0.5]{ }q#kern[-0.7]{ }q#lower[-0.8]{#kern[-0.89]{#minus}}#kern[-0.6]{ }"+chiSymbol)
 pInfo.AddText(mgSymbol+"#kern[-0.4]{ }=#kern[-0.5]{ }2 TeV, "+mchiSymbol+"#kern[-0.4]{ }=#kern[-0.5]{ }0 GeV")
 #pInfo.AddText(mgSymbol+"#kern[-0.4]{ }=#kern[-0.5]{ }2 TeV, "+mchiSymbol+"#kern[-0.4]{ }=#kern[-0.5]{ }1.8 TeV")
-pInfo.AddText("c#tau#kern[-0.5]{ }=#kern[-0.8]{ }10 mm")
+pInfo.AddText("c#tau#lower[0.3]{#scale[0.7]{0}}#kern[-0.5]{ }=#kern[-0.8]{ }10 mm")
 pInfo.SetTextFont(43)
 pInfo.SetTextSize(27)
 pInfo.SetTextAlign(33)

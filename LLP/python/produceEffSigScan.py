@@ -6,8 +6,8 @@ import math
 import numpy
 import scipy.interpolate
 
-name = "llpScan_ctau1_llp2000_lsp1800_da"
-dataCard = "/vols/build/cms/mkomm/LLP/CMSSW_8_1_0/src/cards_da/ctau1_llp2000_lsp1800/out.txt"
+name = "llpScan_ctau1_llp1000_lsp800_noda"
+dataCard = "/vols/build/cms/mkomm/LLP/CMSSW_8_1_0/src/cards_noda/ctau1_llp1000_lsp800/out.txt"
 basePath = "/vols/build/cms/mkomm/LLP/CMSSW_8_1_0/src/"+name
 
 
