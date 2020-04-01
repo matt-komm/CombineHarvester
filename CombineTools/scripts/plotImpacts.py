@@ -16,13 +16,26 @@ parser.add_argument('--output', '-o', help='name of the output file to create')
 parser.add_argument('--translate', '-t', help='JSON file for remapping of parameter names')
 parser.add_argument('--units', default=None, help='Add units to the best-fit parameter value')
 parser.add_argument('--per-page', type=int, default=30, help='Number of parameters to show per page')
+parser.add_argument('--max-pages', type=int, default=None, help='Maximum number of pages to write')
+parser.add_argument('--height', type=int, default=600, help='Canvas height, in pixels')
+parser.add_argument('--left-margin', type=float, default=0.4, help='Left margin, expressed as a fraction')
+parser.add_argument('--label-size', type=float, default=0.021, help='Parameter name label size')
 parser.add_argument('--cms-label', default='Internal', help='Label next to the CMS logo')
 parser.add_argument('--transparent', action='store_true', help='Draw areas as hatched lines instead of solid')
 parser.add_argument('--checkboxes', action='store_true', help='Draw an extra panel with filled checkboxes')
 parser.add_argument('--blind', action='store_true', help='Do not print best fit signal strength')
 parser.add_argument('--color-groups', default=None, help='Comma separated list of GROUP=COLOR')
+parser.add_argument("--pullDef",  default=None, help="Choose the definition of the pull, see HiggsAnalysis/CombinedLimit/python/calculate_pulls.py for options")
 parser.add_argument('--POI', default=None, help='Specify a POI to draw')
 args = parser.parse_args()
+
+if args.transparent:
+    print 'plotImpacts.py: --transparent is now always enabled, the option will be removed in a future update'
+
+externalPullDef = False
+if args.pullDef is not None:
+    externalPullDef = True
+    import HiggsAnalysis.CombinedLimit.calculate_pulls as CP
 
 
 def Translate(name, ndict):
@@ -52,7 +65,7 @@ with open(args.input) as jsonfile:
     data = json.load(jsonfile)
 
 # Set the global plotting style
-plot.ModTDRStyle(l=0.4, b=0.10, width=(900 if args.checkboxes else 700))
+plot.ModTDRStyle(l=args.left_margin, b=0.10, width=(900 if args.checkboxes else 700), height=args.height)
 
 # We will assume the first POI is the one to plot
 POIs = [ele['name'] for ele in data['POIs']]
@@ -76,6 +89,8 @@ if args.checkboxes:
 # Set the number of parameters per page (show) and the number of pages (n)
 show = args.per_page
 n = int(math.ceil(float(len(data['params'])) / float(show)))
+if args.max_pages is not None and args.max_pages > 0:
+    n = args.max_pages
 
 colors = {
     'Gaussian': 1,
@@ -155,14 +170,21 @@ for page in xrange(n):
         if pdata[p]['type'] != 'Unconstrained':
             pre_err_hi = (pre[2] - pre[1])
             pre_err_lo = (pre[1] - pre[0])
-            pull = fit[1] - pre[1]
-            pull = (pull/pre_err_hi) if pull >= 0 else (pull/pre_err_lo)
-            pull_hi = fit[2] - pre[1]
-            pull_hi = (pull_hi/pre_err_hi) if pull_hi >= 0 else (pull_hi/pre_err_lo)
-            pull_hi = pull_hi - pull
-            pull_lo = fit[0] - pre[1]
-            pull_lo = (pull_lo/pre_err_hi) if pull_lo >= 0 else (pull_lo/pre_err_lo)
-            pull_lo =  pull - pull_lo
+
+            if externalPullDef:
+                fit_err_hi = (fit[2] - fit[1])
+                fit_err_lo = (fit[1] - fit[0])
+                pull, pull_hi, pull_lo = CP.returnPullAsym(args.pullDef,fit[1],pre[1],fit_err_hi,pre_err_hi,fit_err_lo,pre_err_lo)
+            else:
+                pull = fit[1] - pre[1]
+                pull = (pull/pre_err_hi) if pull >= 0 else (pull/pre_err_lo)
+                pull_hi = fit[2] - pre[1]
+                pull_hi = (pull_hi/pre_err_hi) if pull_hi >= 0 else (pull_hi/pre_err_lo)
+                pull_hi = pull_hi - pull
+                pull_lo = fit[0] - pre[1]
+                pull_lo = (pull_lo/pre_err_hi) if pull_lo >= 0 else (pull_lo/pre_err_lo)
+                pull_lo =  pull - pull_lo
+
             g_pulls.SetPoint(i, pull, float(i) + 0.5)
             g_pulls.SetPointError(
                 i, pull_lo, pull_hi, 0., 0.)
@@ -192,14 +214,21 @@ for page in xrange(n):
         max_impact = max(
             max_impact, abs(imp[1] - imp[0]), abs(imp[2] - imp[1]))
         col = colors.get(tp, 2)
-        if args.color_groups is not None and len(pdata[p]['groups']) == 1:
-            col = color_groups.get(pdata[p]['groups'][0], 1)
+        if args.color_groups is not None and len(pdata[p]['groups']) >= 1:
+            for p_grp in pdata[p]['groups']:
+                if p_grp in color_groups:
+                    col = color_groups[p_grp]
+                    break
         h_pulls.GetYaxis().SetBinLabel(
             i + 1, ('#color[%i]{%s}'% (col, Translate(pdata[p]['name'], translate))))
 
     # Style and draw the pulls histo
-    plot.Set(h_pulls.GetXaxis(), TitleSize=0.04, LabelSize=0.03, Title='(#hat{#theta}-#theta_{0})/#Delta#theta')
-    plot.Set(h_pulls.GetYaxis(), LabelSize=0.021, TickLength=0.0)
+    if externalPullDef:
+        plot.Set(h_pulls.GetXaxis(), TitleSize=0.04, LabelSize=0.03, Title=CP.returnTitle(args.pullDef))
+    else:
+        plot.Set(h_pulls.GetXaxis(), TitleSize=0.04, LabelSize=0.03, Title='(#hat{#theta}-#theta_{0})/#Delta#theta')
+
+    plot.Set(h_pulls.GetYaxis(), LabelSize=args.label_size, TickLength=0.0)
     h_pulls.GetYaxis().LabelsOption('v')
     h_pulls.Draw()
 
@@ -250,10 +279,24 @@ for page in xrange(n):
 
     # And back to the second pad to draw the impacts graphs
     pads[1].cd()
-    alpha = 0.7 if args.transparent else 1.0
-    g_impacts_hi.SetFillColor(plot.CreateTransparentColor(46, alpha))
+    alpha = 0.7
+
+    lo_color = {
+        'default': 38,
+        'hesse': ROOT.kOrange - 3,
+        'robust': ROOT.kGreen + 1
+    }
+    hi_color = {
+        'default': 46,
+        'hesse': ROOT.kBlue,
+        'robust': ROOT.kAzure - 5
+    }
+    method = 'default'
+    if 'method' in data and data['method'] in lo_color:
+        method = data['method']
+    g_impacts_hi.SetFillColor(plot.CreateTransparentColor(hi_color[method], alpha))
     g_impacts_hi.Draw('2SAME')
-    g_impacts_lo.SetFillColor(plot.CreateTransparentColor(38, alpha))
+    g_impacts_lo.SetFillColor(plot.CreateTransparentColor(lo_color[method], alpha))
     g_impacts_lo.Draw('2SAME')
     pads[1].RedrawAxis()
 
