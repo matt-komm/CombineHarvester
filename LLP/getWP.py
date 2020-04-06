@@ -1,12 +1,31 @@
+import uproot
 import ROOT
-import math
-import os
-import yaml
 import json
+import os
+import numpy as np
+import yaml
 
-# path to processed nanoAOD ntuples
+
 ntuple_path = "/vols/cms/vc1117/LLP/nanoAOD_friends/HNL/25Mar20/"
 lumi = {"2016": 35.88, "2017": 41.53, "2018": 58.83}
+
+tagger_strings = ["lepJet_llpdnnx_-1_isLLP_QMU_QQMU",
+                  "lepJet_llpdnnx_0_isLLP_QMU_QQMU",
+                  "lepJet_llpdnnx_1_isLLP_QMU_QQMU",
+                  "lepJet_llpdnnx_2_isLLP_QMU_QQMU",
+                  "lepJet_llpdnnx_3_isLLP_QMU_QQMU",
+                 ]
+combined_tagger_values = {}
+combined_weight_values = {}
+
+with open("/vols/build/cms/LLP/SM_xsec.yaml") as yaml_file:
+    xsecs = yaml.load(yaml_file, Loader=yaml.FullLoader)
+
+
+for tagger_string in tagger_strings:
+   combined_tagger_values[tagger_string] = []
+   combined_weight_values[tagger_string] = []
+
 
 
 def find_xsec(path, xsecs):
@@ -15,85 +34,53 @@ def find_xsec(path, xsecs):
             return val
     return 1
 
+def selection(tree):
+    sel = (tree.array("MET_pt") < 100.) & \
+          (tree.array("nselectedJets") < 6) & \
+          (tree.array("EventObservables_ht") < 200.) & \
+          (tree.array("dimuon_mass") < 80.) & \
+          (tree.array("dimuon_mass") > 30.) & \
+          (tree.array("nlepJet") == 1)
+    return sel
 
-with open("/vols/build/cms/LLP/xsecs.yaml") as yaml_file:
-    xsecs = yaml.load(yaml_file, Loader=yaml.FullLoader)
-
-
-def getWP(sumHist, n_expected=3.):
-    for i in reversed(range(sumHist.GetNbinsX()+1)):
-        integral = 0
-        for j in range(i, sumHist.GetNbinsX()+1):
-            integral += sumHist.GetBinContent(j)*sumHist.GetBinError(j)
-        n_entries = sumHist.Integral(i, sumHist.GetNbinsX()+1)
-        print(i, integral, n_entries)
-        if integral >= n_expected:
-            return sumHist.GetBinCenter(i), n_entries
-    print("Could not find WP! returning -1")
-    return -1
-
-
-# This class prepares a given sample by scaling to int. luminosity
-class Sample:
-    def __init__(self, name, paths, isMC=True, year="2016"):
-        self.paths = paths
-        self.name = name
-        self.file_list = ROOT.std.vector('string')()
-        self.sum_weight = 0
-        self.isMC = isMC
-        for path in self.paths:
-            for f in os.listdir(os.path.join(ntuple_path, path)):
-                self.file_list.push_back(os.path.join(ntuple_path, path, f))
-            if self.isMC:
-                self.sum_weight += yields[path]["weighted"]
-        self.rdf = ROOT.RDataFrame("Friends", self.file_list)
-        if self.isMC:
-            xsec = find_xsec(path, xsecs)
-            # print(path, xsecs)
-            self.rdf = self.rdf.Define("weightLumi", "IsoMuTrigger_weight_trigger_nominal * \
-                                        MET_filter*tightMuon_weight_iso_nominal * \
-                                        tightMuon_weight_id_nominal*looseMuons_weight_id_nominal*\
-                                        puweight*genweight*%s*1000.0*%s/%s"
-                                        % (lumi[year], xsec, self.sum_weight))
-        else:
-            self.rdf = self.rdf.Define("weightLumi", "1")
-
-        self.hists = []
-        print("RDF "+name+ " has entries: "+str(self.rdf.Count().GetValue()))
+def weight(tree, xsec, exp_yield):
+    weight = tree.array("IsoMuTrigger_weight_trigger_nominal") \
+            * tree.array("MET_filter") \
+            * tree.array("tightMuon_weight_iso_nominal") \
+            * tree.array("tightMuon_weight_id_nominal") \
+            * tree.array("looseMuons_weight_id_nominal") \
+            * tree.array("puweight") \
+            * tree.array("genweight") \
+            * 1000.0*xsec/exp_yield
+    return weight
 
 
-# A process is a combination of several "Samples" which are all added up internally
-class Process:
-    def __init__(self, name):
-        self.name = name
-        self.rdfs = []
-        self.hists = []
+def Sample(name, paths, year="2016"):
+    print("Reading in ", name)
+    tagger_values = {}
+    for tagger_string in tagger_strings:
+        tagger_values[tagger_string] = []
+    file_path = os.path.join(ntuple_path, paths[0])
+    xsec = find_xsec(paths[0], xsecs)
+    exp_yield = yields[paths[0]]["weighted"]
+    for file in os.listdir(file_path):
+        tree = uproot.open(os.path.join(file_path, file))["Friends"]
+        for tagger_string in tagger_strings:
+            sr_selection = selection(tree)
+            tagger_array = tree.array(tagger_string)
+            weight_array = weight(tree, xsec, exp_yield)
+            weight_array = weight_array[sr_selection!=0]
+            tagger_array = tagger_array[sr_selection!=0].flatten()
+            combined_tagger_values[tagger_string].extend(tagger_array)
+            combined_weight_values[tagger_string].extend(weight_array)
 
-    def add(self, *args):
-        for arg in args:
-            self.rdfs.append(arg.rdf)
 
-    def Histo1D(self, args, varexp, weight):
-        category = args[0]
-        for i, rdf in enumerate(self.rdfs):
-            _rdf = rdf.Define(category, varexp)
-            if i == 0:
-                hist = _rdf.Histo1D(args, category)
-            else:
-                tmp_hist = _rdf.Histo1D(args, category)
-                hist.Add(tmp_hist.GetValue())
-
-        hist.SetName(self.name)
-        hist.SetTitle(self.name)
-        self.hists.append(hist)
-        return self.hists[-1]
 
 # for year in ["2018", "2017", "2016"]:
 for year in ["2016"]:
     # Read in event yields and cross-sections for normalisation
     with open("/home/hep/vc1117/LLP/selection/eventyields"+year+".json") as json_file:
         yields = json.load(json_file)
-
     if year == "2016":
         qcd_15to20 = Sample("qcd_15to20", ["QCD_Pt-15to20_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8-"+year], year=year) 
         qcd_20to30 = Sample("qcd_20to30", ["QCD_Pt-20to30_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8-"+year], year=year)
@@ -131,7 +118,6 @@ for year in ["2016"]:
         else:
             ttsemilep = Sample("ttsemilep", ["TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8-"+year], year=year)
             ttdilep = Sample("ttdilep", ["TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8-"+year], year=year)
-           
     if year == "2016":
         #runb = Sample("RunBv2", ["SingleMuon_Run2016B_ver2"], isMC=False)
         #rune = Sample("RunE", ["SingleMuon_Run2016E"], isMC=False)
@@ -165,58 +151,14 @@ for year in ["2016"]:
         dy1jets = Sample("dy1jets", ["DYJetsToLL_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8-2018"], year=year)
         dy2jets = Sample("dy2jets", ["DYJetsToLL_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8-2018"], year=year)
 
-    '''
-    runc = Sample("RunC", ["SingleMuon_Run"+year+"C"], isMC=False)
-    rund = Sample("RunD", ["SingleMuon_Run"+year+"D"], isMC=False)
-    data = Process("data", "data", "#000000")
-    if year == "2016":
-        data.add(runb, runc, rund, rune, runf, rung, runh)
-    elif year == "2017":
-        data.add(runb, runc, rund, rune, runf)
-    elif year == "2018":
-        data.add(runa, runb, runc, rund)
-    #processes = [wjets, dyjets, tt, qcd, data]
-    '''
-
-    wjets = Process("wjets")
-    wjets.add(w0jets, w1jets, w2jets)
-    dyjets = Process("dyjets")
-    if year == "2016":
-        dyjets.add(dy10to50, dy50)
-    else:
-        dyjets.add(dy0jets, dy1jets, dy2jets)
-
-    tt = Process("ttbar")
-    tt.add(ttsemilep, ttdilep)
-    qcd = Process("qcd")
-    qcd.add(qcd_15to20, qcd_20to30, qcd_30to50, qcd_50to80, qcd_80to120, qcd_120to170, qcd_170to300, qcd_300to470, qcd_470to600, qcd_600to800, qcd_800to1000, qcd_1000toInf)
-
-    processes = [wjets, dyjets, tt, qcd]
-
-    background_processes = processes
-
-    for proc in os.listdir(ntuple_path):
-        if "HeavyNeutrino" not in proc:
-            continue
-        short_name = proc.replace('HeavyNeutrino_lljj_', '').replace('_mu_Dirac_Moriond17_aug2018_miniAODv3-2016', '')
-        sample = Sample(short_name, [proc])
-        processes.extend([Process(short_name)])
-        processes[-1].add(sample)
-
-    signal_region_cut = "(weightLumi)*(ntightMuon == 1)*(nlepJet == 1)* \
-                         (MET_pt < 100)*(nselectedJets<6)* \
-                         (EventObservables_ht<200)* \
-                         (dimuon_mass >30)*(dimuon_mass<80)"
-
-    total_cut = "(lepJet_llpdnnx_0_isLLP_QMU_QQMU>0.9953703)+(lepJet_llpdnnx_1_isLLP_QMU_QQMU>0.9993086)+(lepJet_llpdnnx_2_isLLP_QMU_QQMU>0.9996923)+(lepJet_llpdnnx_3_isLLP_QMU_QQMU>0.99999833)"
-    root_file = ROOT.TFile.Open("hists/merged.root", "RECREATE")
-    root_file.cd()
-    root_file.mkdir("merged")
-    root_file.cd("merged")
-    for i, process in enumerate(processes):
-        hist = process.Histo1D(("merged", "merged", 2, 0, 2),
-                               total_cut, signal_region_cut,
-                               )
-        hist.SetDirectory(root_file)
-        hist.Write()
-    root_file.Close()
+    for key, array in combined_tagger_values.items():
+        indices = np.argsort(array)
+        sorted_array = np.array(array)[indices]
+        sorted_weights = np.array(combined_weight_values[key])[indices]
+        exp_count = 0
+        for i in reversed(range(len(sorted_array))):
+            exp_count += sorted_weights[i]
+            if exp_count >= 5:
+                print("(%s>%s)" % (key, sorted_array[i]))
+                break
+        
