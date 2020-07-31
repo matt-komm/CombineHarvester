@@ -18,7 +18,7 @@ tagger_strings = ["lepJet_llpdnnx_-1_isLLP_QMU_QQMU",
 combined_tagger_values = {}
 combined_weight_values = {}
 
-with open("/vols/build/cms/LLP/SM_xsec.yaml") as yaml_file:
+with open("/vols/build/cms/LLP/xsec.yaml") as yaml_file:
     xsecs = yaml.load(yaml_file, Loader=yaml.FullLoader)
 
 
@@ -35,11 +35,11 @@ def find_xsec(path, xsecs):
     return 1
 
 def selection(tree):
-    sel = (tree.array("MET_pt") < 100.) & \
+    sel = (tree.array("MET_pt") < 80.) & \
           (tree.array("nselectedJets") < 6) & \
-          (tree.array("EventObservables_ht") < 200.) & \
+          (tree.array("EventObservables_ht") < 180.) & \
           (tree.array("dimuon_mass") < 80.) & \
-          (tree.array("dimuon_mass") > 30.) & \
+          (tree.array("dimuon_mass") > 20.) & \
           (tree.array("nlepJet") == 1)
     return sel
 
@@ -158,7 +158,7 @@ for year in ["2016"]:
         exp_count = 0
         for i in reversed(range(len(sorted_array))):
             exp_count += sorted_weights[i]
-            if exp_count >= 5:
+            if exp_count >= 10:
                 print("(%s>%s)" % (key, sorted_array[i]))
                 break
         

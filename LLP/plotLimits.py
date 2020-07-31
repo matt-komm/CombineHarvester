@@ -2,116 +2,183 @@ import style
 import ROOT
 import json
 from array import array
-from scipy.interpolate import bisplrep, bisplev
+from scipy import optimize
 import numpy as np
+import math
+import matplotlib.pyplot as plt
 
-
-# open store theory cross-sections and expected limits
-with open('limitDict.json') as f:
-    limitDict = json.load(f)
-
-
-with open('/vols/build/cms/LLP/HNL_xsec.json') as f:
-    xsecDict = json.load(f)
-
+lumi = {"2016": 35.88, "2017": 41.53, "2018": 59.74}
 
 def interpolatedTH2D(masses, couplings, values):
-    # construct a spline to interpolate
-    couplings = np.log10(couplings)
-    # m, log10(v^2), value
-    # limit_spline = bisplrep(masses, couplings, values, kx=2, ky=2, s=0.1)
-    interpolation = bisplrep(masses, couplings, values, kx=3, ky=3, quiet=0, s=0.2)
-    coupling_range = np.arange(-10, -0.5, step=0.5)
-    log_coupling_range = np.power(10, coupling_range)
-    mass_range = np.arange(1, 20.5, step=0.5)
+    log_couplings = np.log10(couplings)
 
-    # interpolated_limits = bisplev(mass_range, coupling_range, limit_spline)
-    interpolated_limits = bisplev(mass_range, coupling_range, interpolation)
-    grid_hist = ROOT.TH2D("", "", mass_range.size-1, mass_range, log_coupling_range.size-1, log_coupling_range)
-    for ibin in range(grid_hist.GetNbinsX()+1):
-        for jbin in range(grid_hist.GetNbinsY()+1):
-            grid_hist.SetBinContent(ibin, jbin, interpolated_limits[ibin,jbin])
-    return grid_hist
+    hist = ROOT.TH2D("", "", mass_range.size-1, mass_range,
+                     coupling_range.size-1, coupling_range)
+
+    graph = ROOT.TGraph2D(len(masses), array('d', masses),
+                          array('d', log_couplings), array('d', values))
+    graph.SetNpx(500)
+    graph.SetNpy(500)
+    interpolated_hist = graph.GetHistogram()
+
+    for ibin in range(hist.GetNbinsX()+1):
+        for jbin in range(hist.GetNbinsY()+1):
+            mass = hist.GetXaxis().GetBinCenter(ibin+1)
+            coupling = math.log10(hist.GetYaxis().GetBinCenter(jbin+1))
+            xbin = interpolated_hist.GetXaxis().FindBin(mass)
+            ybin = interpolated_hist.GetYaxis().FindBin(coupling)
+            hist.SetBinContent(ibin+1, jbin+1,
+                               interpolated_hist.GetBinContent(xbin, ybin))
+    return hist
+
+def fittedXsec(function, args):
+    hist = ROOT.TH2D("", "", mass_range.size-1, mass_range,
+                     coupling_range.size-1, coupling_range)
+
+    for ibin in range(hist.GetNbinsX()+1):
+        for jbin in range(hist.GetNbinsY()+1):
+            mass = hist.GetXaxis().GetBinCenter(ibin+1)
+            coupling = (hist.GetYaxis().GetBinCenter(jbin+1))
+            hist.SetBinContent(ibin+1, jbin+1, coupling*function(mass, *args))
+    return hist    
 
 
+
+def findExclusion(hist1, hist2):
+    hist = hist1.Clone()
+    hist.Divide(hist2)
+    graph = ROOT.TGraph()
+    i = 0
+    for ibin in range(hist.GetNbinsX()+1):
+        limit_min = 1.
+        y_min = 0.1
+        x = hist.GetXaxis().GetBinCenter(ibin)
+        for jbin in range(hist.GetNbinsY()+1):
+            if hist.GetBinContent(ibin+1, jbin+1) < 1. and hist.GetBinContent(ibin+1, jbin+1) > 0.:
+                y = hist.GetYaxis().GetBinCenter(jbin)
+                if y < y_min:
+                    y_min = y
+        if y_min != 0.1:
+            graph.SetPoint(i, x, y_min)
+            i += 1
+    graph.SetLineWidth(2)
+    return graph
 # store information in dictionaries
 
-preds = {}
-npoints = len(limitDict)
-for point, results in limitDict.items():
-    fragments = point.split('-')
-    mass = float(fragments[1].split('_')[0])
-    preds[mass] = []
+# open store theory cross-sections and expected limits
 
-for point, results in limitDict.items():
-    fragments = point.split('-')
-    mass = float(fragments[1].split('_')[0])
-    coupling = fragments[2].replace('_', '.').replace('e', '')
-    if len(fragments) > 3:
-        exponent = "e-"+fragments[3]
-    else:
-        exponent = "e0"
-    coupling = float(coupling+exponent)
-    coupling *= coupling
-    preds[mass].extend([{coupling: results}])
+'''
+matthias_points_mass = []
+matthias_points_couplings = []
+with open('points.txt') as f:
+    for l in f:
+        matthias_points_mass.append(float(l.strip().split(" ")[1]))
+        matthias_points_couplings.append(float(l.strip().split(" ")[2])**2)
+print(matthias_points_mass, matthias_points_couplings)
+matthias_points = ROOT.TGraph(len(matthias_points_mass), np.asarray(matthias_points_mass), np.asarray(matthias_points_couplings))
+matthias_points.SetMarkerColor(ROOT.kBlue)
+'''
+
+with open('xsec.json') as f:
+    xsecDict = json.load(f)
+for year in ["2016"]:
+
+    with open("limitDict"+year+".json") as f:
+        limitDict = json.load(f)
+    log_coupling_range = np.arange(-8, -0.5, step=0.1)
+    #mass_range = np.arange(1, 20.5, step=0.25)
+    mass_range = np.arange(1, 10.5, step=0.25)
+    coupling_range = np.power(10, log_coupling_range)
 
 
-masses = []
-couplings = []
-exp_limits = []
+    preds = {}
+    npoints = len(limitDict)
+    for point, results in limitDict.items():
+        fragments = point.split('_')
+        mass = float(fragments[5].replace('massHNL', '').replace('p', '.'))
+        preds[mass] = []
 
-for mass, coupling_dicts in preds.items():
-    for coupling_dict in coupling_dicts:
-        for coupling, result in coupling_dict.items():
-            expected = result["exp0"]
-            if expected < 1:
+    for point, results in limitDict.items():
+        fragments = point.split('_')
+        mass = float(fragments[5].replace('massHNL', '').replace('p', '.'))
+        coupling = float(fragments[6].replace('Vall', '').replace('p', '.'))
+        coupling *= coupling
+        print(mass, coupling)
+        preds[mass].extend([{coupling: results}])
+
+    masses = []
+    couplings = []
+    exp_limits = []
+
+    for mass, coupling_dicts in preds.items():
+        for coupling_dict in coupling_dicts:
+            for coupling, result in coupling_dict.items():
+                expected = result["exp0"]
                 masses.append(mass)
                 couplings.append(coupling)
                 exp_limits.append(expected)
-grid_hist = interpolatedTH2D(np.array(masses), np.array(couplings), np.array(exp_limits))
-used_points_graph = ROOT.TGraph(len(masses), array('d', masses), array('d', couplings))
 
-masses = []
-couplings = []
-xsecs = []
-
-for mass, coupling_dicts in xsecDict.items():
-    for coupling_dict in coupling_dicts:
-        for coupling, result in coupling_dict.items():
-            xsec = result["xsec"]
-            masses.append(float(mass))
-            couplings.append(float(coupling))
-            xsecs.append(xsec)
-
-xsec_hist = interpolatedTH2D(np.array(masses), np.array(couplings), np.array(xsecs))
-points_graph = ROOT.TGraph(len(masses), array('d', masses), array('d', couplings))
-
-cv = style.makeCanvas()
-cv.Draw("")
-cv.SetBottomMargin(0.12)
-cv.SetLeftMargin(0.15)
-cv.SetRightMargin(0.2)
-
-cv.SetLogy()
-cv.SetLogz()
-grid_hist.GetXaxis().SetTitle("m_{N} (GeV)")
-grid_hist.GetYaxis().SetTitle("|V_{\muN}|^{2}")
-grid_hist.GetZaxis().SetTitle("95% CL expected limit \sigma (pb)")
-grid_hist.GetZaxis().SetRangeUser(1e-3, 1)   
+    used_points_graph = ROOT.TGraph(len(masses), array('d', masses),
+                                    array('d', couplings))
+    used_points_graph.SetMarkerColor(ROOT.kBlue)
+    limit_hist = interpolatedTH2D(masses, couplings, exp_limits)
 
 
-#div_hist = grid_hist.Clone()
-#div_hist.Divide(xsec_hist)
+    masses = []
+    couplings = []
+    xsecs = []
 
+    for mass, coupling_dicts in xsecDict.items():
+        for coupling_dict in coupling_dicts:
+            for coupling, result in coupling_dict.items():
+                xsec = result["xsec"]
+                masses.append(float(mass))
+                couplings.append(float(coupling))
+                xsecs.append(xsec)
+    all_points_graph = ROOT.TGraph(len(masses), array('d', masses),
+                                   array('d', couplings))
 
-grid_hist.Draw("COLZtext")
-used_points_graph.Draw("SAMEP")
-#div_hist.Draw("COLZ")
-cv.SaveAs("test.pdf")
+    xsec_over_coupling = np.divide(xsecs, couplings)
+    def fit_func(x, a, b, c, d):
+        #print(x)
+        #print(b*x)
+        #print(np.multiply(x, x))
+        return a * (1. + np.multiply(b, x) + c * np.power(x, 2) + d * np.power(x, 3))
 
-xsec_hist.GetZaxis().SetRangeUser(1e-6, 10)
-xsec_hist.Draw("COLZtext")
-points_graph.Draw("SAMEP")
+    params, params_covariance = optimize.curve_fit(fit_func, masses, xsec_over_coupling,
+                                                   p0=[5000, 0.1, 0.001, 0.0001])
 
-#fit xsec hist
-cv.SaveAs("xsec.pdf")
+    xsec_hist = fittedXsec(fit_func, params)
+    exclusion_graph = findExclusion(limit_hist, xsec_hist)
+    cv = style.makeCanvas()
+    cv.Draw("")
+
+    cv.SetLogy()
+    cv.SetLogx()
+    cv.SetLogz()
+    limit_hist.GetXaxis().SetTitle("m_{N} (GeV)")
+    limit_hist.GetYaxis().SetTitle("|V_{\muN}|^{2}")
+    limit_hist.GetZaxis().SetTitle("95% CL expected limit #sigma (pb) #bullet B(W#rightarrow q#bar{q})")
+    limit_hist.GetZaxis().SetRangeUser(1e-3, 1e3)   
+
+    limit_hist.Draw("COLZ")
+    used_points_graph.Draw("PSAME")
+    #matthias_points.Draw("PSAME")
+    exclusion_graph.Draw("LSAME")
+
+    leg = style.makeLegend(0.6, 0.7, 0.4, 0.9)
+    leg.AddEntry(exclusion_graph, "exclusion", "l")
+    leg.AddEntry(used_points_graph, "Matthias points", "p")
+    #leg.AddEntry(matthias_points, "Matthias' points", "p")
+    leg.Draw("SAME")
+    style.makeCMSText(0.17, 0.95, additionalText="Simulation Preliminary")
+    style.makeLumiText(0.9, 0.95, year=year, lumi=lumi[year])
+    cv.SaveAs("test"+year+".pdf")
+
+    xsec_hist.GetXaxis().SetTitle("m_{N} (GeV)")
+    xsec_hist.GetYaxis().SetTitle("|V_{\muN}|^{2}")
+    xsec_hist.GetZaxis().SetTitle("theory \sigma (pb) \cdot BR")
+    xsec_hist.GetZaxis().SetRangeUser(1e-7, 1e3)   
+    xsec_hist.Draw("COLZ")
+    all_points_graph.Draw("LSAME")
+    cv.SaveAs("xsec.pdf")
