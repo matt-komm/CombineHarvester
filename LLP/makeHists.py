@@ -171,6 +171,26 @@ else:
         process.add(Sample(subsample_name, subsample ,year=year))
 
 
+def removeNegEntries(hist):
+    alpha = 1. - 0.6827
+    upErr = ROOT.Math.gamma_quantile_c(alpha/2,1,1)
+    avgWeight = hist.Integral()/hist.GetEntries() if hist.GetEntries()>0 else -1
+    #print "weight",avgWeight
+    for ibin in range(hist.GetNbinsX()):
+        c = hist.GetBinContent(ibin+1)
+        if c<10**-4:
+            hist.SetBinContent(ibin+1,10**-3)
+            #note: in case of 0 entries the uncertainty is also small
+            #(this is not the case with negative events)
+            if hist.GetBinError(ibin+1)<10**-4 and avgWeight>0:
+                #set uncertainties for empy bins
+                #https://twiki.cern.ch/twiki/bin/viewauth/CMS/PoissonErrorBars
+                hist.SetBinError(ibin+1,upErr*avgWeight)
+            else:
+                hist.SetBinError(ibin+1,10**-4)
+        #print "bin%2i, %.1f+-%.1f (+-%.1f%%)"%(ibin,c,hist.GetBinError(ibin+1),100.*hist.GetBinError(ibin+1)/c if c>0 else -1)
+
+
 # create root file with nominal value histogram and various systematic variations
 # to be used with Combine Harvester
 root_file = ROOT.TFile.Open("hists/hist_{}_{}.root".format(proc, year), "RECREATE")
@@ -203,6 +223,7 @@ while coupling < 67:
 
         print(name, varexp, weight)
         hist = process.Histo1D((name, name, 10, 0.5, 10.5), varexp, weight)
+        removeNegEntries(hist)
         hist.SetTitle(name)
         hist.SetName(name)
         hist.SetDirectory(root_file)
@@ -220,6 +241,7 @@ while coupling < 67:
                 weight += "*"+coupling_var
             print(name, category_varexp, weight)
             hist = process.Histo1D((name, name, 10, 0.5, 10.5), category_varexp, weight)
+            removeNegEntries(hist)
             hist.SetTitle(name)
             hist.SetName(name)
             hist.SetDirectory(root_file)
