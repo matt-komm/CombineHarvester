@@ -3,10 +3,12 @@ import ROOT
 import os
 import json
 
+years = ["2016"]
+couplings = [2, 7, 12, 47, 52, 67]
+
 # make a datacard for a single HNL mass/coupling scenario
 def make_datacard(cats, signal_name, output_path, coupling=12):
-    #for year in ["2016", "2017", "2018"]:
-    for year in ["2016"]:
+    for year in years:
         cb = ch.CombineHarvester()
         procs = ["ttbar", "qcd", "wjets", "dyjets"]
         signal = ["hnl"]
@@ -33,7 +35,7 @@ def make_datacard(cats, signal_name, output_path, coupling=12):
               )
 
         cb.cp().backgrounds().ExtractShapes(
-              "CombineHarvester/LLP/hists/hist_{}.root".format(year),
+              "CombineHarvester/LLP/hists/{}.root".format(year),
               "$BIN/$PROCESS_{}".format(year),
               "$BIN/$PROCESS_{}_$SYSTEMATIC".format(year)
               )
@@ -64,36 +66,51 @@ cats = [
 ]
 
 hist_path = "CombineHarvester/LLP/hists/"
+
+n_job = 0
 for proc in os.listdir(hist_path):
     if "HNL" not in proc:
         continue
-    for year in ["2016"]:
+    for year in years:
         if year not in proc:
             continue
-        for coupling in [2, 12, 67]:
+        for coupling in couplings:
+            n_job+=1
+
+submit_file = open("runCombine.sh","w")
+submit_file.write('''#!/bin/bash
+#$ -cwd
+#$ -q hep.q
+#$ -l h_rt=00:30:00 
+#$ -e log/log.$TASK_ID.err
+#$ -o log/log.$TASK_ID.out
+#$ -t 1-'''+str(n_job)+'''
+hostname
+date
+source ~/.cms_setup.sh
+cd /home/hep/vc1117/LLP/CMSSW_10_2_13/src
+eval `scramv1 runtime -sh`
+''')
+
+submit_file.write("JOBS=(\n")
+for proc in os.listdir(hist_path):
+    if "HNL" not in proc:
+        continue
+    for year in years:
+        if year not in proc:
+            continue
+        for coupling in couplings:
             # parse name
             name = proc.replace("_{}.root".format(year), "")
             path = os.path.join('CombineHarvester/LLP/cards/{}/coupling_{}/{}'.format(year, coupling, name))
             make_datacard(cats, name, os.path.join(path), coupling=coupling)
-            os.system("(cd %s && combine -M AsymptoticLimits -t -1 --cminPreScan --cminPreFit 1 \
-                  --rAbsAcc 0.000001 --run expected --X-rtd MINIMIZER_analytic --X-rtd MINIMIZER_MaxCalls=99999999999 \
-                  -d out.txt -n HNL)" % (os.path.join(path)))
-    break
-
-# Needs to be rewritten!
-'''
-for year in ["2016"]:
-#os.system("combineTool.py -M CollectLimits higgsCombineHNL.AsymptoticLimits.mH*.root")
-    os.system("combineTool.py -M CollectLimits higgsCombineHNL.AsymptoticLimits.mH{}*.root".format(year))
-
-    with open('limits.json') as f:
-        combine_json = json.load(f)
-
-    limit_json = {}
-    for key, value in combine_json.iteritems():
-        key = int(float(key.replace(year, "")))
-        limit_json[value_map[key]] = value
-
-    with open('limitDict{}.json'.format(year), 'w') as f:
-        json.dump(limit_json, f)
-'''
+            submit_file.write(" \"")
+            submit_file.write('''combineTool.py -M AsymptoticLimits -t -1 --cminPreScan --cminPreFit 1 --rAbsAcc 0.000001 --run expected --X-rtd MINIMIZER_analytic --X-rtd MINIMIZER_MaxCalls=99999999999 -d %s/out.txt --there -n HNL --mass %i''' % (path, coupling))
+            submit_file.write("\"")
+            
+submit_file.write(")")
+submit_file.write("\n")
+submit_file.write("echo ${JOBS[$SGE_TASK_ID]}")
+submit_file.write("\n")
+submit_file.write("${JOBS[$SGE_TASK_ID]}")
+submit_file.close()

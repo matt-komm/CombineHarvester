@@ -13,7 +13,7 @@ args = parser.parse_args()
 year = args.year
 proc = args.proc
 # path to processed nanoAOD ntuples
-ntuple_path = "/vols/cms/vc1117/LLP/nanoAOD_friends/HNL/30Jul20/"
+ntuple_path = "/vols/cms/vc1117/LLP/nanoAOD_friends/HNL/03Aug20/"
 lumi = {"2016": 35.92, "2017": 41.53, "2018": 59.74}
 
 def find_xsec(path, xsecs):
@@ -29,6 +29,11 @@ with open("samples.yaml") as samples_file:
     samples_dict = yaml.load(samples_file, Loader=yaml.FullLoader)
     sample = samples_dict[proc]
 
+if "HNL" in proc:
+    with open("/vols/build/cms/LLP/gridpackLookupTable.json") as lookup_table_file:
+        lookup_table = json.load(lookup_table_file)[proc]
+    print(lookup_table)
+
 #####################################
 ### Various configurations go here
 
@@ -43,16 +48,17 @@ systDict["puweight"] = "pu"
 # defined by Haifa
 # so far optimised only for dilepton
 def signal_region_cut(syst="nominal"):
-    return "(EventObservables_{}_met)*(nselectedJets_{}<6)*(EventObservables_{}_ht<180.)*(EventObservables_{}_mT_met_lep<80.)".format(syst, syst, syst, syst, syst)
+    #return "(EventObservables_{}_met)*(nselectedJets_{}<6)*(EventObservables_{}_ht<180.)*(EventObservables_{}_mT_met_lep<80.)".format(syst, syst, syst, syst, syst)
+    return "(EventObservables_{}_met<100.)".format(syst)
 
 #### to be optimised by Haifa! ###
 def total_cut(flavour="mu", syst="nominal"):
     if flavour=="mu":
-        return "(category_{}_LLP_MU_jet_output>0.99)".format(syst)
+        return "(category_{}_LLP_QMU_jet_output>0.9||category_{}_LLP_Q_jet_output>0.8)*(bdt_score>0.8)".format(syst, syst)
     elif flavour=="el":
-        return "(category_{}_LLP_E_jet_output>0.99)".format(syst)
+        return "(category_{}_LLP_QE_jet_output>0.9||category_{}_LLP_Q_jet_output>0.8)*(bdt_score>0.8)".format(syst, syst)
     elif flavour=="jet":
-        return "(category_{}_LLP_Q_jet_output>0.9)||(category_{}_LLP_TAU_jet_output>0.9)".format(syst, syst)
+        return "(category_{}_LLP_Q_jet_output>0.8)||(category_{}_LLP_QTAU_jet_output>0.8)".format(syst, syst)
 
 category_varexp = "(category_nominal_muonmuon>0)*({})*(dilepton_charge==-1)*(dilepton_mass>20.)*(dilepton_mass<80.)*1".format(total_cut(flavour="mu"))
 category_varexp = "{}+(category_nominal_muonmuon>0)*({})*(dilepton_charge==1)*(dilepton_mass>20.)*(dilepton_mass<80.)*2".format(category_varexp, total_cut(flavour="mu"))
@@ -96,6 +102,7 @@ class Sample:
         self.rdf = ROOT.RDataFrame("Friends", self.file_list)
         # so far only dilepton
         self.rdf = self.rdf.Filter("EventObservables_nominal_met < 100.")
+
         if self.isMC:
             if "HNL" in name:
                 # 1 pb cross- section
@@ -154,7 +161,7 @@ class Process:
 
 
 # Read in event yields and cross-sections for normalisation
-with open("/vols/build/cms/LLP/yields_200311/{}/eventyields.json".format(year)) as json_file:
+with open("/vols/build/cms/LLP/yields_200720/{}/eventyields.json".format(year)) as json_file:
     yields = json.load(json_file)
 
 # select only the relevant year
@@ -193,11 +200,12 @@ def removeNegEntries(hist):
 
 # create root file with nominal value histogram and various systematic variations
 # to be used with Combine Harvester
-root_file = ROOT.TFile.Open("hists/hist_{}_{}.root".format(proc, year), "RECREATE")
+root_file = ROOT.TFile.Open("hists/{}_{}.root".format(proc, year), "RECREATE")
 root_file.cd()
 root_file.mkdir("category")
 root_file.cd("category")
 coupling = 0
+
 while coupling < 67:
     # different scenarios
     if "hnl" in process.name:
@@ -214,7 +222,7 @@ while coupling < 67:
             name = "{}_{}".format(process.name, year)
         if systName != "nominal":
             name += "_"+systName
-        weight = "{}*weightNominal".format(signal_region_cut(syst=systName))
+        weight = "weightNominal"
         if "hnl" in process.name:
             weight += "*"+coupling_var
 
@@ -236,7 +244,7 @@ while coupling < 67:
                 name = "{}_coupling_{}_{}_{}{}".format(process.name, coupling, year, abrv, variation)
             else:
                 name = "{}_{}_{}{}".format(process.name, year, abrv, variation)
-            weight = "{}*weight_{}{}".format(signal_region_cut(), abrv, variation)
+            weight = "weight_{}{}".format(abrv, variation)
             if "hnl" in process.name:
                 weight += "*"+coupling_var
             print(name, category_varexp, weight)

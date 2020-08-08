@@ -169,7 +169,7 @@ ttbar:
 wjets:
     2016:
         w0jets:
-            ["WToLNu_0J_13TeV-amcatnloFXFX-pythia8-2016"]
+            ["WToLNu_0J_13TeV-amcatnloFXFX-pythia8-ext1-2016"]
         w1jets:
             ["WToLNu_1J_13TeV-amcatnloFXFX-pythia8-2016"]
         w2jets:
@@ -191,7 +191,7 @@ wjets:
 dyjets:
     2016:
         dy10to50:
-            ["DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8-2016"]
+            ["DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8-ext1-2016"]
         dy50:
             ["DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8-ext2-2016"]
     2017:
