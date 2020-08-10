@@ -3,42 +3,126 @@ import math
 import os
 import yaml
 import json
+import argparse
 
+# make histograms per year, process
+parser = argparse.ArgumentParser()
+parser.add_argument("--year", dest='year', type=str, default="2016")
+parser.add_argument("--proc", dest='proc', type=str, default="qcd")
+args = parser.parse_args()
+year = args.year
+proc = args.proc
 # path to processed nanoAOD ntuples
-ntuple_path = "/vols/cms/vc1117/LLP/nanoAOD_friends/HNL/25Mar20/"
-lumi = {"2016": 35.88, "2017": 41.53, "2018": 58.83}
+ntuple_path = "/vols/cms/vc1117/LLP/nanoAOD_friends/HNL/03Aug20/"
+lumi = {"2016": 35.92, "2017": 41.53, "2018": 59.74}
 
 def find_xsec(path, xsecs):
     for key, val in xsecs.items():
-        if key in path:     
+        if key in path: 
             return val
     return 1
 
-
-with open("/vols/build/cms/LLP/xsecs.yaml") as yaml_file:
+with open("/vols/build/cms/LLP/xsec.yaml") as yaml_file:
     xsecs = yaml.load(yaml_file, Loader=yaml.FullLoader)
 
+with open("samples.yaml") as samples_file:
+    samples_dict = yaml.load(samples_file, Loader=yaml.FullLoader)
+    sample = samples_dict[proc]
+
+if "HNL" in proc:
+    with open("/vols/build/cms/LLP/gridpackLookupTable.json") as lookup_table_file:
+        lookup_table = json.load(lookup_table_file)[proc]
+
+#####################################
+### Various configurations go here
+
+# Systematic uncertainties
+systDict = {}
+systDict["IsoMuTrigger_weight_trigger"] = "trigger"
+systDict["tightMuon_weight_iso"] = "tight_muon_iso"
+systDict["tightMuon_weight_id"] = "tight_muon_id"
+systDict["tightElectron_weight_id"] = "tight_electron_id"
+systDict["puweight"] = "pu"
+
+# defined by Haifa
+# so far optimised only for dilepton
+def signal_region_cut(syst="nominal"):
+    #return "(EventObservables_{}_met)*(nselectedJets_{}<6)*(EventObservables_{}_ht<180.)*(EventObservables_{}_mT_met_lep<80.)".format(syst, syst, syst, syst, syst)
+    return "(EventObservables_{}_met<100.)".format(syst)
+
+#### to be optimised by Haifa! ###
+def total_cut(flavour="mu", syst="nominal"):
+    if flavour=="mu":
+        return "(category_{}_LLP_QMU_jet_output>0.9||category_{}_LLP_Q_jet_output>0.8)*(bdt_score>0.8)".format(syst, syst)
+    elif flavour=="el":
+        return "(category_{}_LLP_QE_jet_output>0.9||category_{}_LLP_Q_jet_output>0.8)*(bdt_score>0.8)".format(syst, syst)
+    elif flavour=="jet":
+        return "(category_{}_LLP_Q_jet_output>0.8)||(category_{}_LLP_QTAU_jet_output>0.8)".format(syst, syst)
+
+category_varexp = "(category_nominal_muonmuon>0)*({})*(dilepton_charge==-1)*(dilepton_mass>20.)*(dilepton_mass<80.)*1".format(total_cut(flavour="mu"))
+category_varexp = "{}+(category_nominal_muonmuon>0)*({})*(dilepton_charge==1)*(dilepton_mass>20.)*(dilepton_mass<80.)*2".format(category_varexp, total_cut(flavour="mu"))
+category_varexp = "{}+(category_nominal_muonelectron>0)*({})*(dilepton_charge==-1)*(dilepton_mass>20.)*(dilepton_mass<80.)*3".format(category_varexp, total_cut(flavour="el"))
+category_varexp = "{}+(category_nominal_muonelectron>0)*({})*(dilepton_charge==1)*(dilepton_mass>20.)*(dilepton_mass<80.)*4".format(category_varexp, total_cut(flavour="el"))
+category_varexp = "{}+(category_nominal_electronelectron>0)*({})*(dilepton_charge==-1)*(dilepton_mass>20.)*(dilepton_mass<80.)*5".format(category_varexp, total_cut(flavour="el"))
+category_varexp = "{}+(category_nominal_electronelectron>0)*({})*(dilepton_charge==1)*(dilepton_mass>20.)*(dilepton_mass<80.)*6".format(category_varexp, total_cut(flavour="el"))
+category_varexp = "{}+(category_nominal_electronmuon>0)*({})*(dilepton_charge==-1)*(dilepton_mass>20.)*(dilepton_mass<80.)*7".format(category_varexp, total_cut(flavour="mu"))
+category_varexp = "{}+(category_nominal_electronmuon>0)*({})*(dilepton_charge==1)*(dilepton_mass>20.)*(dilepton_mass<80.)*8".format(category_varexp, total_cut(flavour="mu"))
+category_varexp = "{}+(category_nominal_muonjets>0)*({})*9".format(category_varexp, total_cut(flavour="jet"))
+category_varexp = "{}+(category_nominal_electronjets>0)*({})*10".format(category_varexp, total_cut(flavour="jet"))
+
+bin_labels = [
+    "#mu#mu_OS",
+    "#mu#mu_SS",
+    "#mue_OS",
+    "#mue_SS",
+    "ee_OS",
+    "ee_SS",
+    "e#mu_OS",
+    "e#mu_SS",
+    "#mujets",
+    "ejets"
+]
+
+print(category_varexp)
+#####################################
 
 # This class prepares a given sample by scaling to int. luminosity
 class Sample:
     def __init__(self, name, paths, isMC=True, year="2016"):
-        self.paths = paths
         self.name = name
         self.file_list = ROOT.std.vector('string')()
         self.sum_weight = 0
         self.isMC = isMC
-        for path in self.paths:
+        for path in paths:
             for f in os.listdir(os.path.join(ntuple_path, path)):
                 self.file_list.push_back(os.path.join(ntuple_path, path, f))
             if self.isMC:
-                self.sum_weight += yields[path]["weighted"]
+                self.sum_weight += yields[path]
         self.rdf = ROOT.RDataFrame("Friends", self.file_list)
+        # so far only dilepton
+        self.rdf = self.rdf.Filter("EventObservables_nominal_met < 100.")
+
         if self.isMC:
-            xsec = find_xsec(path, xsecs)
-            # print(path, xsecs)
-            self.rdf = self.rdf.Define("weightLumi", "IsoMuTrigger_weight_trigger_nominal*MET_filter*tightMuon_weight_iso_nominal*tightMuon_weight_id_nominal*looseMuons_weight_id_nominal*puweight*genweight*%s*1000.0*%s/%s" %(lumi[year], xsec, self.sum_weight))
+            if "HNL" in name:
+                # 1 pb cross- section
+                self.rdf = self.rdf.Define("weightLumi", "genweight*%s*1000.0/%s" % (lumi[year], self.sum_weight))
+            else:
+                xsec = find_xsec(path, xsecs)
+                self.rdf = self.rdf.Define("weightLumi", "genweight*%s*1000.0*%s/%s" % (lumi[year], xsec, self.sum_weight))
+
+            # the nominal weights, the variations are derived from this
+            self.rdf = self.rdf.Define("weightNominal", "MET_filter*weightLumi*IsoMuTrigger_weight_trigger_nominal * \
+                                        tightMuon_weight_iso_nominal * \
+                                        tightMuon_weight_id_nominal* \
+                                        tightElectron_weight_id_nominal* \
+                                        puweight_nominal"
+                                        )
+
+            for systName, abrv in systDict.items():
+                for variation in ["Up", "Down"]:
+                    self.rdf = self.rdf.Define("weight_{}{}".format(abrv, variation), "weightNominal/{}*{}".format(systName+"_nominal", systName+"_"+variation.lower()))
         else:
-            self.rdf = self.rdf.Define("weightLumi", "1")
+            self.rdf = self.rdf.Define("weightNominal", "1")
 
         self.hists = []
         print("RDF "+name+ " has entries: "+str(self.rdf.Count().GetValue()))
@@ -54,149 +138,116 @@ class Process:
         for arg in args:
             self.rdfs.append(arg.rdf)
 
-    def Histo1D(self, category, varexp, weight):
+    def Histo1D(self, args, varexp, weight):
+        category = args[0]
         for i, rdf in enumerate(self.rdfs):
-            _rdf = rdf.Define(category, varexp)
+            rdf = rdf.Define(category, varexp)
+            _rdf = rdf.Define("weight", weight)
             if i == 0:
-                hist = _rdf.Histo1D((category, category, 2, 0, 2), category)
+                hist = _rdf.Histo1D(args, category, "weight")
+                hist.Sumw2()
             else:
-                tmp_hist = _rdf.Histo1D((category, category, 2, 0, 2), category)
+                tmp_hist = _rdf.Histo1D(args, category, "weight")
+                tmp_hist.Sumw2()
                 hist.Add(tmp_hist.GetValue())
 
         hist.SetName(self.name)
         hist.SetTitle(self.name)
+        for i, label in enumerate(bin_labels):
+            hist.GetXaxis().SetBinLabel(i+1, label)
         self.hists.append(hist)
         return self.hists[-1]
 
-# for year in ["2018", "2017", "2016"]:
-for year in ["2016"]:
-    # Read in event yields and cross-sections for normalisation
-    with open("/home/hep/vc1117/LLP/selection/eventyields"+year+".json") as json_file:
-        yields = json.load(json_file)
 
-    if year == "2016":
-        qcd_15to20 = Sample("qcd_15to20", ["QCD_Pt-15to20_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8-"+year], year=year) 
-        qcd_20to30 = Sample("qcd_20to30", ["QCD_Pt-20to30_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8-"+year], year=year)
-        qcd_30to50 = Sample("qcd_30to50", ["QCD_Pt-30to50_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8-"+year], year=year)
-        qcd_50to80 = Sample("qcd_50to80", ["QCD_Pt-50to80_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8-"+year], year=year)
-        qcd_80to120 = Sample("qcd_80to120", ["QCD_Pt-80to120_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8-"+year], year=year)
-        qcd_120to170 = Sample("qcd_120to170", ["QCD_Pt-120to170_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8-"+year], year=year)
-        qcd_170to300 = Sample("qcd_170to300", ["QCD_Pt-170to300_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia-"+year], year=year)
-        qcd_300to470 = Sample("qcd_300to470", ["QCD_Pt-300to470_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8-"+year], year=year)
-        qcd_470to600 = Sample("qcd_470to600", ["QCD_Pt-470to600_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8-"+year], year=year)
-        qcd_600to800 = Sample("qcd_600to800", ["QCD_Pt-600to800_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8-"+year])
-        qcd_800to1000 = Sample("qcd_800to1000", ["QCD_Pt-800to1000_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8-"+year], year=year)
-        qcd_1000toInf = Sample("qcd_1000toInf", ["QCD_Pt-1000toInf_MuEnrichedPt5_TuneCUETP8M1_13TeV_pythia8-"+year], year=year)
-        ttsemilep = Sample("ttsemilep", ["TTToSemiLeptonic_TuneCP5_PSweights_13TeV-powheg-pythia8-"+year], year=year)
-        ttdilep = Sample("ttdilep", ["TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8-"+year], year=year)
+# Read in event yields and cross-sections for normalisation
+with open("/vols/build/cms/LLP/yields_200720/{}/eventyields.json".format(year)) as json_file:
+    yields = json.load(json_file)
 
+# select only the relevant year
+
+# slightly different syntax for hnl and SM/data
+if "HNL" in proc:
+    process = Process("hnl")
+    process.add(Sample(proc, ["{}-{}".format(proc, year)], year=year))
+else:
+    samples = sample[int(year)]
+    process = Process(proc)
+    for subsample_name, subsample in samples.items():
+        process.add(Sample(subsample_name, subsample ,year=year))
+
+
+def removeNegEntries(hist):
+    alpha = 1. - 0.6827
+    upErr = ROOT.Math.gamma_quantile_c(alpha/2,1,1)
+    avgWeight = hist.Integral()/hist.GetEntries() if hist.GetEntries()>0 else -1
+    #print "weight",avgWeight
+    for ibin in range(hist.GetNbinsX()):
+        c = hist.GetBinContent(ibin+1)
+        if c<10**-4:
+            hist.SetBinContent(ibin+1,10**-3)
+            #note: in case of 0 entries the uncertainty is also small
+            #(this is not the case with negative events)
+            if hist.GetBinError(ibin+1)<10**-4 and avgWeight>0:
+                #set uncertainties for empy bins
+                #https://twiki.cern.ch/twiki/bin/viewauth/CMS/PoissonErrorBars
+                hist.SetBinError(ibin+1,upErr*avgWeight)
+            else:
+                hist.SetBinError(ibin+1,10**-4)
+        #print "bin%2i, %.1f+-%.1f (+-%.1f%%)"%(ibin,c,hist.GetBinError(ibin+1),100.*hist.GetBinError(ibin+1)/c if c>0 else -1)
+
+
+# create root file with nominal value histogram and various systematic variations
+# to be used with Combine Harvester
+root_file = ROOT.TFile.Open("hists/{}_{}.root".format(proc, year), "RECREATE")
+root_file.cd()
+root_file.mkdir("category")
+root_file.cd("category")
+coupling = 0
+
+while coupling < 67:
+    # different scenarios
+    if "hnl" in process.name:
+        coupling += 1
+        coupling_var = "LHEWeights_coupling_{}".format(coupling)
     else:
-        qcd_15to20 = Sample("qcd_15to20", ["QCD_Pt-15to20_MuEnrichedPt5_TuneCP5_13TeV_pythia8-"+year], year=year) 
-        qcd_20to30 = Sample("qcd_20to30", ["QCD_Pt-20to30_MuEnrichedPt5_TuneCP5_13TeV_pythia8-"+year], year=year)
-        qcd_30to50 = Sample("qcd_30to50", ["QCD_Pt-30to50_MuEnrichedPt5_TuneCP5_13TeV_pythia8-"+year], year=year)
-        qcd_50to80 = Sample("qcd_50to80", ["QCD_Pt-50to80_MuEnrichedPt5_TuneCP5_13TeV_pythia8-"+year], year=year)
-        qcd_80to120 = Sample("qcd_80to120", ["QCD_Pt-80to120_MuEnrichedPt5_TuneCP5_13TeV_pythia8-"+year], year=year)
-        qcd_120to170 = Sample("qcd_120to170", ["QCD_Pt-120to170_MuEnrichedPt5_TuneCP5_13TeV_pythia8-"+year], year=year)
-        qcd_170to300 = Sample("qcd_170to300", ["QCD_Pt-170to300_MuEnrichedPt5_TuneCP5_13TeV_pythia8-"+year], year=year)
-        qcd_300to470 = Sample("qcd_300to470", ["QCD_Pt-300to470_MuEnrichedPt5_TuneCP5_13TeV_pythia8-"+year], year=year)
-        qcd_470to600 = Sample("qcd_470to600", ["QCD_Pt-470to600_MuEnrichedPt5_TuneCP5_13TeV_pythia8-"+year], year=year)
-        qcd_600to800 = Sample("qcd_600to800", ["QCD_Pt-600to800_MuEnrichedPt5_TuneCP5_13TeV_pythia8-"+year])
-        qcd_800to1000 = Sample("qcd_800to1000", ["QCD_Pt-800to1000_MuEnrichedPt5_TuneCP5_13TeV_pythia8-"+year], year=year)
-        qcd_1000toInf = Sample("qcd_1000toInf", ["QCD_Pt-1000toInf_MuEnrichedPt5_TuneCP5_13TeV_pythia8-"+year], year=year)
+        coupling = 68
 
-        if year == "2017":
-            ttsemilep = Sample("ttsemilep", ["TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8_ext1-"+year], year=year)
-            ttdilep = Sample("ttdilep", ["TTTo2L2Nu_TuneCP5_PSweights_13TeV-powheg-pythia8-"+year], year=year)
-
+    # variations with changing shape
+    for systName in ["nominal", "jesTotalUp", "jesTotalDown", "jerUp", "jerDown"]:
+        if "hnl" in process.name:
+            name = "{}_coupling_{}_{}".format(process.name, coupling, year)
         else:
-            ttsemilep = Sample("ttsemilep", ["TTToSemiLeptonic_TuneCP5_13TeV-powheg-pythia8-"+year], year=year)
-            ttdilep = Sample("ttdilep", ["TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8-"+year], year=year)
-           
-    if year == "2016":
-        #runb = Sample("RunBv2", ["SingleMuon_Run2016B_ver2"], isMC=False)
-        #rune = Sample("RunE", ["SingleMuon_Run2016E"], isMC=False)
-        #runf = Sample("RunF", ["SingleMuon_Run2016F"], isMC=False)
-        #rung = Sample("RunG", ["SingleMuon_Run2016G"], isMC=False)
-        #runh = Sample("RunH", ["SingleMuon_Run2016H"], isMC=False)
-        w0jets = Sample("w0jets", ["WToLNu_0J_13TeV-amcatnloFXFX-pythia8-2016"], year=year)
-        w1jets = Sample("w1jets", ["WToLNu_1J_13TeV-amcatnloFXFX-pythia8-2016"], year=year)
-        w2jets = Sample("w2jets", ["WToLNu_2J_13TeV-amcatnloFXFX-pythia8-ext4-2016"], year=year)
-        dy10to50 = Sample("dy10to50",  ["DYJetsToLL_M-10to50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8-2016"], year=year)
-        dy50 = Sample("dy50",  ["DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8-ext2-2016"], year=year)
+            name = "{}_{}".format(process.name, year)
+        if systName != "nominal":
+            name += "_"+systName
+        weight = "weightNominal"
+        if "hnl" in process.name:
+            weight += "*"+coupling_var
 
-    elif year == "2017":
-        #runb = Sample("RunB", ["SingleMuon_Run2017B"], isMC=False)
-        #rune = Sample("RunE", ["SingleMuon_Run2017E"], isMC=False)
-        #runf = Sample("RunF", ["SingleMuon_Run2017F"], isMC=False)
-        w0jets = Sample("w0jets", ["WJetsToLNu_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8-2017"], year=year)
-        w1jets = Sample("w1jets", ["WJetsToLNu_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8-ext1-2017"], year=year)
-        w2jets = Sample("w2jets", ["WJetsToLNu_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8-2017"], year=year)
-        dy0jets = Sample("dy0jets", ["DYJetsToLL_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8-2017"], year=year)
-        dy1jets = Sample("dy1jets", ["DYJetsToLL_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8-2017"], year=year)
-        dy2jets = Sample("dy2jets", ["DYJetsToLL_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8-2017"], year=year)
+        # Systematic variation
+        varexp = category_varexp.replace("nominal", systName)
 
-    elif year == "2018":
-        #runa = Sample("RunA", ["SingleMuon_Run2018A"], isMC=False)
-        #runb = Sample("RunB", ["SingleMuon_Run2017B"], isMC=False)
-        w0jets = Sample("w0jets", ["WJetsToLNu_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8-2018"], year=year)
-        w1jets = Sample("w1jets", ["WJetsToLNu_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8-2018"], year=year)
-        w2jets = Sample("w2jets", ["WJetsToLNu_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8-2018"], year=year)     
-        dy0jets = Sample("dy0jets", ["DYJetsToLL_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8-2018"], year=year)
-        dy1jets = Sample("dy1jets", ["DYJetsToLL_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8-2018"], year=year)
-        dy2jets = Sample("dy2jets", ["DYJetsToLL_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8-2018"], year=year)
+        hist = process.Histo1D((name, name, 10, 0.5, 10.5), varexp, weight)
+        removeNegEntries(hist)
+        hist.SetTitle(name)
+        hist.SetName(name)
+        hist.SetDirectory(root_file)
+        hist.Write()
 
-    '''
-    runc = Sample("RunC", ["SingleMuon_Run"+year+"C"], isMC=False)
-    rund = Sample("RunD", ["SingleMuon_Run"+year+"D"], isMC=False)
-    data = Process("data", "data", "#000000")
-    if year == "2016":
-        data.add(runb, runc, rund, rune, runf, rung, runh)
-    elif year == "2017":
-        data.add(runb, runc, rund, rune, runf)
-    elif year == "2018":
-        data.add(runa, runb, runc, rund)
-    #processes = [wjets, dyjets, tt, qcd, data]
-    '''
-
-    wjets = Process("wjets")
-    wjets.add(w0jets, w1jets, w2jets)
-    dyjets = Process("dyjets")
-    if year == "2016":
-        dyjets.add(dy10to50, dy50)
-    else:
-        dyjets.add(dy0jets, dy1jets, dy2jets)
-
-    tt = Process("ttbar")
-    tt.add(ttsemilep, ttdilep)
-    qcd = Process("qcd")
-    qcd.add(qcd_15to20, qcd_20to30, qcd_30to50, qcd_50to80, qcd_80to120, qcd_120to170, qcd_170to300, qcd_300to470, qcd_470to600, qcd_600to800, qcd_800to1000, qcd_1000toInf)
-
-    processes = [wjets, dyjets, tt, qcd]
-
-
-    for proc in os.listdir(ntuple_path):
-        if "HeavyNeutrino" not in proc:
-            continue
-        short_name = proc.replace('HeavyNeutrino_lljj_', '').replace('_mu_Dirac_Moriond17_aug2018_miniAODv3-2016', '')
-        sample = Sample(short_name, [proc])
-        processes.extend([Process(short_name)])
-        processes[-1].add(sample)
-
-
-    signal_region_cut = "(weightLumi)*(ntightMuon == 1)*(nlepJet == 1)*(MET_pt < 100)*(nselectedJets<6)*(EventObservables_ht<200)*(dimuon_mass >30)*(dimuon_mass<80)" 
-    tagger_cuts = {
-        "merged_0": "lepJet_llpdnnx_0_isLLP_QMU_QQMU>0.999",
-        "merged_1": "lepJet_llpdnnx_1_isLLP_QMU_QQMU>0.999",
-        "merged_2": "lepJet_llpdnnx_2_isLLP_QMU_QQMU>0.999",
-    }
-    root_file = ROOT.TFile.Open("hists/merged.root", "RECREATE")
-    for category, varexp in  tagger_cuts.items():
-        print (category, varexp)
-        root_file.cd()
-        root_file.mkdir(category)
-        root_file.cd(category)
-        for process in processes:
-            hist = process.Histo1D(category, varexp, "1")
+    # variations with changing weight
+    for systName, abrv in systDict.items():
+        for variation in ["Up", "Down"]:
+            if "hnl" in process.name:
+                name = "{}_coupling_{}_{}_{}{}".format(process.name, coupling, year, abrv, variation)
+            else:
+                name = "{}_{}_{}{}".format(process.name, year, abrv, variation)
+            weight = "weight_{}{}".format(abrv, variation)
+            if "hnl" in process.name:
+                weight += "*"+coupling_var
+            hist = process.Histo1D((name, name, 10, 0.5, 10.5), category_varexp, weight)
+            removeNegEntries(hist)
+            hist.SetTitle(name)
+            hist.SetName(name)
             hist.SetDirectory(root_file)
             hist.Write()
-    root_file.Close()
+root_file.Close()
