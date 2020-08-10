@@ -45,117 +45,136 @@ for scenario in couplings:
     coupling_text = coupling_dict[scenario][0]
     coupling_title = coupling_dict[scenario][1]
 
-    # arrays to store mass, V2 and sigma/sigma_th values
+    for hnl_type in ["majorana", "dirac"]:
+        print(hnl_type)
+        # arrays to store mass, V2 and sigma/sigma_th values
+        masses = []
+        couplings = []
+        sigma_ratios = []
 
-    masses = []
-    couplings = []
-    sigma_ratios = []
+        for year in years:
+            for f in os.listdir("./"):
+                if ".json" not in f:
+                    continue
 
-    for year in years:
-        for f in os.listdir("./"):
-            if ".json" not in f:
-                continue
+                if hnl_type not in f:
+                    continue
 
-            # limit json aggreggate 
-            with open(f) as json_file:
-                xsecDict = json.load(json_file)
-            if str(scenario) not in xsecDict.keys():
-                continue
-            xsecDict = xsecDict[str(scenario)]
+                # limit json aggreggate 
+                with open(f) as json_file:
+                    xsecDict = json.load(json_file)
+                if str(scenario) not in xsecDict.keys():
+                    continue
+                xsecDict = xsecDict[str(scenario)]
 
-            # means something failed with combine (shouldn't happend!)
-            if "exp0" not in xsecDict:
-                continue
+                # means something failed with combine (shouldn't happend!)
+                if "exp0" not in xsecDict:
+                    continue
 
+                # parse lookup table
+                proc = f.replace("limits_", "").replace(".json", "")
+                lu_infos = lookup_table[proc]['weights'][str(int(scenario))]
+                xsec = lu_infos['xsec']['nominal']
+                coupling = lu_infos['couplings']['Ve']+lu_infos['couplings']['Vmu']+lu_infos['couplings']['Vtau']
+                if coupling not in (2, 12, 67):
+                    coupling = coupling/2
 
-            # parse lookup table
-            proc = f.replace("limits_", "").replace(".json", "")
-            lu_infos = lookup_table[proc]['weights'][str(int(scenario))]
-            xsec = lu_infos['xsec']['nominal']
-            coupling = lu_infos['couplings']['Ve']+lu_infos['couplings']['Vmu']+lu_infos['couplings']['Vtau']
-            if coupling not in (2, 12, 67):
-                coupling = coupling/2
+                coupling = coupling ** 2
+                mass = lookup_table[proc]['mass']
+                expected = xsecDict["exp0"]
 
-            coupling = coupling ** 2
-            mass = lookup_table[proc]['mass']
-            expected = xsecDict["exp0"]
+                ratio = expected/xsec
 
-            ratio = expected/xsec
+                masses.append(mass)
+                couplings.append(coupling)
+                sigma_ratios.append(ratio)
 
-            masses.append(mass)
-            couplings.append(coupling)
-            sigma_ratios.append(ratio)
+            # draw 1d exclusion plots for each mass point
+            df = pd.DataFrame(list(zip(masses, couplings, sigma_ratios)), 
+                           columns =['mass', 'coupling', 'ratio'])
+            #print(df)
 
-        # draw 1d exclusion plots for each mass point
-        df = pd.DataFrame(list(zip(masses, couplings, sigma_ratios)), 
-                       columns =['mass', 'coupling', 'ratio'])
-        #print(df)
-
-        mass_list = sorted(df.mass.unique())
-        sensitive_masses = []
-        crossing_points = []
-        print("list of masses to be analyzed", mass_list)
-
-
-        # make 1d plot and find crossing point
-        for mass in mass_list:
-            coupling_df = df.loc[df['mass'] == mass].sort_values('coupling')
-            ratio_df = coupling_df.sort_values('ratio')
-
-            couplings = array('d', coupling_df.coupling)
-            ratios = array('d', coupling_df.ratio)
-
-            tgr = ROOT.TGraph(len(couplings), couplings, ratios)
-
-            l = ROOT.TLine(couplings[0], 1, couplings[-1], 1)
-            l.SetLineStyle(2)
-
-            cv = style.makeCanvas()
-            cv.SetLogx()
-            cv.SetLogy()
-            cv.Draw("")
-            tgr.GetXaxis().SetTitle("|V_{lN}|^2")
-            tgr.GetYaxis().SetTitle("#frac{#sigma}{#sigma_{th}}")
-            tgr.Draw("APC")
-            l.Draw("SAME")
-
-            # sigma_UL = sigma_th
-            xx = ratio_df.ratio
-            yy = ratio_df.coupling
-            logx = np.log10(xx)
-            logy = np.log10(yy)
-            lin_interp = interpolate.interp1d(logx, logy, kind="linear")
+            mass_list = sorted(df.mass.unique())
+            sensitive_masses = []
+            crossing_points = []
+            print("list of masses to be analyzed", mass_list)
 
 
-            try:
-                crossing_point = np.power(10.0, lin_interp(0))
-            except ValueError:
-                print("Could not interpolate!")
-            else:
-                crossing_points.append(crossing_point)
-                sensitive_masses.append(mass)
-                print(crossing_point)
-                l_crossing = ROOT.TLine(crossing_point, sorted(ratios)[0], crossing_point, sorted(ratios)[-1])
-                l_crossing.SetLineStyle(3)
-                l_crossing.Draw("SAME")
-            cv.SaveAs("limit_coupling_{}_mass_{}_year_{}.pdf".format(scenario, mass, year))
+            # make 1d plot and find crossing point
+            for mass in mass_list:
+                coupling_df = df.loc[df['mass'] == mass].sort_values('coupling')
+                ratio_df = coupling_df.sort_values('ratio')
 
-        graph = ROOT.TGraph(len(crossing_points), array('d', sensitive_masses), array('d', crossing_points))
+                couplings = array('d', coupling_df.coupling)
+                ratios = array('d', coupling_df.ratio)
 
-        cv = style.makeCanvas()
-        cv.Draw("")
-        cv.SetLogy()
-        cv.SetLogx()
-        graph.Draw("")
-        graph.GetXaxis().SetTitle("m_{N} (GeV)")
-        graph.GetYaxis().SetTitle("|V_{lN}|^{2}")
+                if len(couplings) < 2:
+                    print "need at least 2 points to interpolate!"
+                    continue
 
-        graph.GetXaxis().SetLimits(1, 20.)
-        graph.SetMinimum(1e-7)
-        graph.SetMaximum(1e-1)
-        leg = style.makeLegend(0.6, 0.7, 0.4, 0.9)
-        leg.Draw("SAME")
-        style.makeText(0.2, 0.8, 0.2, 0.8, coupling_title)
-        style.makeCMSText(0.17, 0.95, additionalText="Simulation Preliminary")
-        style.makeLumiText(0.9, 0.95, year=year, lumi=lumi[year])
-        cv.SaveAs("limit_coupling_{}_{}.pdf".format(scenario, year))
+                tgr = ROOT.TGraph(len(couplings), couplings, ratios)
+
+                l = ROOT.TLine(couplings[0], 1, couplings[-1], 1)
+                l.SetLineStyle(2)
+
+                cv = style.makeCanvas()
+                cv.SetLogx()
+                cv.SetLogy()
+                cv.Draw("")
+                tgr.GetXaxis().SetTitle("|V_{lN}|^2")
+                tgr.GetYaxis().SetTitle("#frac{#sigma}{#sigma_{th}}")
+                tgr.Draw("APC")
+                l.Draw("SAME")
+
+                # sigma_UL = sigma_th
+                xx = ratio_df.ratio
+                yy = ratio_df.coupling
+                logx = np.log10(xx)
+                logy = np.log10(yy)
+                lin_interp = interpolate.interp1d(logx, logy, kind="linear")
+
+
+                try:
+                    crossing_point = np.power(10.0, lin_interp(0))
+                except ValueError:
+                    print("Could not interpolate!")
+                else:
+                    crossing_points.append(crossing_point)
+                    sensitive_masses.append(mass)
+                    print(crossing_point)
+                    l_crossing = ROOT.TLine(crossing_point, sorted(ratios)[0], crossing_point, sorted(ratios)[-1])
+                    l_crossing.SetLineStyle(3)
+                    l_crossing.Draw("SAME")
+                cv.SaveAs("limit_{}_coupling_{}_mass_{}_year_{}.pdf".format(hnl_type, scenario, mass, year))
+
+        if hnl_type == "majorana":
+            graph_majorana = ROOT.TGraph(len(crossing_points), array('d', sensitive_masses), array('d', crossing_points))
+        else:
+            graph_dirac = ROOT.TGraph(len(crossing_points), array('d', sensitive_masses), array('d', crossing_points))
+
+    cv = style.makeCanvas()
+    cv.Draw("")
+    cv.SetLogy()
+    cv.SetLogx()
+    graph_majorana.Draw("ACP")
+    graph_majorana.GetXaxis().SetTitle("m_{N} (GeV)")
+    graph_majorana.GetYaxis().SetTitle("|V_{lN}|^{2}")
+
+    graph_majorana.GetXaxis().SetLimits(1, 20.)
+    graph_majorana.SetMinimum(1e-7)
+    graph_majorana.SetMaximum(1e-1)
+
+    graph_majorana.SetLineColor(ROOT.kAzure)
+    graph_majorana.SetMarkerColor(ROOT.kAzure)
+    graph_dirac.SetLineColor(ROOT.kOrange)
+    graph_dirac.SetMarkerColor(ROOT.kOrange)
+
+    graph_dirac.Draw("SAMECP")
+    leg = style.makeLegend(0.5, 0.75, 0.7, 0.9)
+    leg.AddEntry(graph_majorana, "Majorana", "lp")
+    leg.AddEntry(graph_dirac, "Dirac", "lp")
+    leg.Draw("SAME")
+    style.makeText(0.2, 0.8, 0.2, 0.8, coupling_title)
+    style.makeCMSText(0.17, 0.95, additionalText="Simulation Preliminary")
+    style.makeLumiText(0.9, 0.95, year=year, lumi=lumi[year])
+    cv.SaveAs("limit_coupling_{}_{}.pdf".format(scenario, year))

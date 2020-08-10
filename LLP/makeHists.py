@@ -32,7 +32,6 @@ with open("samples.yaml") as samples_file:
 if "HNL" in proc:
     with open("/vols/build/cms/LLP/gridpackLookupTable.json") as lookup_table_file:
         lookup_table = json.load(lookup_table_file)[proc]
-    print(lookup_table)
 
 #####################################
 ### Various configurations go here
@@ -165,14 +164,13 @@ with open("/vols/build/cms/LLP/yields_200720/{}/eventyields.json".format(year)) 
     yields = json.load(json_file)
 
 # select only the relevant year
-samples = sample[int(year)]
 
 # slightly different syntax for hnl and SM/data
-# needs some imrpvoement
 if "HNL" in proc:
     process = Process("hnl")
-    process.add(Sample(proc, samples, year=year))
+    process.add(Sample(proc, ["{}-{}".format(proc, year)], year=year))
 else:
+    samples = sample[int(year)]
     process = Process(proc)
     for subsample_name, subsample in samples.items():
         process.add(Sample(subsample_name, subsample ,year=year))
@@ -229,7 +227,6 @@ while coupling < 67:
         # Systematic variation
         varexp = category_varexp.replace("nominal", systName)
 
-        print(name, varexp, weight)
         hist = process.Histo1D((name, name, 10, 0.5, 10.5), varexp, weight)
         removeNegEntries(hist)
         hist.SetTitle(name)
@@ -247,7 +244,6 @@ while coupling < 67:
             weight = "weight_{}{}".format(abrv, variation)
             if "hnl" in process.name:
                 weight += "*"+coupling_var
-            print(name, category_varexp, weight)
             hist = process.Histo1D((name, name, 10, 0.5, 10.5), category_varexp, weight)
             removeNegEntries(hist)
             hist.SetTitle(name)
