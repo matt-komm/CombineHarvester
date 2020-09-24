@@ -5,13 +5,15 @@ import json
 
 years = ["2016"]
 couplings = [2, 7, 12, 47, 52, 67]
-couplings=range(2, 68)
+#couplings=range(2, 68)
+couplings = [12]
 
 # make a datacard for a single HNL mass/coupling scenario
 def make_datacard(cats, signal_name, output_path, coupling=12):
     for year in years:
         cb = ch.CombineHarvester()
         procs = ["ttbar", "qcd", "wjets", "dyjets"]
+        procs = ["qcd", "wjets", "dyjets"]
         signal = ["hnl"]
 
         cb.AddProcesses(era=[year], procs=procs, bin=cats, signal=False)
@@ -41,7 +43,6 @@ def make_datacard(cats, signal_name, output_path, coupling=12):
               "$BIN/$PROCESS_{}_$SYSTEMATIC".format(year)
               )
 
-        '''
         bbFactory = ch.BinByBinFactory()
         bbFactory.SetAddThreshold(0.1)
         #bbFactory.SetMergeThreshold(0.5)
@@ -49,7 +50,6 @@ def make_datacard(cats, signal_name, output_path, coupling=12):
         bbFactory.SetPattern("bb_$BIN_$PROCESS_bin_$#")
         #bbFactory.MergeBinErrors(cb.cp().backgrounds())
         bbFactory.AddBinByBin(cb.cp().backgrounds(), cb)
-        '''
 
         cb.PrintAll()
         f = ROOT.TFile.Open(os.path.join(output_path, "out.root"), "RECREATE")
@@ -63,7 +63,16 @@ def make_datacard(cats, signal_name, output_path, coupling=12):
 
 # WIP -- expand into merged and resolved!
 cats = [
-    (0, "category"),
+    (0, "mumu_OS"),
+    (1, "mumu_SS"),
+    (2, "ee_OS"),
+    (3, "ee_SS"),
+    (4, "mue_OS"),
+    (5, "mue_SS"),
+    (6, "emu_OS"),
+    (7, "emu_SS"),
+    (6, "e"),
+    (7, "mu"),
 ]
 
 hist_path = "CombineHarvester/LLP/hists/"
@@ -82,7 +91,7 @@ submit_file = open("runCombine.sh","w")
 submit_file.write('''#!/bin/bash
 #$ -cwd
 #$ -q hep.q
-#$ -l h_rt=00:30:00 
+#$ -l h_rt=00:30:00
 #$ -e log/log.$TASK_ID.err
 #$ -o log/log.$TASK_ID.out
 #$ -t 1-'''+str(n_job)+'''
@@ -97,6 +106,8 @@ submit_file.write("JOBS=(\n")
 for proc in os.listdir(hist_path):
     if "HNL" not in proc:
         continue
+    if "HNL_majorana_all_ctau1p0e00_massHNL10p0_Vall1p177e-03_2016.root" not in proc:
+        continue
     for year in years:
         if year not in proc:
             continue
@@ -108,7 +119,7 @@ for proc in os.listdir(hist_path):
             submit_file.write(" \"")
             submit_file.write('''combineTool.py -M AsymptoticLimits -t -1 --cminPreScan --cminPreFit 1 --rAbsAcc 0.000001 --run expected --X-rtd MINIMIZER_analytic --X-rtd MINIMIZER_MaxCalls=99999999999 -d %s/out.txt --there -n HNL --mass %i''' % (path, coupling))
             submit_file.write("\"")
-            
+
 submit_file.write(")")
 submit_file.write("\n")
 submit_file.write("echo ${JOBS[$SGE_TASK_ID]}")

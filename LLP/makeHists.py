@@ -53,9 +53,9 @@ def signal_region_cut(syst="nominal"):
 
 def total_cut(category="dilepton", syst="nominal"):
     if category=="dilepton":
-        return "(category_{}_taggerBestOutputParameter[0]>0.7)*(bdt_score_{}>0.7)".format(syst, syst)
+        return "(category_{}_taggerBestOutputValue[0]>0.7)*(bdt_score_{}>0.7)".format(syst, syst)
     elif category=="singlelepton":
-        return "(category_{}_taggerBestOutputParameter[0]>0.7)".format(syst)
+        return "(category_{}_taggerBestOutputValue[0]>0.7)".format(syst)
 
 
 macroCategory_dict = {}
