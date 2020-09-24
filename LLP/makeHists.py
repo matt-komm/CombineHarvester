@@ -116,7 +116,7 @@ class Sample:
                 self.sum_weight += yields[path]
         self.rdf = ROOT.RDataFrame("Friends", self.file_list)
         # so far only dilepton
-        #self.rdf = self.rdf.Filter("EventObservables_nominal_met < 100.")
+        self.rdf = self.rdf.Filter("EventObservables_nominal_met < 100.")
 
         if self.isMC:
             if "HNL" in name:
@@ -186,7 +186,6 @@ if "HNL" in proc:
     print(yieldHNL, flush=True)
 
 
-
 # select only the relevant year
 
 # slightly different syntax for hnl and SM/data
@@ -239,7 +238,7 @@ while coupling < 67:
     # different scenarios
     if "hnl" in process.name:
         coupling += 1
-        print("coupling: {}/ 68".format(coupling))
+        print("coupling: {}/67".format(coupling))
         coupling_var = "(LHEWeights_coupling_{}/{})".format(coupling, yieldHNL["LHEWeights_coupling_{}".format(coupling)])
     else:
         coupling = 68
@@ -271,8 +270,10 @@ while coupling < 67:
         #print(category_variable, weight)
 
         # read in hist from nanoAOD friends
-        hist_nano = process.Histo1D((category_variable, category_variable, 12, -2, 10), macroCategory_name, category_variable, weight)
+        hist_nano = process.Histo1D((category_variable, category_variable, 8, -1.5, 6.5), macroCategory_name, category_variable, weight)
         hist_nano = hist_nano.Clone()
+        #for ibin in range(hist_nano.GetNbinsX()):
+            #print(ibin+1, hist_nano.GetXaxis().GetBinCenter(ibin+1), hist_nano.GetBinContent(ibin+1))
 
         index_new = 0
         hist_limits = ROOT.TH1D("hist", "hist", len(category_dict), -0.5, len(category_dict)-0.5)
@@ -280,9 +281,14 @@ while coupling < 67:
         for index, category in category_dict.items():
             index_new += 1
             hist_content = hist_nano.GetBinContent(hist_nano.FindBin(index))
+            hist_error = hist_nano.GetBinError(hist_nano.FindBin(index))
             hist_limits.SetBinContent(index_new, hist_content)
+            hist_limits.SetBinError(index_new, hist_error)
             hist_limits.GetXaxis().SetBinLabel(index_new, category)
             #print(category, index, hist_nano.FindBin(index), index_new, hist_content)
+
+        #for ibin in range(hist_limits.GetNbinsX()+1):
+            #print(ibin+1, hist_limits.GetBinContent(ibin+1))
 
         removeNegEntries(hist_limits)
         hist_limits.SetTitle(name)
@@ -313,7 +319,7 @@ while coupling < 67:
                 category_variable = category_variable_nominal+"*"+total_cut(category="dilepton")
 
             # read in hist from nanoAOD friends
-            hist_nano = process.Histo1D((category_variable, category_variable, 12, -2, 10), macroCategory_name, category_variable, weight)
+            hist_nano = process.Histo1D((category_variable, category_variable, 8, -1.5, 6.5), macroCategory_name, category_variable, weight)
             hist_nano = hist_nano.Clone()
 
             index_new = 0

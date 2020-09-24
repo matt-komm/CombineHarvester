@@ -2,8 +2,7 @@
 #$ -cwd
 #$ -j y
 #$ -q hep.q
-#$ -l h_vmem=12G
-#$ -l h_rt=3:0:0 
+#$ -l h_rt=2:30:0 
 #$ -o log/$JOB_ID_$TASK_ID.dat
 #$ -t 1-1260
 

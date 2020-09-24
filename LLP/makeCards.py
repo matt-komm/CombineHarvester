@@ -13,7 +13,6 @@ def make_datacard(cats, signal_name, output_path, coupling=12):
     for year in years:
         cb = ch.CombineHarvester()
         procs = ["ttbar", "qcd", "wjets", "dyjets"]
-        procs = ["qcd", "wjets", "dyjets"]
         signal = ["hnl"]
 
         cb.AddProcesses(era=[year], procs=procs, bin=cats, signal=False)
