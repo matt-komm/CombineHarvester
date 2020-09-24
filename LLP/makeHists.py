@@ -3,22 +3,25 @@ import math
 import os
 import yaml
 import json
+import random
 import argparse
 
 # make histograms per year, process
 parser = argparse.ArgumentParser()
 parser.add_argument("--year", dest='year', type=str, default="2016")
 parser.add_argument("--proc", dest='proc', type=str, default="qcd")
+parser.add_argument("--category", dest='category', type=str, default="mumu_OS")
+parser.add_argument("--ntuple_path", dest="ntuple_path", default="/vols/cms/vc1117/LLP/nanoAOD_friends/HNL/21Sep20")
 args = parser.parse_args()
 year = args.year
 proc = args.proc
+ntuple_path = args.ntuple_path
 # path to processed nanoAOD ntuples
-ntuple_path = "/vols/cms/vc1117/LLP/nanoAOD_friends/HNL/03Aug20/"
 lumi = {"2016": 35.92, "2017": 41.53, "2018": 59.74}
 
 def find_xsec(path, xsecs):
     for key, val in xsecs.items():
-        if key in path: 
+        if key in path:
             return val
     return 1
 
@@ -44,32 +47,32 @@ systDict["tightMuon_weight_id"] = "tight_muon_id"
 systDict["tightElectron_weight_id"] = "tight_electron_id"
 systDict["puweight"] = "pu"
 
-# defined by Haifa
 # so far optimised only for dilepton
 def signal_region_cut(syst="nominal"):
-    #return "(EventObservables_{}_met)*(nselectedJets_{}<6)*(EventObservables_{}_ht<180.)*(EventObservables_{}_mT_met_lep<80.)".format(syst, syst, syst, syst, syst)
-    return "(EventObservables_{}_met<100.)".format(syst)
+    return "(EventObservables_{}_met<100.)*(nselectedJets_{}<6)".format(syst, syst)
 
-#### to be optimised by Haifa! ###
-def total_cut(flavour="mu", syst="nominal"):
-    if flavour=="mu":
-        return "(category_{}_LLP_QMU_jet_output>0.9||category_{}_LLP_Q_jet_output>0.8)*(bdt_score>0.8)".format(syst, syst)
-    elif flavour=="el":
-        return "(category_{}_LLP_QE_jet_output>0.9||category_{}_LLP_Q_jet_output>0.8)*(bdt_score>0.8)".format(syst, syst)
-    elif flavour=="jet":
-        return "(category_{}_LLP_Q_jet_output>0.8)||(category_{}_LLP_QTAU_jet_output>0.8)".format(syst, syst)
+def total_cut(category="dilepton", syst="nominal"):
+    if category=="dilepton":
+        return "(category_{}_taggerBestOutputParameter[0]>0.7)*(bdt_score_{}>0.7)".format(syst, syst)
+    elif category=="singlelepton":
+        return "(category_{}_taggerBestOutputParameter[0]>0.7)".format(syst)
 
-category_varexp = "(category_nominal_muonmuon>0)*({})*(dilepton_charge==-1)*(dilepton_mass>20.)*(dilepton_mass<80.)*1".format(total_cut(flavour="mu"))
-category_varexp = "{}+(category_nominal_muonmuon>0)*({})*(dilepton_charge==1)*(dilepton_mass>20.)*(dilepton_mass<80.)*2".format(category_varexp, total_cut(flavour="mu"))
-category_varexp = "{}+(category_nominal_muonelectron>0)*({})*(dilepton_charge==-1)*(dilepton_mass>20.)*(dilepton_mass<80.)*3".format(category_varexp, total_cut(flavour="el"))
-category_varexp = "{}+(category_nominal_muonelectron>0)*({})*(dilepton_charge==1)*(dilepton_mass>20.)*(dilepton_mass<80.)*4".format(category_varexp, total_cut(flavour="el"))
-category_varexp = "{}+(category_nominal_electronelectron>0)*({})*(dilepton_charge==-1)*(dilepton_mass>20.)*(dilepton_mass<80.)*5".format(category_varexp, total_cut(flavour="el"))
-category_varexp = "{}+(category_nominal_electronelectron>0)*({})*(dilepton_charge==1)*(dilepton_mass>20.)*(dilepton_mass<80.)*6".format(category_varexp, total_cut(flavour="el"))
-category_varexp = "{}+(category_nominal_electronmuon>0)*({})*(dilepton_charge==-1)*(dilepton_mass>20.)*(dilepton_mass<80.)*7".format(category_varexp, total_cut(flavour="mu"))
-category_varexp = "{}+(category_nominal_electronmuon>0)*({})*(dilepton_charge==1)*(dilepton_mass>20.)*(dilepton_mass<80.)*8".format(category_varexp, total_cut(flavour="mu"))
-category_varexp = "{}+(category_nominal_muonjets>0)*({})*9".format(category_varexp, total_cut(flavour="jet"))
-category_varexp = "{}+(category_nominal_electronjets>0)*({})*10".format(category_varexp, total_cut(flavour="jet"))
 
+macroCategory_dict = {}
+macroCategory_dict["mumu_OS"] = "(Leptons_muonmuon>0)*(dilepton_charge<0)*(dilepton_mass>30.)*(dilepton_mass<80.)"
+macroCategory_dict["mumu_SS"] = "(Leptons_muonmuon>0)*(dilepton_charge>0)*(dilepton_mass>30.)*(dilepton_mass<80.)"
+macroCategory_dict["ee_OS"] = "(Leptons_electronelectron>0)*(dilepton_charge<0)*(dilepton_mass>30.)*(dilepton_mass<80.)"
+macroCategory_dict["ee_SS"] = "(Leptons_electronelectron>0)*(dilepton_charge>0)*(dilepton_mass>30.)*(dilepton_mass<80.)"
+macroCategory_dict["mue_OS"] = "(Leptons_muonelectron)*(dilepton_charge<0)*(dilepton_mass>30.)*(dilepton_mass<80.)"
+macroCategory_dict["mue_SS"] = "(Leptons_muonelectron)*(dilepton_charge>0)*(dilepton_mass>30.)*(dilepton_mass<80.)"
+macroCategory_dict["emu_OS"] = "(Leptons_electronmuon)*(dilepton_charge<0)*(dilepton_mass>30.)*(dilepton_mass<80.)"
+macroCategory_dict["emu_SS"] = "(Leptons_electronmuon)*(dilepton_charge>0)*(dilepton_mass>30.)*(dilepton_mass<80.)"
+macroCategory_dict["mu"] = "(Leptons_muonjets>0)"
+macroCategory_dict["e"] = "(Leptons_electronjets>0)"
+
+macroCategory = macroCategory_dict[args.category]
+
+'''
 bin_labels = [
     "#mu#mu_OS",
     "#mu#mu_SS",
@@ -82,8 +85,21 @@ bin_labels = [
     "#mujets",
     "ejets"
 ]
+'''
 
-print(category_varexp)
+
+diLeptonCategory_dict = {}
+diLeptonCategory_dict[-1] = "unsel"
+diLeptonCategory_dict[1] = "q"
+diLeptonCategory_dict[2] = "ql"
+diLeptonCategory_dict[3] = "q+q"
+diLeptonCategory_dict[4] = "ql+q"
+
+singleLeptonCategory_dict = {}
+singleLeptonCategory_dict[-1] = "unsel"
+singleLeptonCategory_dict[5] = "q"
+singleLeptonCategory_dict[6] = "q+q"
+
 #####################################
 
 # This class prepares a given sample by scaling to int. luminosity
@@ -100,12 +116,12 @@ class Sample:
                 self.sum_weight += yields[path]
         self.rdf = ROOT.RDataFrame("Friends", self.file_list)
         # so far only dilepton
-        self.rdf = self.rdf.Filter("EventObservables_nominal_met < 100.")
+        #self.rdf = self.rdf.Filter("EventObservables_nominal_met < 100.")
 
         if self.isMC:
             if "HNL" in name:
                 # 1 pb cross- section
-                self.rdf = self.rdf.Define("weightLumi", "genweight*%s*1000.0/%s" % (lumi[year], self.sum_weight))
+                self.rdf = self.rdf.Define("weightLumi", "genweight*%s*1000.0" % (lumi[year]))
             else:
                 xsec = find_xsec(path, xsecs)
                 self.rdf = self.rdf.Define("weightLumi", "genweight*%s*1000.0*%s/%s" % (lumi[year], xsec, self.sum_weight))
@@ -125,7 +141,7 @@ class Sample:
             self.rdf = self.rdf.Define("weightNominal", "1")
 
         self.hists = []
-        print("RDF "+name+ " has entries: "+str(self.rdf.Count().GetValue()))
+        print("RDF "+name+ " has entries: "+str(self.rdf.Count().GetValue()), flush=True)
 
 # A process is a combination of several "Samples" which are all added up internally
 class Process:
@@ -138,23 +154,22 @@ class Process:
         for arg in args:
             self.rdfs.append(arg.rdf)
 
-    def Histo1D(self, args, varexp, weight):
-        category = args[0]
+    def Histo1D(self, args, category, varexp, weight):
         for i, rdf in enumerate(self.rdfs):
             rdf = rdf.Define(category, varexp)
-            _rdf = rdf.Define("weight", weight)
+            weight_var = "weight_{}".format(random.randrange(1e6))
+            rdf = rdf.Define(weight_var, weight)
             if i == 0:
-                hist = _rdf.Histo1D(args, category, "weight")
+                hist = rdf.Histo1D(args, category, weight_var)
                 hist.Sumw2()
             else:
-                tmp_hist = _rdf.Histo1D(args, category, "weight")
+                tmp_hist = rdf.Histo1D(args, category, weight_var)
                 tmp_hist.Sumw2()
                 hist.Add(tmp_hist.GetValue())
 
         hist.SetName(self.name)
         hist.SetTitle(self.name)
-        for i, label in enumerate(bin_labels):
-            hist.GetXaxis().SetBinLabel(i+1, label)
+
         self.hists.append(hist)
         return self.hists[-1]
 
@@ -162,6 +177,15 @@ class Process:
 # Read in event yields and cross-sections for normalisation
 with open("/vols/build/cms/LLP/yields_200720/{}/eventyields.json".format(year)) as json_file:
     yields = json.load(json_file)
+
+with open("/vols/build/cms/LLP/yields_200720/{}/eventyieldsHNL.json".format(year)) as json_file:
+    yieldsHNL = json.load(json_file)
+
+if "HNL" in proc:
+    yieldHNL = yieldsHNL["{}-{}".format(proc, year)]
+    print(yieldHNL, flush=True)
+
+
 
 # select only the relevant year
 
@@ -198,17 +222,25 @@ def removeNegEntries(hist):
 
 # create root file with nominal value histogram and various systematic variations
 # to be used with Combine Harvester
-root_file = ROOT.TFile.Open("hists/{}_{}.root".format(proc, year), "RECREATE")
+
+category_variable_nominal = "category_nominal_allCategories"
+root_file = ROOT.TFile.Open("hists/{}_{}_{}.root".format(proc, args.category, year), "RECREATE")
+
+macroCategory_name = args.category
+category_weight = macroCategory_dict[args.category]
+
+print("The category name and weight are:", macroCategory_name, category_weight, flush=True)
 root_file.cd()
-root_file.mkdir("category")
-root_file.cd("category")
-coupling = 0
+root_file.mkdir(macroCategory_name)
+root_file.cd(macroCategory_name)
+coupling = 1
 
 while coupling < 67:
     # different scenarios
     if "hnl" in process.name:
         coupling += 1
-        coupling_var = "LHEWeights_coupling_{}".format(coupling)
+        print("coupling: {}/ 68".format(coupling))
+        coupling_var = "(LHEWeights_coupling_{}/{})".format(coupling, yieldHNL["LHEWeights_coupling_{}".format(coupling)])
     else:
         coupling = 68
 
@@ -225,14 +257,39 @@ while coupling < 67:
             weight += "*"+coupling_var
 
         # Systematic variation
-        varexp = category_varexp.replace("nominal", systName)
+        varexp = category_weight.replace("nominal", systName)
+        weight = "{}*{}".format(weight, varexp)
+        category_variable = category_variable_nominal.replace("nominal", systName)
 
-        hist = process.Histo1D((name, name, 10, 0.5, 10.5), varexp, weight)
-        removeNegEntries(hist)
-        hist.SetTitle(name)
-        hist.SetName(name)
-        hist.SetDirectory(root_file)
-        hist.Write()
+        if macroCategory_name in ["e", "mu"]:
+            category_dict = singleLeptonCategory_dict
+            category_variable += "*"+total_cut(category="singlelepton", syst=systName)
+        else:
+            category_dict = diLeptonCategory_dict
+            category_variable += "*"+total_cut(category="dilepton", syst=systName)
+
+        #print(category_variable, weight)
+
+        # read in hist from nanoAOD friends
+        hist_nano = process.Histo1D((category_variable, category_variable, 12, -2, 10), macroCategory_name, category_variable, weight)
+        hist_nano = hist_nano.Clone()
+
+        index_new = 0
+        hist_limits = ROOT.TH1D("hist", "hist", len(category_dict), -0.5, len(category_dict)-0.5)
+
+        for index, category in category_dict.items():
+            index_new += 1
+            hist_content = hist_nano.GetBinContent(hist_nano.FindBin(index))
+            hist_limits.SetBinContent(index_new, hist_content)
+            hist_limits.GetXaxis().SetBinLabel(index_new, category)
+            #print(category, index, hist_nano.FindBin(index), index_new, hist_content)
+
+        removeNegEntries(hist_limits)
+        hist_limits.SetTitle(name)
+        hist_limits.SetName(name)
+        hist_limits.SetDirectory(root_file)
+        hist_limits.Write()
+
 
     # variations with changing weight
     for systName, abrv in systDict.items():
@@ -244,10 +301,36 @@ while coupling < 67:
             weight = "weight_{}{}".format(abrv, variation)
             if "hnl" in process.name:
                 weight += "*"+coupling_var
-            hist = process.Histo1D((name, name, 10, 0.5, 10.5), category_varexp, weight)
-            removeNegEntries(hist)
-            hist.SetTitle(name)
-            hist.SetName(name)
-            hist.SetDirectory(root_file)
-            hist.Write()
+
+            varexp = category_weight.replace("nominal", systName)
+            weight = "{}*{}".format(weight, varexp)
+
+            if macroCategory_name in ["e", "mu"]:
+                category_dict = singleLeptonCategory_dict
+                category_variable = category_variable_nominal+"*"+total_cut(category="singlelepton")
+            else:
+                category_dict = diLeptonCategory_dict
+                category_variable = category_variable_nominal+"*"+total_cut(category="dilepton")
+
+            # read in hist from nanoAOD friends
+            hist_nano = process.Histo1D((category_variable, category_variable, 12, -2, 10), macroCategory_name, category_variable, weight)
+            hist_nano = hist_nano.Clone()
+
+            index_new = 0
+
+            hist_limits = ROOT.TH1D("hist", "hist", len(category_dict), -0.5, len(category_dict)-0.5)
+
+            for index, category in category_dict.items():
+                index_new += 1
+                hist_content = hist_nano.GetBinContent(hist_nano.FindBin(index))
+                hist_limits.SetBinContent(index_new, hist_content)
+                hist_limits.GetXaxis().SetBinLabel(index_new, category)
+                #print(category, index, hist_nano.FindBin(index), index_new, hist_content)
+
+            removeNegEntries(hist_limits)
+            hist_limits.SetTitle(name)
+            hist_limits.SetName(name)
+            hist_limits.SetDirectory(root_file)
+            hist_limits.Write()
+
 root_file.Close()

@@ -5,6 +5,7 @@ import json
 
 years = ["2016"]
 couplings = [2, 7, 12, 47, 52, 67]
+couplings=range(2, 68)
 
 # make a datacard for a single HNL mass/coupling scenario
 def make_datacard(cats, signal_name, output_path, coupling=12):
