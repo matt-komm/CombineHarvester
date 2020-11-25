@@ -2,22 +2,39 @@ import CombineHarvester.CombineTools.ch as ch
 import ROOT
 import os
 import json
+import argparse
+import math
+ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.WARNING)
+
+
+def getHist(fileName, histName):
+    rootFile = ROOT.TFile(fileName)
+    hist = rootFile.Get(histName)
+    hist = hist.Clone()
+    hist.SetDirectory(0)
+    rootFile.Close()
+    return hist
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument("--path", default="/home/hep/vc1117/LLP/histo/hists_merged")
+args = parser.parse_args()
+hist_path = args.path
 
 years = ["2016"] # ["2016", "2017", "2018"]
 couplings = [2, 7, 12, 47, 52, 67]
-couplings = range(2, 68)
-
-hist_path = "/home/hep/vc1117/LLP/histo/hists_merged"
+#couplings = range(2, 68)
 
 # make a datacard for a single HNL mass/coupling scenario
 def make_datacard(cats, cats_signal, signal_name, output_path, coupling=12):
     for year in years:
         cb = ch.CombineHarvester()
-        procs = ["qcd"] #["ttbar", "qcd", "wjets", "dyjets"]
+        bkgs_mc = ["ttbar"]
+        bkgs_abcd = ["qcd", "wjets", "dyjets"]
         signal = ["HNL"]
 
-        cb.AddProcesses(era=[year], procs=procs, bin=cats, signal=False)
-        cb.AddProcesses(era=[year], procs=signal, bin=cats_signal, signal=True)
+        cb.AddProcesses(era=[year], procs=bkgs_mc, bin=cats, signal=False)
+        cb.AddProcesses(era=[year], procs=signal, bin=cats_signal, signal=True) # for now no signal outside region D
 
         if os.path.exists(output_path):
             print("Overwriting path!")
@@ -31,61 +48,107 @@ def make_datacard(cats, cats_signal, signal_name, output_path, coupling=12):
 
         cb.cp().AddSyst(cb, "lumi_$ERA", "lnN", ch.SystMap("era")([year], 1.026))
 
-        try:
-            cb.cp().signals().ExtractShapes(
-                  "{}/{}_{}.root".format(hist_path, signal_name, year),
-                  "$BIN/$PROCESS_coupling_{}".format(coupling),
-                  "$BIN/$PROCESS_coupling_{}_$SYSTEMATIC".format(coupling)
-                  )
-        except RuntimeError:
-            print("Got error. Skipping!")
-            return False
-        else:
-            cb.cp().backgrounds().ExtractShapes(
-                  #"{}/{}.root".format(hist_path, year),
-                  "{}/qcd_{}.root".format(hist_path, year),
-                  "$BIN/$PROCESS",
-                  "$BIN/$PROCESS_$SYSTEMATIC"
-                  )
 
-            for proc in procs:
-                for category in cats:
-                    category_name = category[1]
-                    rate = cb.cp().process([proc]).bin([category_name]).GetRate()
+        cb.cp().signals().ExtractShapes(
+                "{}/{}_{}.root".format(hist_path, signal_name, year),
+                "$BIN/$PROCESS_coupling_{}".format(coupling),
+                "$BIN/$PROCESS_coupling_{}_$SYSTEMATIC".format(coupling)
+                )
 
-                    if "D" in category_name:
-                        abcd_string = proc+"_"+category_name.replace("_D", "_A")+"_rate,"
-                        abcd_string += proc+"_"+category_name.replace("_D", "_C")+"_rate,"
-                        abcd_string += proc+"_"+category_name.replace("_D", "_B")+"_rate"
+        cb.cp().backgrounds().ExtractShapes(
+                "{}/{}.root".format(hist_path, year),
+                "$BIN/$PROCESS",
+                "$BIN/$PROCESS_$SYSTEMATIC"
+                )
+                
+        shape_hist = getHist(
+            os.path.join(hist_path, "{}.root".format(year)),
+            "mumu_OS_prompt_D/ttbar"
+        )
 
-                        cb.cp().process([proc]).bin([category_name]).AddSyst(cb, proc+"_"+category_name+"_rate", "rateParam",
-                            ch.SystMap("era")([year], ("@0*@1/@2", abcd_string)) 
+        nbins = shape_hist.GetNbinsX()
+        bin_min = -0.5
+        bin_max = nbins-0.5
+
+        
+        # pseudo-data
+        for _, category_name in cats:
+            obs = ch.Observation()
+            for i, bkg in enumerate(bkgs_mc+bkgs_abcd):
+                bkg_obs_hist = getHist(
+                    os.path.join(hist_path,"{}.root".format(year)),
+                        "{}/{}".format(category_name, bkg)
+                )
+                if i == 0:
+                    obs_sum_hist = bkg_obs_hist.Clone(category_name)
+                else:
+                    obs_sum_hist.Add(bkg_obs_hist)
+
+            obs_sum_hist.SetDirectory(0)
+            obs.set_shape(obs_sum_hist,True)
+            obs.set_bin(category_name)
+            obs.set_era(year)
+            cb.InsertObservation(obs)
+
+        # ABCD method
+        for _, category_name in cats_signal:
+            for region in ["A","B","C", "D"]:
+                name = category_name.replace("_D", "_"+region)
+                for ibin in range(nbins):
+                    proc = ch.Process()
+                    process_name = "bkg_{}_bin{}".format(name, ibin+1)
+                    syst_name = "rate_bkg_{}_bin{}".format(name, ibin+1)
+
+                    proc.set_process(process_name)
+                    proc.set_bin(name)
+                    proc.set_era(year)
+
+                    hist = ROOT.TH1F("bkgHist_{}_bin{}".format(name,ibin+1), "", nbins, bin_min, bin_max)
+                    hist.SetBinContent(ibin+1, 1)
+                    hist.SetBinError(ibin+1, 1e-9)
+                    hist.SetDirectory(0)
+                    proc.set_shape(hist, True)
+                    cb.InsertProcess(proc)
+                
+                    cb.cp().process([process_name]).bin([name]).AddSyst(cb, syst_name, "rateParam", ch.SystMap("era")([year], 1.))
+                    param = cb.GetParameter(syst_name)
+
+                    # Sum up all bkgs in mc to set initial param value
+                    for i, bkg in enumerate(bkgs_mc):
+                        bkg_hist = getHist(
+                            os.path.join(hist_path,"{}.root".format(year)),
+                                "{}/{}".format(name, bkg)
                         )
-                    else:
-                        cb.cp().process([proc]).bin([category_name]).AddSyst(cb, proc+"_"+category_name+"_rate", "rateParam",
-                            #ch.SystMap("era")([year], rate)
-                            ch.SystMap("era")([year], 1)
-                        )
+                        if i == 0:
+                            bkg_hist_sum = bkg_hist.Clone(name)
+                        else:
+                            bkg_hist_sum.Add(bkg_hist)
+  
+
+                    content = max(0.,bkg_hist_sum.GetBinContent(ibin+1))
+                    err = max(0.,math.sqrt(bkg_hist_sum.GetBinContent(ibin+1)))
+                    param.set_val(content)
+                    param.set_range(0, 2*content+3*err)
 
 
-            bbFactory = ch.BinByBinFactory()
-            bbFactory.SetAddThreshold(0.1)
-            #bbFactory.SetMergeThreshold(0.5)
-            bbFactory.SetFixNorm(True)
-            bbFactory.SetPattern("bb_$BIN_$PROCESS_bin_$#")
-            #bbFactory.MergeBinErrors(cb.cp().backgrounds())
-            bbFactory.AddBinByBin(cb.cp().backgrounds(), cb)
+        bbFactory = ch.BinByBinFactory()
+        bbFactory.SetAddThreshold(0.1)
+        #bbFactory.SetMergeThreshold(0.5)
+        bbFactory.SetFixNorm(True)
+        bbFactory.SetPattern("bb_$BIN_$PROCESS_bin_$#")
+        #bbFactory.MergeBinErrors(cb.cp().backgrounds())
+        bbFactory.AddBinByBin(cb.cp().backgrounds(), cb)
 
-            cb.PrintAll()
-            f = ROOT.TFile.Open(os.path.join(output_path, "out.root"), "RECREATE")
+        #cb.PrintAll()
+        f = ROOT.TFile.Open(os.path.join(output_path, "out.root"), "RECREATE")
 
-            cb.cp().WriteDatacard(
-                os.path.join(output_path, "out.txt"),
-                f
-            )
+        cb.cp().WriteDatacard(
+            os.path.join(output_path, "out.txt"),
+            f
+        )
 
-            f.Close()
-            return True
+        f.Close()
+        return True
 
 
 categories = [
@@ -105,8 +168,8 @@ categories = [
     "mue_SS_prompt",
     "emu_OS_prompt",
     "emu_SS_prompt",
-    "e",
-    "mu",
+    #"e",
+    #"mu",
 ]
 
 n_categories = len(categories)
@@ -122,7 +185,6 @@ for index1, category_name in enumerate(categories):
         if region == "D":
             category_pairs_signal.append(pair)
         category_pairs.append(pair)
-print(category_pairs)
 
 n_job = 0
 for proc in os.listdir(hist_path):
@@ -151,7 +213,6 @@ eval `scramv1 runtime -sh`
 submit_file.write("JOBS=(\n")
 icounter = 0
 for proc in os.listdir(hist_path):
-    print(icounter)
     if "HNL" not in proc:
         continue
     for year in years:
