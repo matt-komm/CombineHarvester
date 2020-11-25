@@ -60,6 +60,15 @@ def make_datacard(cats, cats_signal, signal_name, output_path, coupling=12):
                 "$BIN/$PROCESS",
                 "$BIN/$PROCESS_$SYSTEMATIC"
                 )
+
+
+        bbFactory = ch.BinByBinFactory()
+        bbFactory.SetAddThreshold(0.1)
+        #bbFactory.SetMergeThreshold(0.5)
+        bbFactory.SetFixNorm(True)
+        bbFactory.SetPattern("bb_$BIN_$PROCESS_bin_$#")
+        #bbFactory.MergeBinErrors(cb.cp().backgrounds())
+        bbFactory.AddBinByBin(cb.cp().backgrounds(), cb)
                 
         shape_hist = getHist(
             os.path.join(hist_path, "{}.root".format(year)),
@@ -109,35 +118,38 @@ def make_datacard(cats, cats_signal, signal_name, output_path, coupling=12):
                     hist.SetDirectory(0)
                     proc.set_shape(hist, True)
                     cb.InsertProcess(proc)
-                
-                    cb.cp().process([process_name]).bin([name]).AddSyst(cb, syst_name, "rateParam", ch.SystMap("era")([year], 1.))
-                    param = cb.GetParameter(syst_name)
-
-                    # Sum up all bkgs in mc to set initial param value
-                    for i, bkg in enumerate(bkgs_mc):
-                        bkg_hist = getHist(
-                            os.path.join(hist_path,"{}.root".format(year)),
-                                "{}/{}".format(name, bkg)
-                        )
-                        if i == 0:
-                            bkg_hist_sum = bkg_hist.Clone(name)
-                        else:
-                            bkg_hist_sum.Add(bkg_hist)
-  
-
-                    content = max(0.,bkg_hist_sum.GetBinContent(ibin+1))
-                    err = max(0.,math.sqrt(bkg_hist_sum.GetBinContent(ibin+1)))
-                    param.set_val(content)
-                    param.set_range(0, 2*content+3*err)
 
 
-        bbFactory = ch.BinByBinFactory()
-        bbFactory.SetAddThreshold(0.1)
-        #bbFactory.SetMergeThreshold(0.5)
-        bbFactory.SetFixNorm(True)
-        bbFactory.SetPattern("bb_$BIN_$PROCESS_bin_$#")
-        #bbFactory.MergeBinErrors(cb.cp().backgrounds())
-        bbFactory.AddBinByBin(cb.cp().backgrounds(), cb)
+                    if "_D" in process_name:
+                        syst_name_A = category_name.replace("_D", "_A")
+                        syst_name_B = category_name.replace("_D", "_B")
+                        syst_name_C = category_name.replace("_D", "_C")
+
+                        cb.cp().process([process_name]).bin([name]).AddSyst(cb, syst_name,"rateParam",
+                            ch.SystMap("era")(["13TeV2016"],(
+                            "TMath::Max(@0,0.000001)*TMath::Range(0,10.,TMath::Max(@1,0.000001)/TMath::Max(@2,0.000001))",
+                            syst_name_A+","+syst_name_C+","+syst_name_B
+                        ))
+                        )       
+                    else:
+                        cb.cp().process([process_name]).bin([name]).AddSyst(cb, syst_name, "rateParam", ch.SystMap("era")([year], 1.))
+                        param = cb.GetParameter(syst_name)
+
+                        # Sum up all bkgs in mc to set initial param value
+                        for i, bkg in enumerate(bkgs_mc):
+                            bkg_hist = getHist(
+                                os.path.join(hist_path,"{}.root".format(year)),
+                                    "{}/{}".format(name, bkg)
+                            )
+                            if i == 0:
+                                bkg_hist_sum = bkg_hist.Clone(name)
+                            else:
+                                bkg_hist_sum.Add(bkg_hist)
+
+                        content = max(0.,bkg_hist_sum.GetBinContent(ibin+1))
+                        err = max(0.,math.sqrt(bkg_hist_sum.GetBinContent(ibin+1)))
+                        param.set_val(content)
+                        param.set_range(0, 2*content+3*err)
 
         #cb.PrintAll()
         f = ROOT.TFile.Open(os.path.join(output_path, "out.root"), "RECREATE")
@@ -228,6 +240,7 @@ for proc in os.listdir(hist_path):
                 submit_file.write("\"")
                 icounter += 1
                 print("Done "+str(icounter)+"/"+str(n_job))
+    #break
 
 submit_file.write(")")
 submit_file.write("\n")
