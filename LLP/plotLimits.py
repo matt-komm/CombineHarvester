@@ -23,7 +23,7 @@ HNL_majorana_all_ctau1p0e00_massHNL1p0_Vall5p274e-01
      67 fractions=0.000,0.000,1.000 => couplings=0.0000e+00,0.0000e+00,1.3615e+00
 '''
 
-with open("/vols/build/cms/LLP/gridpackLookupTable.json") as lookup_table_file:
+with open("/vols/cms/LLP/gridpackLookupTable.json") as lookup_table_file:
     lookup_table = json.load(lookup_table_file)
 
 limits_ghent = {}
