@@ -23,6 +23,7 @@ hist_path = args.path
 
 years = ["2016"] # ["2016", "2017", "2018"]
 couplings = [2, 7, 12, 47, 52, 67]
+#couplings = [12]
 #couplings = range(2, 68)
 
 # make a datacard for a single HNL mass/coupling scenario
@@ -30,7 +31,7 @@ def make_datacard(cats, cats_signal, signal_name, output_path, coupling=12):
     for year in years:
         cb = ch.CombineHarvester()
         bkgs_mc = ["ttbar"]
-        bkgs_abcd = ["qcd", "wjets", "dyjets"]
+        bkgs_abcd = ["wjets", "dyjets", "qcd"]
         signal = ["HNL"]
 
         cb.AddProcesses(era=[year], procs=bkgs_mc, bin=cats, signal=False)
@@ -42,6 +43,7 @@ def make_datacard(cats, cats_signal, signal_name, output_path, coupling=12):
             os.makedirs(output_path)
 
         systematics = ["jesTotal", "jer", "pu", "trigger", "tight_muon_iso", "tight_muon_id", "tight_electron_id"]
+        systematics = []
 
         for syst in systematics:
             cb.cp().AddSyst(cb, syst, "shape", ch.SystMap()(1.0))
@@ -61,14 +63,12 @@ def make_datacard(cats, cats_signal, signal_name, output_path, coupling=12):
                 "$BIN/$PROCESS_$SYSTEMATIC"
                 )
 
-
         bbFactory = ch.BinByBinFactory()
         bbFactory.SetAddThreshold(0.1)
-        #bbFactory.SetMergeThreshold(0.5)
+        bbFactory.SetMergeThreshold(0.5)
         bbFactory.SetFixNorm(True)
         bbFactory.SetPattern("bb_$BIN_$PROCESS_bin_$#")
-        #bbFactory.MergeBinErrors(cb.cp().backgrounds())
-        bbFactory.AddBinByBin(cb.cp().backgrounds(), cb)
+        bbFactory.AddBinByBin(cb.cp().process(bkgs_mc), cb)
                 
         shape_hist = getHist(
             os.path.join(hist_path, "{}.root".format(year)),
@@ -94,7 +94,7 @@ def make_datacard(cats, cats_signal, signal_name, output_path, coupling=12):
                     obs_sum_hist.Add(bkg_obs_hist)
 
             obs_sum_hist.SetDirectory(0)
-            obs.set_shape(obs_sum_hist,True)
+            obs.set_shape(obs_sum_hist, True)
             obs.set_bin(category_name)
             obs.set_era(year)
             cb.InsertObservation(obs)
@@ -121,13 +121,14 @@ def make_datacard(cats, cats_signal, signal_name, output_path, coupling=12):
 
 
                     if "_D" in process_name:
-                        syst_name_A = category_name.replace("_D", "_A")
-                        syst_name_B = category_name.replace("_D", "_B")
-                        syst_name_C = category_name.replace("_D", "_C")
+                        syst_name_A = syst_name.replace("_D", "_A")
+                        syst_name_B = syst_name.replace("_D", "_B")
+                        syst_name_C = syst_name.replace("_D", "_C")
 
-                        cb.cp().process([process_name]).bin([name]).AddSyst(cb, syst_name,"rateParam",
-                            ch.SystMap("era")(["13TeV2016"],(
-                            "TMath::Max(@0,0.000001)*TMath::Range(0,10.,TMath::Max(@1,0.000001)/TMath::Max(@2,0.000001))",
+                        cb.cp().process([process_name]).bin([name]).AddSyst(cb, syst_name, "rateParam",
+                            ch.SystMap("era")([year],(
+                            #"TMath::Max(@0,0.001)*TMath::Range(0,100.,TMath::Max(@1,0.000001)/TMath::Max(@2,0.000001))",
+                            "@0*@1/@2",
                             syst_name_A+","+syst_name_C+","+syst_name_B
                         ))
                         )       
@@ -136,7 +137,7 @@ def make_datacard(cats, cats_signal, signal_name, output_path, coupling=12):
                         param = cb.GetParameter(syst_name)
 
                         # Sum up all bkgs in mc to set initial param value
-                        for i, bkg in enumerate(bkgs_mc):
+                        for i, bkg in enumerate(bkgs_abcd):
                             bkg_hist = getHist(
                                 os.path.join(hist_path,"{}.root".format(year)),
                                     "{}/{}".format(name, bkg)
@@ -148,8 +149,10 @@ def make_datacard(cats, cats_signal, signal_name, output_path, coupling=12):
 
                         content = max(0.,bkg_hist_sum.GetBinContent(ibin+1))
                         err = max(0.,math.sqrt(bkg_hist_sum.GetBinContent(ibin+1)))
-                        param.set_val(content)
-                        param.set_range(0, 2*content+3*err)
+                        param.set_val(content) #content
+                        param.set_range(0.1, 10*content)
+                        #cb.cp().process([process_name]).AddSyst(cb, "rate_unc", "lnN", ch.SystMap("era")([year], 1.2))
+
 
         #cb.PrintAll()
         f = ROOT.TFile.Open(os.path.join(output_path, "out.root"), "RECREATE")
@@ -225,7 +228,7 @@ eval `scramv1 runtime -sh`
 submit_file.write("JOBS=(\n")
 icounter = 0
 for proc in os.listdir(hist_path):
-    if "HNL" not in proc:
+    if "HNL" not in proc: # one datacard for each sig/bkg
         continue
     for year in years:
         if year not in proc:
@@ -236,11 +239,11 @@ for proc in os.listdir(hist_path):
             path = os.path.join('CombineHarvester/LLP/cards/{}/coupling_{}/{}'.format(year, coupling, name))
             if make_datacard(category_pairs, category_pairs_signal, name, os.path.join(path), coupling=coupling):
                 submit_file.write(" \"")
-                submit_file.write('''combineTool.py -M AsymptoticLimits -t -1 --cminPreScan --cminPreFit 1 --rAbsAcc 0.000001 --run expected --X-rtd MINIMIZER_analytic --X-rtd MINIMIZER_MaxCalls=99999999999 -d %s/out.txt --there -n HNL --mass %i''' % (path, coupling))
+                submit_file.write('''combineTool.py -M AsymptoticLimits --cminPreScan --cminPreFit 1 --rAbsAcc 0.000001--X-rtd MINIMIZER_analytic --X-rtd MINIMIZER_MaxCalls=99999999999 -d %s/out.txt --there -n HNL --mass %i''' % (path, coupling))
+                #submit_file.write('''combine -M FitDiagnostics --saveShapes --saveWithUncertainties -t -1 --expectSignal=1  -d %s/out.txt ''' % (path))
                 submit_file.write("\"")
                 icounter += 1
                 print("Done "+str(icounter)+"/"+str(n_job))
-    #break
 
 submit_file.write(")")
 submit_file.write("\n")
