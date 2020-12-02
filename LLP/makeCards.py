@@ -239,7 +239,7 @@ for proc in os.listdir(hist_path):
             path = os.path.join('CombineHarvester/LLP/cards/{}/coupling_{}/{}'.format(year, coupling, name))
             if make_datacard(category_pairs, category_pairs_signal, name, os.path.join(path), coupling=coupling):
                 submit_file.write(" \"")
-                submit_file.write('''combineTool.py -M AsymptoticLimits --cminPreScan --cminPreFit 1 --rAbsAcc 0.000001--X-rtd MINIMIZER_analytic --X-rtd MINIMIZER_MaxCalls=99999999999 -d %s/out.txt --there -n HNL --mass %i''' % (path, coupling))
+                submit_file.write('''combineTool.py -M AsymptoticLimits --run expected --cminPreScan --cminPreFit 1 --rAbsAcc 0.000001 --X-rtd MINIMIZER_analytic --X-rtd MINIMIZER_MaxCalls=99999999999 -d %s/out.txt --there -n HNL --mass %i''' % (path, coupling))
                 #submit_file.write('''combine -M FitDiagnostics --saveShapes --saveWithUncertainties -t -1 --expectSignal=1  -d %s/out.txt ''' % (path))
                 submit_file.write("\"")
                 icounter += 1
