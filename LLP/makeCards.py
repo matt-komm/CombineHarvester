@@ -5,6 +5,8 @@ import json
 import argparse
 import math
 import subprocess
+from multiprocessing import Pool
+
 ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.WARNING)
 
 
@@ -23,9 +25,69 @@ args = parser.parse_args()
 hist_path = args.path
 
 years = ["2016", "2017", "2018"]
-#couplings = [2, 7, 12, 47, 52, 67]
-couplings = [12]
+couplings = [2, 7, 12, 47, 52]
+#couplings = [12]
 #couplings = range(2, 68)
+
+def make_sge_script(procs):
+    submit_file = open("runCombine.sh","w")
+    submit_file.write('''#!/bin/bash
+    #$ -cwd
+    #$ -q hep.q
+    #$ -l h_rt=00:30:00
+    #$ -e log/log.$TASK_ID.err
+    #$ -o log/log.$TASK_ID.out
+    #$ -t 1-'''+str(4*n_job)+'''
+    hostname
+    date
+    source ~/.cms_setup.sh
+    eval `scramv1 runtime -sh`
+    ''')
+
+    submit_file.write("JOBS=(\n")
+
+    for proc in procs:
+        for coupling in couplings:
+            for year in years:
+                path = os.path.join('CombineHarvester/LLP/cards/{}/coupling_{}/{}'.format(year, coupling, proc))
+                submit_file.write(" \"")
+                submit_file.write('''combineTool.py -M AsymptoticLimits --run expected --cminPreScan --cminPreFit 1 --rAbsAcc 0.000001 --X-rtd MINIMIZER_analytic --X-rtd MINIMIZER_MaxCalls=99999999999 -d %s/out.txt --there -n HNL --mass %i''' % (path, coupling))
+                #ssubmit_file.write('''combine -M FitDiagnostics --saveShapes --saveWithUncertainties -t -1 --expectSignal=1  -d %s/out.txt ''' % (path))
+                submit_file.write("\"")
+                submit_file.write("\n")
+    
+            path_2016 = os.path.join('CombineHarvester/LLP/cards/{}/coupling_{}/{}/'.format(2016, coupling, proc))
+            path_2017 = os.path.join('CombineHarvester/LLP/cards/{}/coupling_{}/{}/'.format(2017, coupling, proc))
+            path_2018 = os.path.join('CombineHarvester/LLP/cards/{}/coupling_{}/{}/'.format(2018, coupling, proc))
+            path_combined = os.path.join('CombineHarvester/LLP/cards/{}/coupling_{}/{}/'.format("combined", coupling, proc))
+
+            if not os.path.exists(path_combined):
+                os.makedirs(path_combined)
+
+            submit_file.write(" \"")
+            submit_file.write("combineCards.py "+ path_2016+"out.txt " + path_2017 + "out.txt " + path_2018+"out.txt >> " +path_combined+"out.txt ")
+            submit_file.write('''&& combineTool.py -M AsymptoticLimits --run expected --cminPreScan --cminPreFit 1 --rAbsAcc 0.000001 --X-rtd MINIMIZER_analytic --X-rtd MINIMIZER_MaxCalls=99999999999 -d %sout.txt -n HNL --mass %i''' % (path_combined, coupling))
+            submit_file.write("\"")
+            submit_file.write("\n")
+
+
+    submit_file.write(")")
+    submit_file.write("\n")
+    submit_file.write("echo ${JOBS[$SGE_TASK_ID-1]}")
+    submit_file.write("\n")
+    submit_file.write('''eval "${JOBS[$SGE_TASK_ID-1]}"''')
+    submit_file.close()
+
+def worker(proc):
+    print("Started", str(hnl_sample_list.index(proc))+"/"+str(n_job))
+    for year in years:
+        for coupling in couplings:
+            path = os.path.join('CombineHarvester/LLP/cards/{}/coupling_{}/{}'.format(year, coupling, proc))
+            make_datacard(category_pairs, category_pairs_signal, proc, path, coupling=coupling, year=year)
+
+    print("Finished", str(hnl_sample_list.index(proc))+"/"+str(n_job))
+
+
 
 # make a datacard for a single HNL mass/coupling scenario
 def make_datacard(cats, cats_signal, signal_name, output_path, coupling=12, year="2016"):
@@ -210,64 +272,14 @@ hnl_sample_list = []
 for proc in os.listdir(hist_path):
     if "HNL" not in proc:
         continue
+    #if "HNL_majorana_all_ctau1p0e00_massHNL10p0_Vall1p177e-03" not in proc:
+        #continue
     if "_2016" in proc:
         hnl_sample_list.append(proc.replace("_2016.root", ""))
         for coupling in couplings:
             n_job+=1
 
+make_sge_script(hnl_sample_list)
     
-submit_file = open("runCombine.sh","w")
-submit_file.write('''#!/bin/bash
-#$ -cwd
-#$ -q hep.q
-#$ -l h_rt=00:30:00
-#$ -e log/log.$TASK_ID.err
-#$ -o log/log.$TASK_ID.out
-#$ -t 1-'''+str(n_job)+'''
-hostname
-date
-source ~/.cms_setup.sh
-eval `scramv1 runtime -sh`
-''')
-
-submit_file.write("JOBS=(\n")
-icounter = 0
-for proc in hnl_sample_list:
-    #if "HNL_majorana_all_ctau1p0e00_massHNL10p0_Vall1p177e-03" not in proc:
-        #continue
-    print(proc)
-    for year in years:
-        for coupling in couplings:
-            path = os.path.join('CombineHarvester/LLP/cards/{}/coupling_{}/{}'.format(year, coupling, proc))
-            if make_datacard(category_pairs, category_pairs_signal, proc, path, coupling=coupling, year=year):
-                submit_file.write(" \"")
-                submit_file.write('''combineTool.py -M AsymptoticLimits --run expected --cminPreScan --cminPreFit 1 --rAbsAcc 0.000001 --X-rtd MINIMIZER_analytic --X-rtd MINIMIZER_MaxCalls=99999999999 -d %s/out.txt --there -n HNL --mass %i''' % (path, coupling))
-                #submit_file.write('''combine -M FitDiagnostics --saveShapes --saveWithUncertainties -t -1 --expectSignal=1  -d %s/out.txt ''' % (path))
-                submit_file.write("\"")
-    path_2016 = os.path.join('CombineHarvester/LLP/cards/{}/coupling_{}/{}/'.format(2016, coupling, proc))
-    path_2017 = os.path.join('CombineHarvester/LLP/cards/{}/coupling_{}/{}/'.format(2017, coupling, proc))
-    path_2018 = os.path.join('CombineHarvester/LLP/cards/{}/coupling_{}/{}/'.format(2018, coupling, proc))
-    path_combined = os.path.join('CombineHarvester/LLP/cards/{}/coupling_{}/{}/'.format("combined", coupling, proc))
-
-    card_combined = subprocess.check_output(["combineCards.py", path_2016+"out.txt", path_2017+"out.txt", path_2018+"out.txt"])
-
-    if os.path.exists(path_combined):
-        print("Overwriting path!")
-    else:
-        os.makedirs(path_combined)
-
-    with open(path_combined+"out.txt", "w") as combined_f:
-        combined_f.write(card_combined)
-
-    submit_file.write(" \"")
-    submit_file.write('''combineTool.py -M AsymptoticLimits --run expected --cminPreScan --cminPreFit 1 --rAbsAcc 0.000001 --X-rtd MINIMIZER_analytic --X-rtd MINIMIZER_MaxCalls=99999999999 -d %s/out.txt -n HNL --mass %i''' % (path_combined, coupling))
-    submit_file.write("\"")
-    icounter += 1
-    print("Done "+str(icounter)+"/"+str(n_job))
-
-submit_file.write(")")
-submit_file.write("\n")
-submit_file.write("echo ${JOBS[$SGE_TASK_ID-1]}")
-submit_file.write("\n")
-submit_file.write("${JOBS[$SGE_TASK_ID-1]}")
-submit_file.close()
+pool = Pool(16)
+pool.map(worker, hnl_sample_list)
