@@ -13,26 +13,15 @@ import matplotlib.pyplot as plt
 import os
 import yaml
 
-'''
-HNL_majorana_all_ctau1p0e00_massHNL1p0_Vall5p274e-01
-     02 fractions=1.000,0.000,0.000 => couplings=8.0064e-01,0.0000e+00,0.0000e+00
-     07 fractions=0.500,0.500,0.000 => couplings=5.7204e-01,5.7204e-01,0.0000e+00
-     12 fractions=0.000,1.000,0.000 => couplings=0.0000e+00,8.1759e-01,0.0000e+00
-     47 fractions=0.500,0.000,0.500 => couplings=6.9015e-01,0.0000e+00,6.9015e-01
-     52 fractions=0.000,0.500,0.500 => couplings=0.0000e+00,7.0092e-01,7.0092e-01
-     67 fractions=0.000,0.000,1.000 => couplings=0.0000e+00,0.0000e+00,1.3615e+00
-'''
 
 with open("/vols/cms/LLP/gridpackLookupTable.json") as lookup_table_file:
     lookup_table = json.load(lookup_table_file)
 
 limits_ghent = {}
-limits_ghent[12.0] = [[1, 3, 8, 10, 12], [4e-4, 1e-5, 6e-7, 5e-7, 7e-7]]
 
+lumi = {"2016": 35.9, "2017": 41.5, "2018": 59.7, "combined": 137.1}
+years = ["2016", "2017", "2018", "combined"]
 
-
-lumi = {"2016": 35.88, "2017": 41.53, "2018": 59.68}
-years = ["2016"]
 couplings = [2.0, 7.0, 12.0, 47.0, 52.0, 67.0]
 ncouplings = len(couplings)
 coupling_dict = {}
@@ -43,7 +32,7 @@ coupling_dict[47.0] = ["etau", "U_{e} : U_{#mu} : U_{#tau} = 1 : 0 : 1"]
 coupling_dict[52.0] = ["mutau", "U_{e} : U_{#mu} : U_{#tau} = 0 : 1 : 1"]
 coupling_dict[67.0] = ["tautau", "U_{e} : U_{#mu} : U_{#tau} = 0 : 0 : 1"]
 
-mass_range = np.arange(1, 20.5, step=0.5)
+mass_range = np.arange(1, 24.5, step=0.5)
 log_coupling_range = np.arange(-8, -0.5, step=0.1)
 coupling_range = np.power(10, log_coupling_range)
 
@@ -141,7 +130,7 @@ for scenario in couplings:
                     roots = np.roots(coeffs)
 
                     def filter_root(root):
-                        if root > -10 and root < 1. and np.imag(root) == 0 and root<max(x)+1.6:
+                        if root > -10 and root < 1. and np.imag(root) == 0 and root<max(x)+0.5 and root>min(x)-0.5:
                             return True
                         else:
                             return False
@@ -149,6 +138,9 @@ for scenario in couplings:
                     roots = filter(filter_root, roots)
                     roots = np.power(10, roots)
                     print(mass, roots)
+
+                    if mass > 12 and len(roots) == 2:
+                        roots = [roots[0]]
                     
                     if len(roots) == 1:
                         root_lower = roots[0]
