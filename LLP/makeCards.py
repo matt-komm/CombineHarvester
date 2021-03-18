@@ -32,17 +32,17 @@ couplings = [2, 7, 12, 47, 52]
 def make_sge_script(procs):
     submit_file = open("runCombine.sh","w")
     submit_file.write('''#!/bin/bash
-    #$ -cwd
-    #$ -q hep.q
-    #$ -l h_rt=00:30:00
-    #$ -e log/log.$TASK_ID.err
-    #$ -o log/log.$TASK_ID.out
-    #$ -t 1-'''+str(4*n_job)+'''
-    hostname
-    date
-    source ~/.cms_setup.sh
-    eval `scramv1 runtime -sh`
-    ''')
+#$ -cwd
+#$ -q hep.q
+#$ -l h_rt=00:30:00
+#$ -e log/log.$TASK_ID.err
+#$ -o log/log.$TASK_ID.out
+#$ -t 1-'''+str(4*n_job)+'''
+hostname
+date
+source ~/.cms_setup.sh
+eval `scramv1 runtime -sh`
+''')
 
     submit_file.write("JOBS=(\n")
 
@@ -66,7 +66,7 @@ def make_sge_script(procs):
 
             submit_file.write(" \"")
             submit_file.write("combineCards.py "+ path_2016+"out.txt " + path_2017 + "out.txt " + path_2018+"out.txt >> " +path_combined+"out.txt ")
-            submit_file.write('''&& combineTool.py -M AsymptoticLimits --run expected --cminPreScan --cminPreFit 1 --rAbsAcc 0.000001 --X-rtd MINIMIZER_analytic --X-rtd MINIMIZER_MaxCalls=99999999999 -d %sout.txt -n HNL --mass %i''' % (path_combined, coupling))
+            submit_file.write('''&& combineTool.py -M AsymptoticLimits --run expected --cminPreScan --cminPreFit 1 --rAbsAcc 0.000001 --X-rtd MINIMIZER_analytic --X-rtd MINIMIZER_MaxCalls=99999999999 -d %sout.txt --there -n HNL --mass %i''' % (path_combined, coupling))
             submit_file.write("\"")
             submit_file.write("\n")
 
@@ -79,13 +79,13 @@ def make_sge_script(procs):
     submit_file.close()
 
 def worker(proc):
-    print("Started", str(hnl_sample_list.index(proc))+"/"+str(n_job))
+    print("Started", str(hnl_sample_list.index(proc))+"/"+str(n_job/len(couplings)))
     for year in years:
         for coupling in couplings:
             path = os.path.join('CombineHarvester/LLP/cards/{}/coupling_{}/{}'.format(year, coupling, proc))
             make_datacard(category_pairs, category_pairs_signal, proc, path, coupling=coupling, year=year)
 
-    print("Finished", str(hnl_sample_list.index(proc))+"/"+str(n_job))
+    print("Finished", str(hnl_sample_list.index(proc))+"/"+str(n_job/len(couplings)))
 
 
 
@@ -281,5 +281,5 @@ for proc in os.listdir(hist_path):
 
 make_sge_script(hnl_sample_list)
     
-pool = Pool(16)
-pool.map(worker, hnl_sample_list)
+#pool = Pool(16)
+#pool.map(worker, hnl_sample_list)

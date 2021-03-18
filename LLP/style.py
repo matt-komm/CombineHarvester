@@ -186,7 +186,7 @@ def makeLumiText(x1,y1,lumi="35.9",year="2016"):
     pText.AddText("%sfb#lower[-0.8]{#scale[0.7]{-1}} (%s)" % (lumi, year))
     pText.SetTextFont(63)
     pText.SetTextSize(31)
-    pText.SetTextAlign(33)
+    pText.SetTextAlign(13)
     rootObj.append(pText)
     pText.Draw("Same")
  

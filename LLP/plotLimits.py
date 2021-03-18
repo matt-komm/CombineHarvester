@@ -20,9 +20,9 @@ with open("/vols/cms/LLP/gridpackLookupTable.json") as lookup_table_file:
 limits_ghent = {}
 
 lumi = {"2016": 35.9, "2017": 41.5, "2018": 59.7, "combined": 137.1}
-years = ["2016", "2017", "2018", "combined"]
+years = ["2016", "2017", "2018"]#, "combined"]
 
-couplings = [2.0, 7.0, 12.0, 47.0, 52.0, 67.0]
+couplings = [2.0, 7.0, 12.0, 47.0, 52.0]# 67.0]
 ncouplings = len(couplings)
 coupling_dict = {}
 coupling_dict[2.0] = ["ee", "U_{e} : U_{#mu} : U_{#tau} = 1 : 0 : 0"]
@@ -36,22 +36,25 @@ mass_range = np.arange(1, 24.5, step=0.5)
 log_coupling_range = np.arange(-8, -0.5, step=0.1)
 coupling_range = np.power(10, log_coupling_range)
 
-for scenario in couplings:
-    print("Analyzing coupling scenario: "+str(scenario))
-    coupling_text = coupling_dict[scenario][0]
-    coupling_title = coupling_dict[scenario][1]
+for year in years:
+    print(year)
+    for scenario in couplings:
+        print("Analyzing coupling scenario: "+str(scenario))
+        coupling_text = coupling_dict[scenario][0]
+        coupling_title = coupling_dict[scenario][1]
 
-    for hnl_type in ["majorana", "dirac"]:
-        print(hnl_type)
-        # arrays to store mass, V2 and sigma/sigma_th values
-        masses = []
-        couplings = []
-        sigma_ratios = {}
-        for exp_var in ["exp0", "exp+1", "exp+2", "exp-1", "exp-2"]:
-            sigma_ratios[exp_var] = []
+        for hnl_type in ["majorana", "dirac"]:
+            print(hnl_type)
+            # arrays to store mass, V2 and sigma/sigma_th values
+            masses = []
+            couplings = []
+            sigma_ratios = {}
+            for exp_var in ["exp0", "exp+1", "exp+2", "exp-1", "exp-2"]:
+                sigma_ratios[exp_var] = []
 
-        for year in years:
             for f in os.listdir("./"):
+                if year not in f:
+                    continue
                 if ".json" not in f:
                     continue
                 if hnl_type not in f:
@@ -68,7 +71,7 @@ for scenario in couplings:
                     continue
 
                 # parse lookup table
-                proc = f.replace("limits_", "").replace(".json", "")
+                proc = f.replace(year, "").replace("limits_", "").replace(".json", "")
                 lu_infos = lookup_table[proc]['weights'][str(int(scenario))]
                 xsec = lu_infos['xsec']['nominal']
                 coupling = lu_infos['couplings']['Ve']+lu_infos['couplings']['Vmu']+lu_infos['couplings']['Vtau']
@@ -88,7 +91,7 @@ for scenario in couplings:
 
             # draw 1d exclusion plots for each mass point
             df = pd.DataFrame(list(zip(masses, couplings, sigma_ratios["exp0"], sigma_ratios["exp+1"], sigma_ratios["exp+2"], sigma_ratios["exp-1"], sigma_ratios["exp-2"])), 
-                           columns =['mass', 'coupling', 'exp0', 'exp+1', 'exp+2', 'exp-1', 'exp-2'])
+                        columns =['mass', 'coupling', 'exp0', 'exp+1', 'exp+2', 'exp-1', 'exp-2'])
             #print(df)
 
             mass_list = sorted(df.mass.unique())
@@ -137,7 +140,6 @@ for scenario in couplings:
 
                     roots = filter(filter_root, roots)
                     roots = np.power(10, roots)
-                    print(mass, roots)
 
                     if mass > 12 and len(roots) == 2:
                         roots = [roots[0]]
@@ -170,76 +172,76 @@ for scenario in couplings:
             plt.savefig("fit_{}_coupling_{}_year_{}.pdf".format(hnl_type, scenario, year))
             plt.clf()
 
-        y_error_down = [y_up-y for y_up, y in zip(crossing_points["exp+1"], crossing_points["exp0"])]
-        y_error_up = [y-y_down for y_down, y in zip(crossing_points["exp-1"], crossing_points["exp0"])]
-        x = np.zeros(len(crossing_points["exp0"]))
+            y_error_down = [y_up-y for y_up, y in zip(crossing_points["exp+1"], crossing_points["exp0"])]
+            y_error_up = [y-y_down for y_down, y in zip(crossing_points["exp-1"], crossing_points["exp0"])]
+            x = np.zeros(len(crossing_points["exp0"]))
 
-        y_error_down_upper = [y_up-y for y_up, y in zip(crossing_points_upper["exp+1"], crossing_points_upper["exp0"])]
-        y_error_up_upper = [y-y_down for y_down, y in zip(crossing_points_upper["exp-1"], crossing_points_upper["exp0"])]
-        x_upper = np.zeros(len(crossing_points_upper["exp0"]))
+            y_error_down_upper = [y_up-y for y_up, y in zip(crossing_points_upper["exp+1"], crossing_points_upper["exp0"])]
+            y_error_up_upper = [y-y_down for y_down, y in zip(crossing_points_upper["exp-1"], crossing_points_upper["exp0"])]
+            x_upper = np.zeros(len(crossing_points_upper["exp0"]))
 
-        if hnl_type == "majorana":
-            graph_majorana = ROOT.TGraphAsymmErrors(len(crossing_points["exp0"]), array('d', sensitive_masses["exp0"]), array('d', crossing_points["exp0"]), array('d', x), array('d', x), array('d', y_error_up), array('d', y_error_down))
-            if len(y_error_up_upper) == 0:
-                upperMajorana = False
+            if hnl_type == "majorana":
+                graph_majorana = ROOT.TGraphAsymmErrors(len(crossing_points["exp0"]), array('d', sensitive_masses["exp0"]), array('d', crossing_points["exp0"]), array('d', x), array('d', x), array('d', y_error_up), array('d', y_error_down))
+                if len(y_error_up_upper) == 0:
+                    upperMajorana = False
+                else:
+                    upperMajorana = True
+                    graph_majorana_upper = ROOT.TGraphAsymmErrors(len(crossing_points_upper["exp0"]), array('d', sensitive_masses_upper["exp0"]), array('d', crossing_points_upper["exp0"]), array('d', x_upper), array('d', y_error_up_upper), array('d', y_error_down_upper))
+
             else:
-                upperMajorana = True
-                graph_majorana_upper = ROOT.TGraphAsymmErrors(len(crossing_points_upper["exp0"]), array('d', sensitive_masses_upper["exp0"]), array('d', crossing_points_upper["exp0"]), array('d', x_upper), array('d', y_error_up_upper), array('d', y_error_down_upper))
+                graph_dirac = ROOT.TGraphAsymmErrors(len(crossing_points["exp0"]), array('d', sensitive_masses["exp0"]), array('d', crossing_points["exp0"]), array('d', x), array('d', x), array('d', y_error_up), array('d', y_error_down))
+                if len(y_error_up_upper) == 0:
+                    upperDirac = False
+                else:
+                    upperDirac = True
+                    graph_dirac_upper = ROOT.TGraphAsymmErrors(len(crossing_points_upper["exp0"]), array('d', sensitive_masses_upper["exp0"]), array('d', crossing_points_upper["exp0"]), array('d', x_upper), array('d', y_error_up_upper), array('d', y_error_down_upper))
 
-        else:
-            graph_dirac = ROOT.TGraphAsymmErrors(len(crossing_points["exp0"]), array('d', sensitive_masses["exp0"]), array('d', crossing_points["exp0"]), array('d', x), array('d', x), array('d', y_error_up), array('d', y_error_down))
-            if len(y_error_up_upper) == 0:
-                upperDirac = False
-            else:
-                upperDirac = True
-                graph_dirac_upper = ROOT.TGraphAsymmErrors(len(crossing_points_upper["exp0"]), array('d', sensitive_masses_upper["exp0"]), array('d', crossing_points_upper["exp0"]), array('d', x_upper), array('d', y_error_up_upper), array('d', y_error_down_upper))
+        cv = style.makeCanvas()
+        cv.Draw("")
+        cv.SetLogy()
+        cv.SetLogx()
+        graph_majorana.Draw("ACP3")
+        graph_majorana.GetXaxis().SetTitle("m_{N} (GeV)")
+        graph_majorana.GetYaxis().SetTitle("|V_{lN}|^{2}")
 
-    cv = style.makeCanvas()
-    cv.Draw("")
-    cv.SetLogy()
-    cv.SetLogx()
-    graph_majorana.Draw("ACP3")
-    graph_majorana.GetXaxis().SetTitle("m_{N} (GeV)")
-    graph_majorana.GetYaxis().SetTitle("|V_{lN}|^{2}")
+        graph_majorana.GetXaxis().SetLimits(1, 20.)
+        graph_majorana.SetMinimum(1e-7)
+        graph_majorana.SetMaximum(1e1)
 
-    graph_majorana.GetXaxis().SetLimits(1, 20.)
-    graph_majorana.SetMinimum(1e-7)
-    graph_majorana.SetMaximum(1e1)
+        graph_majorana.SetLineColor(ROOT.kAzure)
+        graph_majorana.SetMarkerColor(ROOT.kAzure)
+        graph_majorana.SetFillColorAlpha(ROOT.kAzure, 0.3)
 
-    graph_majorana.SetLineColor(ROOT.kAzure)
-    graph_majorana.SetMarkerColor(ROOT.kAzure)
-    graph_majorana.SetFillColorAlpha(ROOT.kAzure, 0.3)
-
-    graph_dirac.SetLineColor(ROOT.kOrange)
-    graph_dirac.SetMarkerColor(ROOT.kOrange)
-    graph_dirac.SetFillColorAlpha(ROOT.kOrange, 0.3)
+        graph_dirac.SetLineColor(ROOT.kOrange)
+        graph_dirac.SetMarkerColor(ROOT.kOrange)
+        graph_dirac.SetFillColorAlpha(ROOT.kOrange, 0.3)
 
 
-    graph_dirac.Draw("SAMECP3")
+        graph_dirac.Draw("SAMECP3")
 
-    '''
-    if scenario in limits_ghent:
-        m_values_ghent = array('d', limits_ghent[scenario][0])
-        v_values_ghent = array('d', limits_ghent[scenario][1])
-        graph_ghent = ROOT.TGraph(len(m_values_ghent), m_values_ghent, v_values_ghent)
-        graph_ghent.Draw("SAMECP")
-    '''
-    if upperDirac:
-        graph_dirac_upper.Draw("SAMECP3")
-        graph_dirac_upper.SetLineColor(ROOT.kOrange)
-        graph_dirac_upper.SetMarkerColor(ROOT.kOrange)
-        graph_dirac_upper.SetFillColorAlpha(ROOT.kOrange, 0.3)
-    if upperMajorana:
-        graph_majorana_upper.SetLineColor(ROOT.kAzure)
-        graph_majorana_upper.SetMarkerColor(ROOT.kAzure)
-        graph_majorana_upper.SetFillColorAlpha(ROOT.kAzure, 0.3)
-        graph_majorana_upper.Draw("SAMECP3")
+        '''
+        if scenario in limits_ghent:
+            m_values_ghent = array('d', limits_ghent[scenario][0])
+            v_values_ghent = array('d', limits_ghent[scenario][1])
+            graph_ghent = ROOT.TGraph(len(m_values_ghent), m_values_ghent, v_values_ghent)
+            graph_ghent.Draw("SAMECP")
+        '''
+        if upperDirac:
+            graph_dirac_upper.Draw("SAMECP3")
+            graph_dirac_upper.SetLineColor(ROOT.kOrange)
+            graph_dirac_upper.SetMarkerColor(ROOT.kOrange)
+            graph_dirac_upper.SetFillColorAlpha(ROOT.kOrange, 0.3)
+        if upperMajorana:
+            graph_majorana_upper.SetLineColor(ROOT.kAzure)
+            graph_majorana_upper.SetMarkerColor(ROOT.kAzure)
+            graph_majorana_upper.SetFillColorAlpha(ROOT.kAzure, 0.3)
+            graph_majorana_upper.Draw("SAMECP3")
 
-    leg = style.makeLegend(0.65, 0.75, 0.8, 0.87)
-    leg.AddEntry(graph_majorana, "Majorana", "lpf")
-    leg.AddEntry(graph_dirac, "Dirac", "lpf")
-    leg.Draw("SAME")
-    style.makeText(0.2, 0.8, 0.2, 0.8, coupling_title)
-    style.makeCMSText(0.17, 0.95, additionalText="Simulation Preliminary")
-    style.makeLumiText(0.9, 0.95, year=year, lumi=lumi[year])
-    cv.SaveAs("limit_coupling_{}_{}.pdf".format(scenario, year))
+        leg = style.makeLegend(0.65, 0.75, 0.8, 0.87)
+        leg.AddEntry(graph_majorana, "Majorana", "lpf")
+        leg.AddEntry(graph_dirac, "Dirac", "lpf")
+        leg.Draw("SAME")
+        style.makeText(0.2, 0.8, 0.2, 0.8, coupling_title)
+        style.makeCMSText(0.17, 0.95, additionalText="Simulation Preliminary")
+        style.makeLumiText(0.9, 0.95, year=year, lumi=lumi[year])
+        cv.SaveAs("limit_coupling_{}_{}.pdf".format(scenario, year))
