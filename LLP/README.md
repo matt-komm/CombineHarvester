@@ -11,7 +11,7 @@
 
 ## Step 3: Collect results
 
-* parse results into json files, e.g. ```combineTool.py -M CollectLimits cards/2016/coupling_*/*/*HNL*.root --use-dirs -o limits.json```
+* parse results into json files, e.g. ```combineTool.py -M CollectLimits cards/$YEAR/coupling_*/*/*HNL*.root --use-dirs -o jsons/limits_$YEAR.json```, where ```YEAR``` is 2016, 2017, 2018,or "combined" (full Run 2).
 * plot limits using ```python CombineHarvester/LLP/plotLimits.py```
 
 ## Step 4: Making pre and post-fit plots (Work in progress!)

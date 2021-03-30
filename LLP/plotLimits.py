@@ -13,6 +13,8 @@ import matplotlib.pyplot as plt
 import os
 import yaml
 
+json_path = "jsons"
+
 
 with open("/vols/cms/LLP/gridpackLookupTable.json") as lookup_table_file:
     lookup_table = json.load(lookup_table_file)
@@ -20,17 +22,15 @@ with open("/vols/cms/LLP/gridpackLookupTable.json") as lookup_table_file:
 limits_ghent = {}
 
 lumi = {"2016": 35.9, "2017": 41.5, "2018": 59.7, "combined": 137.1}
-years = ["2016", "2017", "2018"]#, "combined"]
+years = ["2016", "2017", "2018", "combined"]
 
-couplings = [2.0, 7.0, 12.0, 47.0, 52.0]# 67.0]
-ncouplings = len(couplings)
 coupling_dict = {}
 coupling_dict[2.0] = ["ee", "U_{e} : U_{#mu} : U_{#tau} = 1 : 0 : 0"]
 coupling_dict[7.0] = ["emu", "U_{e} : U_{#mu} : U_{#tau} = 1 : 1 : 0"]
 coupling_dict[12.0] = ["mumu", "U_{e} : U_{#mu} : U_{#tau} = 0 : 1 : 0"]
 coupling_dict[47.0] = ["etau", "U_{e} : U_{#mu} : U_{#tau} = 1 : 0 : 1"]
 coupling_dict[52.0] = ["mutau", "U_{e} : U_{#mu} : U_{#tau} = 0 : 1 : 1"]
-coupling_dict[67.0] = ["tautau", "U_{e} : U_{#mu} : U_{#tau} = 0 : 0 : 1"]
+#coupling_dict[67.0] = ["tautau", "U_{e} : U_{#mu} : U_{#tau} = 0 : 0 : 1"]
 
 mass_range = np.arange(1, 24.5, step=0.5)
 log_coupling_range = np.arange(-8, -0.5, step=0.1)
@@ -38,7 +38,7 @@ coupling_range = np.power(10, log_coupling_range)
 
 for year in years:
     print(year)
-    for scenario in couplings:
+    for scenario in coupling_dict.keys():
         print("Analyzing coupling scenario: "+str(scenario))
         coupling_text = coupling_dict[scenario][0]
         coupling_title = coupling_dict[scenario][1]
@@ -52,7 +52,7 @@ for year in years:
             for exp_var in ["exp0", "exp+1", "exp+2", "exp-1", "exp-2"]:
                 sigma_ratios[exp_var] = []
 
-            for f in os.listdir("./"):
+            for f in os.listdir(json_path):
                 if year not in f:
                     continue
                 if ".json" not in f:
@@ -60,7 +60,8 @@ for year in years:
                 if hnl_type not in f:
                     continue
                 # limit json aggreggate 
-                with open(f) as json_file:
+                print(f)
+                with open(os.path.join(json_path, f)) as json_file:
                     xsecDict = json.load(json_file)
                 if str(scenario) not in xsecDict.keys():
                     continue
@@ -71,7 +72,7 @@ for year in years:
                     continue
 
                 # parse lookup table
-                proc = f.replace(year, "").replace("limits_", "").replace(".json", "")
+                proc = f.replace(year+"_", "").replace("limits_", "").replace(".json", "")
                 lu_infos = lookup_table[proc]['weights'][str(int(scenario))]
                 xsec = lu_infos['xsec']['nominal']
                 coupling = lu_infos['couplings']['Ve']+lu_infos['couplings']['Vmu']+lu_infos['couplings']['Vtau']
@@ -104,7 +105,7 @@ for year in years:
                 sensitive_masses[exp_var] = []
                 crossing_points_upper[exp_var] = []
                 sensitive_masses_upper[exp_var] = []
-            print("list of masses to be analyzed", mass_list)
+            print "list of masses to be analyzed {}".format(mass_list)
 
 
             # make 1d plot and find crossing point
@@ -169,7 +170,7 @@ for year in years:
                         plt.axhline(1)
                         for root in roots:
                             plt.axvline(root)
-            plt.savefig("fit_{}_coupling_{}_year_{}.pdf".format(hnl_type, scenario, year))
+            plt.savefig("limits/fit_{}_coupling_{}_year_{}.pdf".format(hnl_type, scenario, year))
             plt.clf()
 
             y_error_down = [y_up-y for y_up, y in zip(crossing_points["exp+1"], crossing_points["exp0"])]
@@ -180,13 +181,15 @@ for year in years:
             y_error_up_upper = [y-y_down for y_down, y in zip(crossing_points_upper["exp-1"], crossing_points_upper["exp0"])]
             x_upper = np.zeros(len(crossing_points_upper["exp0"]))
 
+            print(y, y_error_up, y_error_down, x, y_error_down_upper, y_error_up_upper, x_upper)
+
             if hnl_type == "majorana":
                 graph_majorana = ROOT.TGraphAsymmErrors(len(crossing_points["exp0"]), array('d', sensitive_masses["exp0"]), array('d', crossing_points["exp0"]), array('d', x), array('d', x), array('d', y_error_up), array('d', y_error_down))
                 if len(y_error_up_upper) == 0:
                     upperMajorana = False
                 else:
                     upperMajorana = True
-                    graph_majorana_upper = ROOT.TGraphAsymmErrors(len(crossing_points_upper["exp0"]), array('d', sensitive_masses_upper["exp0"]), array('d', crossing_points_upper["exp0"]), array('d', x_upper), array('d', y_error_up_upper), array('d', y_error_down_upper))
+                    #graph_majorana_upper = ROOT.TGraphAsymmErrors(len(crossing_points_upper["exp0"]), array('d', sensitive_masses_upper["exp0"]), array('d', crossing_points_upper["exp0"]), array('d', x_upper), array('d', y_error_up_upper), array('d', y_error_down_upper))
 
             else:
                 graph_dirac = ROOT.TGraphAsymmErrors(len(crossing_points["exp0"]), array('d', sensitive_masses["exp0"]), array('d', crossing_points["exp0"]), array('d', x), array('d', x), array('d', y_error_up), array('d', y_error_down))
@@ -194,7 +197,7 @@ for year in years:
                     upperDirac = False
                 else:
                     upperDirac = True
-                    graph_dirac_upper = ROOT.TGraphAsymmErrors(len(crossing_points_upper["exp0"]), array('d', sensitive_masses_upper["exp0"]), array('d', crossing_points_upper["exp0"]), array('d', x_upper), array('d', y_error_up_upper), array('d', y_error_down_upper))
+                    #graph_dirac_upper = ROOT.TGraphAsymmErrors(len(crossing_points_upper["exp0"]), array('d', sensitive_masses_upper["exp0"]), array('d', crossing_points_upper["exp0"]), array('d', x_upper), array('d', y_error_up_upper), array('d', y_error_down_upper))
 
         cv = style.makeCanvas()
         cv.Draw("")
@@ -225,7 +228,6 @@ for year in years:
             v_values_ghent = array('d', limits_ghent[scenario][1])
             graph_ghent = ROOT.TGraph(len(m_values_ghent), m_values_ghent, v_values_ghent)
             graph_ghent.Draw("SAMECP")
-        '''
         if upperDirac:
             graph_dirac_upper.Draw("SAMECP3")
             graph_dirac_upper.SetLineColor(ROOT.kOrange)
@@ -236,12 +238,13 @@ for year in years:
             graph_majorana_upper.SetMarkerColor(ROOT.kAzure)
             graph_majorana_upper.SetFillColorAlpha(ROOT.kAzure, 0.3)
             graph_majorana_upper.Draw("SAMECP3")
+        '''
 
-        leg = style.makeLegend(0.65, 0.75, 0.8, 0.87)
+        leg = style.makeLegend(0.7, 0.75, 0.85, 0.87)
         leg.AddEntry(graph_majorana, "Majorana", "lpf")
         leg.AddEntry(graph_dirac, "Dirac", "lpf")
         leg.Draw("SAME")
-        style.makeText(0.2, 0.8, 0.2, 0.8, coupling_title)
-        style.makeCMSText(0.17, 0.95, additionalText="Simulation Preliminary")
-        style.makeLumiText(0.9, 0.95, year=year, lumi=lumi[year])
-        cv.SaveAs("limit_coupling_{}_{}.pdf".format(scenario, year))
+        style.makeText(0.2, 0.7, 0.2, 0.7, coupling_title)
+        style.makeCMSText(0.2, 0.87, additionalText="Simulation Preliminary")
+        style.makeLumiText(0.2, 0.8, year=year, lumi=lumi[year])
+        cv.SaveAs("limits/limit_coupling_{}_{}.pdf".format(scenario, year))
