@@ -15,6 +15,8 @@ import yaml
 
 json_path = "jsons"
 
+K_FACTOR = 1.1
+
 
 with open("/vols/cms/LLP/gridpackLookupTable.json") as lookup_table_file:
     lookup_table = json.load(lookup_table_file)
@@ -74,7 +76,7 @@ for year in years:
                 # parse lookup table
                 proc = f.replace(year+"_", "").replace("limits_", "").replace(".json", "")
                 lu_infos = lookup_table[proc]['weights'][str(int(scenario))]
-                xsec = lu_infos['xsec']['nominal']
+                xsec = lu_infos['xsec']['nominal']*K_FACTOR
                 coupling = lu_infos['couplings']['Ve']+lu_infos['couplings']['Vmu']+lu_infos['couplings']['Vtau']
                 if coupling not in (2, 12, 67):
                     coupling = coupling/2
@@ -93,18 +95,18 @@ for year in years:
             # draw 1d exclusion plots for each mass point
             df = pd.DataFrame(list(zip(masses, couplings, sigma_ratios["exp0"], sigma_ratios["exp+1"], sigma_ratios["exp+2"], sigma_ratios["exp-1"], sigma_ratios["exp-2"])), 
                         columns =['mass', 'coupling', 'exp0', 'exp+1', 'exp+2', 'exp-1', 'exp-2'])
-            #print(df)
+            mass_points = np.array(df['mass'])
+            coupling_points = np.array(df['coupling'])
+            npoints = len(mass_points)
+            if hnl_type == "majorana":
+                points_graph = ROOT.TGraph(npoints, mass_points, coupling_points)
+                points_graph.SetMarkerStyle(33)
+                points_graph.SetMarkerSize(1)
 
             mass_list = sorted(df.mass.unique())
             sensitive_masses = {}
-            crossing_points = {}
-            sensitive_masses_upper = {}
-            crossing_points_upper = {}
             for exp_var in ["exp0", "exp+1", "exp+2", "exp-1", "exp-2"]:
-                crossing_points[exp_var] = []
-                sensitive_masses[exp_var] = []
-                crossing_points_upper[exp_var] = []
-                sensitive_masses_upper[exp_var] = []
+                sensitive_masses[exp_var] = {}
             print "list of masses to be analyzed {}".format(mass_list)
 
 
@@ -124,17 +126,19 @@ for year in years:
 
                 for exp_var in sigma_ratios.keys():
                     ratios = array('d', coupling_df[exp_var])
-                    # sigma_UL = sigma_th
                     x = np.log10(couplings)
                     y = np.log10(ratios)
+
+                    xrange = np.geomspace(1e-10, 1.)
+
                     coeffs = np.polyfit(x, y, 2)
                     poly = np.poly1d(coeffs)
-                    xrange = np.geomspace(1e-10, 1.)
+                    
                     y_fitted = poly(np.log10(xrange))
                     roots = np.roots(coeffs)
 
                     def filter_root(root):
-                        if root > -10 and root < 1. and np.imag(root) == 0 and root<max(x)+0.5 and root>min(x)-0.5:
+                        if root > -8 and root < 0. and np.imag(root) == 0 and root<max(x)+2 and root>min(x)-0.5:
                             return True
                         else:
                             return False
@@ -142,24 +146,15 @@ for year in years:
                     roots = filter(filter_root, roots)
                     roots = np.power(10, roots)
 
-                    if mass > 12 and len(roots) == 2:
+                    if len(roots) == 2:
                         roots = [roots[0]]
                     
                     if len(roots) == 1:
                         root_lower = roots[0]
-                        sensitive_masses[exp_var].append(mass)
-                        crossing_points[exp_var].append(root_lower)
-
-                    elif len(roots) == 2:
-                        root_lower = roots[0]
-                        root_upper = roots[1]
-                        sensitive_masses[exp_var].append(mass)
-                        sensitive_masses_upper[exp_var].append(mass)
-                        crossing_points[exp_var].append(root_lower)
-                        crossing_points_upper[exp_var].append(root_upper)
+                        sensitive_masses[exp_var][mass] = root_lower
 
                     if exp_var == "exp0":
-                        plt.subplot(3, len(mass_list) / 3 + 1, i)
+                        plt.subplot(3, 4, i)
                         plt.xlabel(r'$|V_{lN}|^2$')
                         plt.ylabel(r'$\frac{\sigma}{\sigma_{th}}$') 
                         plt.xscale('log')
@@ -167,37 +162,58 @@ for year in years:
                         plt.title("{} GeV".format(mass))
                         plt.plot(couplings, ratios, 'o')
                         plt.plot(xrange, np.power(10, y_fitted))
-                        plt.axhline(1)
+                        plt.axhline(1.)
                         for root in roots:
                             plt.axvline(root)
+
             plt.savefig("limits/fit_{}_coupling_{}_year_{}.pdf".format(hnl_type, scenario, year))
             plt.clf()
 
-            y_error_down = [y_up-y for y_up, y in zip(crossing_points["exp+1"], crossing_points["exp0"])]
-            y_error_up = [y-y_down for y_down, y in zip(crossing_points["exp-1"], crossing_points["exp0"])]
-            x = np.zeros(len(crossing_points["exp0"]))
 
-            y_error_down_upper = [y_up-y for y_up, y in zip(crossing_points_upper["exp+1"], crossing_points_upper["exp0"])]
-            y_error_up_upper = [y-y_down for y_down, y in zip(crossing_points_upper["exp-1"], crossing_points_upper["exp0"])]
-            x_upper = np.zeros(len(crossing_points_upper["exp0"]))
+            y_values = []
+            y_values_down = []
+            y_values_up = []
+            masses = []
 
-            print(y, y_error_up, y_error_down, x, y_error_down_upper, y_error_up_upper, x_upper)
+            for mass in mass_list:
+                if mass not in sensitive_masses["exp0"]:
+                    continue
+                else:
+                    masses.append(mass)
+                    y = sensitive_masses["exp0"][mass]
+                if mass in sensitive_masses["exp+1"]:
+                    y_up = max(0, sensitive_masses["exp+1"][mass]-y)
+                else:
+                    y_up = 0.
+                if mass in sensitive_masses["exp-1"]:
+                    y_down = max(0, y-sensitive_masses["exp-1"][mass])
+                
+                y_values.append(y)
+                y_values_down.append(y_down)
+                y_values_up.append(y_up)
+
+            n = len(y_values)
+            x = np.zeros(n)
+            masses = array('d', masses)
+            y_values = array('d', y_values)
+            y_values_down = array('d', y_values_down)
+            y_values_up = array('d', y_values_up)
 
             if hnl_type == "majorana":
-                graph_majorana = ROOT.TGraphAsymmErrors(len(crossing_points["exp0"]), array('d', sensitive_masses["exp0"]), array('d', crossing_points["exp0"]), array('d', x), array('d', x), array('d', y_error_up), array('d', y_error_down))
-                if len(y_error_up_upper) == 0:
-                    upperMajorana = False
-                else:
-                    upperMajorana = True
-                    #graph_majorana_upper = ROOT.TGraphAsymmErrors(len(crossing_points_upper["exp0"]), array('d', sensitive_masses_upper["exp0"]), array('d', crossing_points_upper["exp0"]), array('d', x_upper), array('d', y_error_up_upper), array('d', y_error_down_upper))
+                graph_majorana = ROOT.TGraphAsymmErrors(n, masses, y_values, x, x, y_values_down, y_values_up)
+                # if len(y_error_up_upper) == 0:
+                #     upperMajorana = False
+                # else:
+                #     upperMajorana = True
+                #     #graph_majorana_upper = ROOT.TGraphAsymmErrors(len(crossing_points_upper["exp0"]), array('d', sensitive_masses_upper["exp0"]), array('d', crossing_points_upper["exp0"]), array('d', x_upper), array('d', y_error_up_upper), array('d', y_error_down_upper))
 
             else:
-                graph_dirac = ROOT.TGraphAsymmErrors(len(crossing_points["exp0"]), array('d', sensitive_masses["exp0"]), array('d', crossing_points["exp0"]), array('d', x), array('d', x), array('d', y_error_up), array('d', y_error_down))
-                if len(y_error_up_upper) == 0:
-                    upperDirac = False
-                else:
-                    upperDirac = True
-                    #graph_dirac_upper = ROOT.TGraphAsymmErrors(len(crossing_points_upper["exp0"]), array('d', sensitive_masses_upper["exp0"]), array('d', crossing_points_upper["exp0"]), array('d', x_upper), array('d', y_error_up_upper), array('d', y_error_down_upper))
+                graph_dirac = ROOT.TGraphAsymmErrors(n, masses, y_values, x, x, y_values_down, y_values_up)
+                # if len(y_error_up_upper) == 0:
+                #     upperDirac = False
+                # else:
+                #     upperDirac = True
+                #     #graph_dirac_upper = ROOT.TGraphAsymmErrors(len(crossing_points_upper["exp0"]), array('d', sensitive_masses_upper["exp0"]), array('d', crossing_points_upper["exp0"]), array('d', x_upper), array('d', y_error_up_upper), array('d', y_error_down_upper))
 
         cv = style.makeCanvas()
         cv.Draw("")
@@ -209,7 +225,8 @@ for year in years:
 
         graph_majorana.GetXaxis().SetLimits(1, 20.)
         graph_majorana.SetMinimum(1e-7)
-        graph_majorana.SetMaximum(1e1)
+        graph_majorana.SetMaximum(1e3)
+        graph_majorana.GetXaxis().SetMoreLogLabels()
 
         graph_majorana.SetLineColor(ROOT.kAzure)
         graph_majorana.SetMarkerColor(ROOT.kAzure)
@@ -221,6 +238,8 @@ for year in years:
 
 
         graph_dirac.Draw("SAMECP3")
+        graph_majorana.Draw("SAME CP3")
+        points_graph.Draw("SAME P")
 
         '''
         if scenario in limits_ghent:

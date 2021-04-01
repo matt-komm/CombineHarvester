@@ -154,13 +154,18 @@ def make_datacard(cats, cats_signal, signal_name, output_path, coupling=12, year
             )
 
         obs_sum_hist.SetDirectory(0)
+        # Blinding
+        if "D" in category_name:
+            obs_sum_hist.Scale(0.)
         obs.set_shape(obs_sum_hist, True)
         obs.set_bin(category_name)
         obs.set_era(year)
         cb.InsertObservation(obs)
 
-
     # ABCD method
+    cb.AddExtArgValue('xi', 1.0)
+    cb.GetParameter('xi').set_range(0.8, 1.2)
+
     for _, category_name in cats_signal:
         if "single" in category_name:
             nbins = 1 # one bin
@@ -195,8 +200,8 @@ def make_datacard(cats, cats_signal, signal_name, output_path, coupling=12, year
 
                     cb.cp().process([process_name]).bin([name]).AddSyst(cb, syst_name, "rateParam",
                         ch.SystMap("era")([year],(
-                        "@0*@1/@2",
-                        syst_name_A+","+syst_name_C+","+syst_name_B
+                        "@0*(@1/@2)*@3",
+                        syst_name_A+","+syst_name_C+","+syst_name_B+",xi"
                     ))
                     )       
                 else:
@@ -224,8 +229,7 @@ def make_datacard(cats, cats_signal, signal_name, output_path, coupling=12, year
                     err = max(0.,math.sqrt(bkg_hist_sum.GetBinContent(ibin+1)))
                     param.set_val(content)
                     param.set_range(max(0, content-10*err), content+10*err)
-                    # TODO:set ABCD uncertanty correctly
-                    cb.cp().process([process_name]).AddSyst(cb, "rate_unc", "lnN", ch.SystMap("era")([year], 1.2))
+
 
     #cb.PrintAll()
     f = ROOT.TFile.Open(os.path.join(output_path, "out.root"), "RECREATE")

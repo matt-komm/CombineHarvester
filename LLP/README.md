@@ -14,7 +14,17 @@
 * parse results into json files, e.g. ```combineTool.py -M CollectLimits cards/$YEAR/coupling_*/*/*HNL*.root --use-dirs -o jsons/limits_$YEAR.json```, where ```YEAR``` is 2016, 2017, 2018,or "combined" (full Run 2).
 * plot limits using ```python CombineHarvester/LLP/plotLimits.py```
 
-## Step 4: Making pre and post-fit plots (Work in progress!)
+## Step 4: Make impact plots for one benchmark model (takes a while)
+
+```
+text2workspace.py cards/2016/coupling_7/HNL_majorana_all_ctau1p0e-01_massHNL8p0_Vall6p702e-03/out.txt -o workspace.root
+combineTool.py -M Impacts -d workspace.root -m 7 -t -1 --doInitialFit --robustFit 1 --expectSignal=1.93
+combineTool.py -M Impacts -d workspace.root -m 7 -t -1 --robustFit 1 --doFits --parallel 16 --expectSignal=1.93
+combineTool.py -M Impacts -d workspace.root -m 7 -o impacts.json
+plotImpacts.py -i impacts.json -o impacts -t rename.json --units pb
+```
+
+## Step 5: Making pre and post-fit plots (Work in progress!)
 
 * Change directory to one of the datacards, and convert it to a rootfit/combine workspace ```text2workspace.py out.txt -o workspace.root```
 * Do a bkg-only fit ```combine -M MultiDimFit -t -1 --expectSignal=0 --robustFit 1 -d out.txt --cminDefaultMinimizerStrategy 0 --X-rtd MINIMIZER_analytic --X-rtd MINIMIZER_MaxCalls=99999999999 --saveFitResult```
