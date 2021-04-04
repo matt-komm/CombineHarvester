@@ -8,17 +8,23 @@ ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.WARNING)
 
 YEARS = ["2016", "2017", "2018"]
 COUPLINGS = [2, 7, 12, 47, 52, 67] 
-#COUPLINGS = range(2, 68) for triangle plot
+COUPLINGS = range(2, 68)
 
 PSEUDO_DATA = 0
 
 def getHist(fileName, histName):
     rootFile = ROOT.TFile(fileName)
     hist = rootFile.Get(histName)
-    hist = hist.Clone()
-    hist.SetDirectory(0)
-    rootFile.Close()
-    return hist
+
+    try:
+        hist = hist.Clone()
+        hist.SetDirectory(0)
+    except:
+        print("Could not read hist from file"+histName+fileName)
+        return -1
+    else:
+        rootFile.Close()
+        return hist
 
 def make_sge_script(procs):
     submit_file = open("runCombine.sh","w")
@@ -95,9 +101,8 @@ def make_datacard(cats, cats_signal, signal_name, output_path, coupling=12, year
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
-    systematics_correlated = ["jesTotal", "jer", "trigger", "tight_muon_iso", "tight_muon_id", "tight_electron_id", "tight_electron_reco", "loose_electron_reco"]
-    #TODO: add pu and unclEn
-
+    systematics_correlated = ["pu", "unclEn", "jesTotal", "jer", "trigger", "tight_muon_iso", "tight_muon_id", "tight_electron_id", "tight_electron_reco", "loose_electron_reco"]
+caq
     lumi_uncertainty = {"2016": 1.025, "2017": 1.023, "2018": 1.025}
 
     for syst in systematics_correlated:
