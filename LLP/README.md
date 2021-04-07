@@ -11,7 +11,7 @@
 
 ## Step 3: Collect results
 
-* parse results into json files, e.g. ```combineTool.py -M CollectLimits cards/$YEAR/coupling_*/*/*HNL*.root --use-dirs -o jsons/limits_$YEAR.json```, where ```YEAR``` is 2016, 2017, 2018,or "combined" (full Run 2).
+* parse results into json files, e.g. ```for YEAR in 2016 2017 2018 combined; do combineTool.py -M CollectLimits cards/$YEAR/coupling_*/*/*HNL*.root --use-dirs -o jsons/limits_$YEAR.json; done```.
 * plot limits using ```python CombineHarvester/LLP/plotLimits.py```
 
 ## Step 4: Make impact plots for one benchmark model (takes a while)

@@ -13,6 +13,12 @@ import matplotlib.pyplot as plt
 import os
 import yaml
 
+def getGraph(fileName, histName):
+    rootFile = ROOT.TFile(fileName)
+    hist = rootFile.Get(histName)
+    rootFile.Close()
+    return hist
+
 json_path = "jsons"
 
 K_FACTOR = 1.1
@@ -236,34 +242,48 @@ for year in years:
         graph_dirac.SetMarkerColor(ROOT.kOrange)
         graph_dirac.SetFillColorAlpha(ROOT.kOrange, 0.3)
 
-
         graph_dirac.Draw("SAMECP3")
         graph_majorana.Draw("SAME CP3")
         points_graph.Draw("SAME P")
 
-        '''
-        if scenario in limits_ghent:
-            m_values_ghent = array('d', limits_ghent[scenario][0])
-            v_values_ghent = array('d', limits_ghent[scenario][1])
-            graph_ghent = ROOT.TGraph(len(m_values_ghent), m_values_ghent, v_values_ghent)
-            graph_ghent.Draw("SAMECP")
-        if upperDirac:
-            graph_dirac_upper.Draw("SAMECP3")
-            graph_dirac_upper.SetLineColor(ROOT.kOrange)
-            graph_dirac_upper.SetMarkerColor(ROOT.kOrange)
-            graph_dirac_upper.SetFillColorAlpha(ROOT.kOrange, 0.3)
-        if upperMajorana:
-            graph_majorana_upper.SetLineColor(ROOT.kAzure)
-            graph_majorana_upper.SetMarkerColor(ROOT.kAzure)
-            graph_majorana_upper.SetFillColorAlpha(ROOT.kAzure, 0.3)
-            graph_majorana_upper.Draw("SAMECP3")
-        '''
-
-        leg = style.makeLegend(0.7, 0.75, 0.85, 0.87)
+        leg = style.makeLegend(0.16, 0.47, 0.5, 0.67)
         leg.AddEntry(graph_majorana, "Majorana", "lpf")
         leg.AddEntry(graph_dirac, "Dirac", "lpf")
+
+        # Table 3: displaced HNL, Vmu , Dirac
+        # Table 4: displaced HNL, Vmu, Majorana
+        # Table 6: Prompt HNL, Vmu Dirac+Majorana
+        # Table 5: prompt HNL, Ve Dirac+Majorana
+
+        if scenario == 12:
+            hist_displaced_dirac = getGraph("hepdata/HEPData-ins1736526-v1.root", "Table 3/Graph1D_y1")
+            hist_displaced_majorana = getGraph("hepdata/HEPData-ins1736526-v1.root", "Table 4/Graph1D_y1")
+            hist_prompt = getGraph("hepdata/HEPData-ins1736526-v1.root", "Table 6/Graph1D_y1")
+            hist_displaced_dirac.SetLineColor(ROOT.kRed)
+            hist_displaced_majorana.SetLineColor(ROOT.kBlue)
+            hist_prompt.SetLineStyle(2)
+            hist_displaced_dirac.SetLineWidth(2)
+            hist_displaced_majorana.SetLineWidth(2)
+            hist_prompt.SetLineWidth(2)
+
+            hist_displaced_dirac.Draw("SAME")
+            hist_displaced_majorana.Draw("SAME")
+            hist_prompt.Draw("SAME")
+
+            leg.AddEntry(hist_displaced_dirac, "ATLAS 3l, displaced LNC")
+            leg.AddEntry(hist_displaced_majorana, "ATLAS 3l, displaced LNV")
+            leg.AddEntry(hist_prompt, "ATLAS 3l, prompt")
+
+        elif scenario == 2:
+            hist_prompt = getGraph("hepdata/HEPData-ins1736526-v1.root", "Table 5/Graph1D_y1")
+            hist_prompt.SetLineStyle(2)
+            hist_prompt.SetLineWidth(2)
+            hist_prompt.Draw("SAME")
+            leg.AddEntry(hist_prompt, "ATLAS 3l, prompt")
+
+
         leg.Draw("SAME")
-        style.makeText(0.2, 0.7, 0.2, 0.7, coupling_title)
-        style.makeCMSText(0.2, 0.87, additionalText="Simulation Preliminary")
-        style.makeLumiText(0.2, 0.8, year=year, lumi=lumi[year])
+        style.makeText(0.18, 0.7, 0.2, 0.7, coupling_title)
+        style.makeCMSText(0.18, 0.87, additionalText="Simulation Preliminary")
+        style.makeLumiText(0.18, 0.8, year=year, lumi=lumi[year])
         cv.SaveAs("limits/limit_coupling_{}_{}.pdf".format(scenario, year))
