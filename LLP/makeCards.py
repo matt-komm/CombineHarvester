@@ -8,17 +8,23 @@ ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.WARNING)
 
 YEARS = ["2016", "2017", "2018"]
 COUPLINGS = [2, 7, 12, 47, 52, 67] 
-#COUPLINGS = range(2, 68) for triangle plot
+COUPLINGS = range(2, 68)
 
 PSEUDO_DATA = 0
 
 def getHist(fileName, histName):
     rootFile = ROOT.TFile(fileName)
     hist = rootFile.Get(histName)
-    hist = hist.Clone()
-    hist.SetDirectory(0)
-    rootFile.Close()
-    return hist
+
+    try:
+        hist = hist.Clone()
+        hist.SetDirectory(0)
+    except:
+        print("Could not read hist from file"+histName+fileName)
+        return -1
+    else:
+        rootFile.Close()
+        return hist
 
 def make_sge_script(procs):
     submit_file = open("runCombine.sh","w")
@@ -95,9 +101,7 @@ def make_datacard(cats, cats_signal, signal_name, output_path, coupling=12, year
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
-    systematics_correlated = ["jesTotal", "jer", "trigger", "tight_muon_iso", "tight_muon_id", "tight_electron_id", "tight_electron_reco", "loose_electron_reco"]
-    #TODO: add pu and unclEn
-
+    systematics_correlated = ["pu", "unclEn", "jesTotal", "jer", "trigger", "tight_muon_iso", "tight_muon_id", "tight_electron_id", "tight_electron_reco", "loose_electron_reco"]
     lumi_uncertainty = {"2016": 1.025, "2017": 1.023, "2018": 1.025}
 
     for syst in systematics_correlated:
@@ -162,9 +166,9 @@ def make_datacard(cats, cats_signal, signal_name, output_path, coupling=12, year
         obs.set_era(year)
         cb.InsertObservation(obs)
 
-    # ABCD method
-    cb.AddExtArgValue('xi', 1.0)
-    cb.GetParameter('xi').set_range(0.8, 1.2)
+    # ABCD method uncertainty -- not working yet
+    #cb.AddExtArgValue('xi', 1.0)
+    #cb.GetParameter('xi').set_range(1.0, 1.0)
 
     for _, category_name in cats_signal:
         if "single" in category_name:
@@ -200,8 +204,8 @@ def make_datacard(cats, cats_signal, signal_name, output_path, coupling=12, year
 
                     cb.cp().process([process_name]).bin([name]).AddSyst(cb, syst_name, "rateParam",
                         ch.SystMap("era")([year],(
-                        "@0*(@1/@2)*@3",
-                        syst_name_A+","+syst_name_C+","+syst_name_B+",xi"
+                        "@0*(@1/@2)",
+                        syst_name_A+","+syst_name_C+","+syst_name_B
                     ))
                     )       
                 else:
