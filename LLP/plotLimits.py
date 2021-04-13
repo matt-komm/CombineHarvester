@@ -8,26 +8,63 @@ from array import array
 from scipy import interpolate
 import numpy as np
 import pandas as pd
-import math
-import matplotlib.pyplot as plt
 import os
-import yaml
 
-def getGraph(fileName, histName):
-    rootFile = ROOT.TFile(fileName)
-    hist = rootFile.Get(histName)
-    rootFile.Close()
+def get_mu(theory, exp):
+    if np.isnan(theory) or np.isnan(exp):
+        mu = 4.
+    else:
+        mu = exp-theory
+    mu = np.clip(mu, -6., 4.)
+    return mu
+
+def parse_lookup_table(f, lookup_table):
+
+    # parse lookup table
+    proc = f.replace(year+"_", "").replace("limits_", "").replace(".json", "")
+    lu_infos = lookup_table[proc]['weights'][str(int(scenario))]
+    xsec = lu_infos['xsec']['nominal']*K_FACTOR
+    coupling = lu_infos['couplings']['Ve']+lu_infos['couplings']['Vmu']+lu_infos['couplings']['Vtau']
+    if coupling not in (2, 12, 67):
+        coupling = coupling/2
+    coupling = coupling ** 2
+    mass = lookup_table[proc]['mass']
+
+    return mass, coupling, xsec
+
+def interpolate_point(coupling_points, mu_points):
+    for i, (coupling, mu) in enumerate(zip(coupling_points, mu_points)):
+        if i < len(mu_points)-1 and mu > 0 and mu_points[i+1] < 0:
+            return (coupling+coupling_points[i+1])/2
+    return 
+
+def parse_limit_json(f, scenario=12):
+    # limit json aggreggate 
+    with open(os.path.join(json_path, f)) as json_file:
+        xsec_dict = json.load(json_file)
+    if str(scenario) not in xsec_dict.keys():
+        raise ValueError
+    xsec_dict = xsec_dict[str(scenario)]
+    # means something failed with combine (shouldn't happend!)
+    if "exp0" not in xsec_dict or "exp+1" not in xsec_dict or "exp+2" not in xsec_dict or "exp-1" not in xsec_dict or "exp-2" not in xsec_dict:
+        return None
+
+    return xsec_dict
+
+def get_graph(filename, histname):
+    root_file = ROOT.TFile(filename)
+    hist = root_file.Get(histname)
+    root_file.Close()
     return hist
 
-json_path = "jsons"
+def find_nearest(array, value):
+    array = np.asarray(array)
+    idx = (np.abs(array - value)).argmin()
+    return array[idx]
+
+json_path = "jsons_old"
 
 K_FACTOR = 1.1
-
-
-with open("/vols/cms/LLP/gridpackLookupTable.json") as lookup_table_file:
-    lookup_table = json.load(lookup_table_file)
-
-limits_ghent = {}
 
 lumi = {"2016": 35.9, "2017": 41.5, "2018": 59.7, "combined": 137.1}
 years = ["2016", "2017", "2018", "combined"]
@@ -40,9 +77,14 @@ coupling_dict[47.0] = ["etau", "U_{e} : U_{#mu} : U_{#tau} = 1 : 0 : 1"]
 coupling_dict[52.0] = ["mutau", "U_{e} : U_{#mu} : U_{#tau} = 0 : 1 : 1"]
 #coupling_dict[67.0] = ["tautau", "U_{e} : U_{#mu} : U_{#tau} = 0 : 0 : 1"]
 
-mass_range = np.arange(1, 24.5, step=0.5)
-log_coupling_range = np.arange(-8, -0.5, step=0.1)
+n_bins = 200
+
+mass_range = np.geomspace(1., 24., num=n_bins)
+log_coupling_range = np.linspace(-8, -1., num=n_bins)
 coupling_range = np.power(10, log_coupling_range)
+
+with open("/vols/cms/LLP/gridpackLookupTable.json") as lookup_table_file:
+    lookup_table = json.load(lookup_table_file)
 
 for year in years:
     print(year)
@@ -56,176 +98,115 @@ for year in years:
             # arrays to store mass, V2 and sigma/sigma_th values
             masses = []
             couplings = []
-            sigma_ratios = {}
-            for exp_var in ["exp0", "exp+1", "exp+2", "exp-1", "exp-2"]:
-                sigma_ratios[exp_var] = []
+            sigma_dict = {}
+            for exp_var in ["exp0", "exp+1", "exp+2", "exp-1", "exp-2", "theory"]:
+                sigma_dict[exp_var] = []
 
             for f in os.listdir(json_path):
-                if year not in f:
-                    continue
-                if ".json" not in f:
-                    continue
-                if hnl_type not in f:
-                    continue
-                # limit json aggreggate 
-                print(f)
-                with open(os.path.join(json_path, f)) as json_file:
-                    xsecDict = json.load(json_file)
-                if str(scenario) not in xsecDict.keys():
-                    continue
-                xsecDict = xsecDict[str(scenario)]
-
-                # means something failed with combine (shouldn't happend!)
-                if "exp0" not in xsecDict or "exp+1" not in xsecDict or "exp+2" not in xsecDict or "exp-1" not in xsecDict or "exp-2" not in xsecDict:
+                if year not in f or ".json" not in f or hnl_type not in f:
                     continue
 
-                # parse lookup table
-                proc = f.replace(year+"_", "").replace("limits_", "").replace(".json", "")
-                lu_infos = lookup_table[proc]['weights'][str(int(scenario))]
-                xsec = lu_infos['xsec']['nominal']*K_FACTOR
-                coupling = lu_infos['couplings']['Ve']+lu_infos['couplings']['Vmu']+lu_infos['couplings']['Vtau']
-                if coupling not in (2, 12, 67):
-                    coupling = coupling/2
-
-                coupling = coupling ** 2
-                mass = lookup_table[proc]['mass']
+                xsec_dict = parse_limit_json(f, year, hnl_type, scenario)
+                mass, coupling, xsec = parse_lookup_table(f, lookup_table)
+                sigma_dict["theory"].append(xsec)
 
                 for exp_var in ["exp0", "exp+1", "exp+2", "exp-1", "exp-2"]:
-                    expected = xsecDict[exp_var]
-                    ratio = expected/xsec
-                    sigma_ratios[exp_var].append(ratio)
+                    sigma_dict[exp_var].append(xsec_dict[exp_var])
 
                 masses.append(mass)
                 couplings.append(coupling)
 
-            # draw 1d exclusion plots for each mass point
-            df = pd.DataFrame(list(zip(masses, couplings, sigma_ratios["exp0"], sigma_ratios["exp+1"], sigma_ratios["exp+2"], sigma_ratios["exp-1"], sigma_ratios["exp-2"])), 
-                        columns =['mass', 'coupling', 'exp0', 'exp+1', 'exp+2', 'exp-1', 'exp-2'])
-            mass_points = np.array(df['mass'])
-            coupling_points = np.array(df['coupling'])
-            npoints = len(mass_points)
-            if hnl_type == "majorana":
-                points_graph = ROOT.TGraph(npoints, mass_points, coupling_points)
-                points_graph.SetMarkerStyle(33)
-                points_graph.SetMarkerSize(1)
+            df = pd.DataFrame(list(zip(masses, couplings, sigma_dict["theory"], sigma_dict["exp0"], sigma_dict["exp+1"],
+             sigma_dict["exp+2"], sigma_dict["exp-1"], sigma_dict["exp-2"])), 
+                        columns =['mass', 'coupling', 'theory', 'exp0', 'exp+1', 'exp+2', 'exp-1', 'exp-2'])
+            npoints = len(df)
+            mass_coupling_pair = np.array([df['mass'], np.log10(df['coupling'])]).T
+            log_theory_points = np.log10(np.array(df['theory']))
+            log_expected_points = np.log10(np.array(df['exp0']))
+            log_expected_points_plus = np.log10(np.array(df['exp+1']))
+            log_expected_points_minus = np.log10(np.array(df['exp-1']))
 
-            mass_list = sorted(df.mass.unique())
-            sensitive_masses = {}
-            for exp_var in ["exp0", "exp+1", "exp+2", "exp-1", "exp-2"]:
-                sensitive_masses[exp_var] = {}
-            print "list of masses to be analyzed {}".format(mass_list)
+            n_bins = 200
+            grid_x, grid_y = np.meshgrid(mass_range, log_coupling_range, indexing='ij')
+            fit_method = 'cubic'
 
+            results_theory = interpolate.griddata(mass_coupling_pair, log_theory_points, (grid_x, grid_y), method=fit_method)
+            results = interpolate.griddata(mass_coupling_pair, log_expected_points, (grid_x, grid_y), method=fit_method)
+            results_plus = interpolate.griddata(mass_coupling_pair, log_expected_points_plus, (grid_x, grid_y), method=fit_method)
+            results_minus = interpolate.griddata(mass_coupling_pair, log_expected_points_minus, (grid_x, grid_y), method=fit_method)
 
-            # make 1d plot and find crossing point
-            i = 0
-            fig, ax = plt.subplots(figsize=(24, 18))
-            fig.suptitle("{}, coupling scenario {}".format(hnl_type, scenario), size=40)
-            for mass in mass_list:
-                coupling_df = df.loc[df['mass'] == mass].sort_values('coupling')
-                ratio_df = coupling_df.sort_values('exp0')
-                couplings = array('d', coupling_df.coupling)
+            hist_mu = ROOT.TH2D("mu"+hnl_type+str(scenario), "mu", n_bins-1, mass_range, n_bins-1, coupling_range)
+            crossing_points = []
+            masses_at_crossing_points = []
+            errors_up = []
+            errors_down = []
 
-                if len(couplings) < 2:
-                    print "need at least 2 points to interpolate!"
-                    continue
-                i += 1
+            for i in range(n_bins):
+                mass = mass_range[i]
+                coupling_values = []
+                mu_values = []
+                mu_plus_values = []
+                mu_minus_values = []
 
-                for exp_var in sigma_ratios.keys():
-                    ratios = array('d', coupling_df[exp_var])
-                    x = np.log10(couplings)
-                    y = np.log10(ratios)
+                for j in range(n_bins):
+                    coupling_values.append(log_coupling_range[j])
+                    exp = results[i, j]
+                    exp_plus = results_plus[i, j]
+                    exp_minus = results_minus[i, j]
+                    theory = results_theory[i, j]
 
-                    xrange = np.geomspace(1e-10, 1.)
+                    mu_values.append(get_mu(theory, exp))
+                    mu_plus_values.append(get_mu(theory, exp_plus))
+                    mu_minus_values.append(get_mu(theory, exp_minus))
 
-                    coeffs = np.polyfit(x, y, 2)
-                    poly = np.poly1d(coeffs)
-                    
-                    y_fitted = poly(np.log10(xrange))
-                    roots = np.roots(coeffs)
+                    hist_mu.SetBinContent(i+1, j+1, np.power(10, get_mu(theory, exp)))
+                crossing_point = interpolate_point(coupling_values, mu_values)
+                crossing_point_plus = interpolate_point(coupling_values, mu_plus_values) 
+                crossing_point_minus = interpolate_point(coupling_values, mu_minus_values)
 
-                    def filter_root(root):
-                        if root > -8 and root < 0. and np.imag(root) == 0 and root<max(x)+2 and root>min(x)-0.5:
-                            return True
-                        else:
-                            return False
+                if crossing_point and crossing_point_plus and crossing_point_minus:
+                    crossing_points.append(np.power(10, crossing_point))
+                    errors_down.append(np.power(10, crossing_point_plus)-np.power(10,crossing_point))
+                    errors_up.append(np.power(10, crossing_point)-np.power(10, crossing_point_minus))
+                    masses_at_crossing_points.append(mass)
 
-                    roots = filter(filter_root, roots)
-                    roots = np.power(10, roots)
+            x_errors = np.zeros(len(crossing_points))  
+            graph = ROOT.TGraphAsymmErrors(len(crossing_points), array('d', masses_at_crossing_points), array('d', crossing_points), x_errors, x_errors, array('d', errors_up), array('d', errors_down))
 
-                    if len(roots) == 2:
-                        roots = [roots[0]]
-                    
-                    if len(roots) == 1:
-                        root_lower = roots[0]
-                        sensitive_masses[exp_var][mass] = root_lower
+            cv = style.makeCanvas()
+            cv.SetRightMargin(0.2)
+            cv.Draw("")
+            cv.SetLogy()
+            cv.SetLogx()
+            cv.SetLogz()
 
-                    if exp_var == "exp0":
-                        plt.subplot(3, 4, i)
-                        plt.xlabel(r'$|V_{lN}|^2$')
-                        plt.ylabel(r'$\frac{\sigma}{\sigma_{th}}$') 
-                        plt.xscale('log')
-                        plt.yscale('log')
-                        plt.title("{} GeV".format(mass))
-                        plt.plot(couplings, ratios, 'o')
-                        plt.plot(xrange, np.power(10, y_fitted))
-                        plt.axhline(1.)
-                        for root in roots:
-                            plt.axvline(root)
+            hist_mu.GetXaxis().SetTitle("m_{N} (GeV)")
+            hist_mu.GetYaxis().SetTitle("|V_{lN}|^{2}")
+            hist_mu.GetZaxis().SetTitle("#sigma/#sigma_{th}")
+            hist_mu.Draw("COLZ")
+            points_graph = ROOT.TGraph(npoints, array('d', mass_coupling_pair.T[0]), array('d',np.power(10, mass_coupling_pair.T[1])))
+            points_graph.SetMarkerStyle(33)
+            points_graph.SetMarkerSize(1)
 
-            plt.savefig("limits/fit_{}_coupling_{}_year_{}.pdf".format(hnl_type, scenario, year))
-            plt.clf()
+            graph.SetLineColor(ROOT.kBlack)
+            graph.SetMarkerColor(ROOT.kBlack)
+            graph.SetFillColorAlpha(ROOT.kBlack, 0.3)
+            graph.SetLineWidth(2)
 
-
-            y_values = []
-            y_values_down = []
-            y_values_up = []
-            masses = []
-
-            for mass in mass_list:
-                if mass not in sensitive_masses["exp0"]:
-                    continue
-                else:
-                    masses.append(mass)
-                    y = sensitive_masses["exp0"][mass]
-                if mass in sensitive_masses["exp+1"]:
-                    y_up = max(0, sensitive_masses["exp+1"][mass]-y)
-                else:
-                    y_up = 0.
-                if mass in sensitive_masses["exp-1"]:
-                    y_down = max(0, y-sensitive_masses["exp-1"][mass])
-                
-                y_values.append(y)
-                y_values_down.append(y_down)
-                y_values_up.append(y_up)
-
-            n = len(y_values)
-            x = np.zeros(n)
-            masses = array('d', masses)
-            y_values = array('d', y_values)
-            y_values_down = array('d', y_values_down)
-            y_values_up = array('d', y_values_up)
-
-            if hnl_type == "majorana":
-                graph_majorana = ROOT.TGraphAsymmErrors(n, masses, y_values, x, x, y_values_down, y_values_up)
-                # if len(y_error_up_upper) == 0:
-                #     upperMajorana = False
-                # else:
-                #     upperMajorana = True
-                #     #graph_majorana_upper = ROOT.TGraphAsymmErrors(len(crossing_points_upper["exp0"]), array('d', sensitive_masses_upper["exp0"]), array('d', crossing_points_upper["exp0"]), array('d', x_upper), array('d', y_error_up_upper), array('d', y_error_down_upper))
-
-            else:
-                graph_dirac = ROOT.TGraphAsymmErrors(n, masses, y_values, x, x, y_values_down, y_values_up)
-                # if len(y_error_up_upper) == 0:
-                #     upperDirac = False
-                # else:
-                #     upperDirac = True
-                #     #graph_dirac_upper = ROOT.TGraphAsymmErrors(len(crossing_points_upper["exp0"]), array('d', sensitive_masses_upper["exp0"]), array('d', crossing_points_upper["exp0"]), array('d', x_upper), array('d', y_error_up_upper), array('d', y_error_down_upper))
-
+            graph.Draw("SAMEC3")
+            points_graph.Draw("P SAME")
+            cv.SaveAs("limits/interpolation_{}_coupling_{}_{}.pdf".format(hnl_type, scenario, year))
+            if hnl_type == 'majorana':
+                graph_majorana = graph.Clone("majorana")
+            elif hnl_type == 'dirac':
+                graph_dirac = graph.Clone("dirac")
+               
         cv = style.makeCanvas()
         cv.Draw("")
         cv.SetLogy()
         cv.SetLogx()
-        graph_majorana.Draw("ACP3")
+        cv.SetLogz()
+        graph_majorana.Draw("AC3")
         graph_majorana.GetXaxis().SetTitle("m_{N} (GeV)")
         graph_majorana.GetYaxis().SetTitle("|V_{lN}|^{2}")
 
@@ -242,8 +223,8 @@ for year in years:
         graph_dirac.SetMarkerColor(ROOT.kOrange)
         graph_dirac.SetFillColorAlpha(ROOT.kOrange, 0.3)
 
-        graph_dirac.Draw("SAMECP3")
-        graph_majorana.Draw("SAME CP3")
+        graph_dirac.Draw("SAMEC3")
+        graph_majorana.Draw("SAME C3")
         points_graph.Draw("SAME P")
 
         leg = style.makeLegend(0.16, 0.47, 0.5, 0.67)
@@ -256,9 +237,9 @@ for year in years:
         # Table 5: prompt HNL, Ve Dirac+Majorana
 
         if scenario == 12:
-            hist_displaced_dirac = getGraph("hepdata/HEPData-ins1736526-v1.root", "Table 3/Graph1D_y1")
-            hist_displaced_majorana = getGraph("hepdata/HEPData-ins1736526-v1.root", "Table 4/Graph1D_y1")
-            hist_prompt = getGraph("hepdata/HEPData-ins1736526-v1.root", "Table 6/Graph1D_y1")
+            hist_displaced_dirac = get_graph("hepdata/HEPData-ins1736526-v1.root", "Table 3/Graph1D_y1")
+            hist_displaced_majorana = get_graph("hepdata/HEPData-ins1736526-v1.root", "Table 4/Graph1D_y1")
+            hist_prompt = get_graph("hepdata/HEPData-ins1736526-v1.root", "Table 6/Graph1D_y1")
             hist_displaced_dirac.SetLineColor(ROOT.kRed)
             hist_displaced_majorana.SetLineColor(ROOT.kBlue)
             hist_prompt.SetLineStyle(2)
@@ -275,12 +256,11 @@ for year in years:
             leg.AddEntry(hist_prompt, "ATLAS 3l, prompt")
 
         elif scenario == 2:
-            hist_prompt = getGraph("hepdata/HEPData-ins1736526-v1.root", "Table 5/Graph1D_y1")
+            hist_prompt = get_graph("hepdata/HEPData-ins1736526-v1.root", "Table 5/Graph1D_y1")
             hist_prompt.SetLineStyle(2)
             hist_prompt.SetLineWidth(2)
             hist_prompt.Draw("SAME")
             leg.AddEntry(hist_prompt, "ATLAS 3l, prompt")
-
 
         leg.Draw("SAME")
         style.makeText(0.18, 0.7, 0.2, 0.7, coupling_title)
