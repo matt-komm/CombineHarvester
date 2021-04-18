@@ -39,6 +39,7 @@ def interpolate_point(coupling_points, mu_points):
     return 
 
 def parse_limit_json(f, scenario=12):
+
     # limit json aggreggate 
     with open(os.path.join(json_path, f)) as json_file:
         xsec_dict = json.load(json_file)
@@ -106,7 +107,7 @@ for year in years:
                 if year not in f or ".json" not in f or hnl_type not in f:
                     continue
 
-                xsec_dict = parse_limit_json(f, year, hnl_type, scenario)
+                xsec_dict = parse_limit_json(f, scenario)
                 mass, coupling, xsec = parse_lookup_table(f, lookup_table)
                 sigma_dict["theory"].append(xsec)
 

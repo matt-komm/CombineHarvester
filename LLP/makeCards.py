@@ -7,20 +7,22 @@ from multiprocessing import Pool
 ROOT.RooMsgService.instance().setGlobalKillBelow(ROOT.RooFit.WARNING)
 
 YEARS = ["2016", "2017", "2018"]
-COUPLINGS = [2, 7, 12, 47, 52, 67] 
-COUPLINGS = range(2, 68)
-
+#YEARS = ["2016"]
+#COUPLINGS = range(2, 68)
+COUPLINGS = [2, 7, 12, 47, 52] 
+NBINS = 32
+ZERO_BIN_RATE = 0.001
 PSEUDO_DATA = 0
 
-def getHist(fileName, histName):
-    rootFile = ROOT.TFile(fileName)
-    hist = rootFile.Get(histName)
+def get_hist(file_name, hist_name):
+    rootFile = ROOT.TFile(file_name)
+    hist = rootFile.Get(hist_name)
 
     try:
         hist = hist.Clone()
         hist.SetDirectory(0)
     except:
-        print("Could not read hist from file"+histName+fileName)
+        print("Could not read hist from file"+hist_name+file_name)
         return -1
     else:
         rootFile.Close()
@@ -65,9 +67,10 @@ eval `scramv1 runtime -sh`
                 os.makedirs(path_combined)
 
             submit_file.write(" \"")
-            submit_file.write("combineCards.py "+ path_2016+"out.txt " + path_2017 + "out.txt " + path_2018+"out.txt >> " +path_combined+"out.txt ")
-            submit_file.write('''&& combineTool.py -M AsymptoticLimits --run expected --cminPreScan --cminPreFit 1 --rAbsAcc 0.000001 --X-rtd MINIMIZER_analytic --X-rtd MINIMIZER_MaxCalls=99999999999 -d %sout.txt --there -n HNL --mass %i''' % (path_combined, COUPLING))
-            submit_file.write("\"")
+            if YEARS == ["2016", "2017", "2018"]:
+                submit_file.write("combineCards.py "+ path_2016+"out.txt " + path_2017 + "out.txt " + path_2018+"out.txt >> " +path_combined+"out.txt ")
+                submit_file.write('''&& combineTool.py -M AsymptoticLimits --run expected --cminPreScan --cminPreFit 1 --rAbsAcc 0.000001 --X-rtd MINIMIZER_analytic --X-rtd MINIMIZER_MaxCalls=99999999999 -d %sout.txt --there -n HNL --mass %i''' % (path_combined, COUPLING))
+                submit_file.write("\"")
             submit_file.write("\n")
 
 
@@ -128,7 +131,7 @@ def make_datacard(cats, cats_signal, signal_name, output_path, coupling=12, year
     bbFactory.SetFixNorm(True)
     bbFactory.SetPattern("bb_$ERA_$BIN_$PROCESS_bin_$#")
     bbFactory.AddBinByBin(cb.cp().process(bkgs_mc), cb)
-    shape_hist = getHist(
+    shape_hist = get_hist(
         os.path.join(hist_path, "{}.root".format(year)),
         "mumu_OS_prompt_D/wjets"
     )
@@ -143,7 +146,7 @@ def make_datacard(cats, cats_signal, signal_name, output_path, coupling=12, year
         # pseudo-data = sum of MC
         if PSEUDO_DATA:
             for i, bkg in enumerate(bkgs_mc+bkgs_abcd):
-                bkg_obs_hist = getHist(
+                bkg_obs_hist = get_hist(
                     os.path.join(hist_path,"{}.root".format(year)),
                         "{}/{}".format(category_name, bkg)
                 )
@@ -152,7 +155,7 @@ def make_datacard(cats, cats_signal, signal_name, output_path, coupling=12, year
                 else:
                     obs_sum_hist.Add(bkg_obs_hist)
         else: #data
-            obs_sum_hist = getHist(
+            obs_sum_hist = get_hist(
                 os.path.join(hist_path,"{}.root".format(year)),
                     "{}/{}".format(category_name, "data")
             )
@@ -215,7 +218,7 @@ def make_datacard(cats, cats_signal, signal_name, output_path, coupling=12, year
                     # Set ABCD rate parameter values from MC or data:
                     if PSEUDO_DATA:
                         for i, bkg in enumerate(bkgs_abcd):
-                            bkg_hist = getHist(
+                            bkg_hist = get_hist(
                                 os.path.join(hist_path,"{}.root".format(year)),
                                     "{}/{}".format(name, bkg)
                             )
@@ -224,7 +227,7 @@ def make_datacard(cats, cats_signal, signal_name, output_path, coupling=12, year
                             else:
                                 bkg_hist_sum.Add(bkg_hist)
                     else:
-                        bkg_hist_sum = getHist(
+                        bkg_hist_sum = get_hist(
                             os.path.join(hist_path,"{}.root".format(year)),
                                 "{}/{}".format(name, "data")
                         )
@@ -234,8 +237,9 @@ def make_datacard(cats, cats_signal, signal_name, output_path, coupling=12, year
                     param.set_val(content)
                     param.set_range(max(0, content-10*err), content+10*err)
 
-
-    #cb.PrintAll()
+    if abs(cb.cp().signals().GetRate() - ZERO_BIN_RATE*NBINS)/ZERO_BIN_RATE*NBINS < 0.1:
+        print("Zero signal in histogram for the signal sample. Check your cuts! Skipping process: "+ signal_name +", coupling: "+ str(coupling))
+        return False
     f = ROOT.TFile.Open(os.path.join(output_path, "out.root"), "RECREATE")
 
     cb.cp().WriteDatacard(
@@ -248,7 +252,7 @@ def make_datacard(cats, cats_signal, signal_name, output_path, coupling=12, year
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("--path", default="/vols/cms/vc1117/AN-19-207/classes/hists_merged")
+parser.add_argument("--path", default="/vols/cms/vc1117/AN-19-207/histo/limits/hists_merged")
 args = parser.parse_args()
 hist_path = args.path
 
